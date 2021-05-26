@@ -17,7 +17,7 @@ public:
 	Game();
 	~Game();
 
-	void init(const char* title);
+	void init(const char* title, int width, int height);
 	void handleEvents();
 	void update();
 	bool running() { return isRunning; }
@@ -27,9 +27,6 @@ public:
 	static SDL_Renderer* renderer;
 	static SDL_Event event;
 	static double deltaTime;
-
-	static const int width = 800;
-	static const int height = 600;
 private:
 	bool isRunning;
 	SDL_Window* window;
