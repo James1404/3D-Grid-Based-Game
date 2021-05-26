@@ -1,21 +1,18 @@
 #include "Game.h"
 #include "Entity.h"
 #include "Entities/Player.h"
-#include <iostream>
 
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 double Game::deltaTime;
 
-Player* player;
-
 Game::Game() { }
 Game::~Game() { }
 
-void Game::init(const char* title) {
+void Game::init(const char* title, int width, int height) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 		
 		const char* glsl_version = "#version 330";
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -32,6 +29,8 @@ void Game::init(const char* title) {
 			}
 		}
 
+		glViewport(0, 0, width, height);
+
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
@@ -40,13 +39,23 @@ void Game::init(const char* title) {
 
 		isRunning = true;
 	}
-	player = new Player();
 }
 
 void Game::handleEvents() {
-	SDL_PollEvent(&event);
-	ImGui_ImplSDL2_ProcessEvent(&event);
-	if (event.type == SDL_QUIT) isRunning = false;
+	if (SDL_PollEvent(&event)) {
+		ImGui_ImplSDL2_ProcessEvent(&event);
+		switch (event.type) {
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		case SDL_WINDOWEVENT_RESIZED:
+			SDL_SetWindowSize(window, event.window.data1, event.window.data2);
+			glViewport(0, 0, event.window.data1, event.window.data2);
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 Uint64 NOW = SDL_GetPerformanceCounter();
@@ -57,13 +66,14 @@ void Game::update() {
 	NOW = SDL_GetPerformanceCounter();
 
 	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-	std::cout << deltaTime << std::endl;
 
 	// update entities
-	player->update();
 }
 
 void Game::render() {
+	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window);
 	ImGui::NewFrame();
@@ -71,9 +81,7 @@ void Game::render() {
 	ImGui::ShowDemoWindow();
 
 	ImGui::Render();
-	glViewport(0, 0, width, height);
-	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SDL_GL_SwapWindow(window);
 }
