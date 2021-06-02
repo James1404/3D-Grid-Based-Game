@@ -12,6 +12,12 @@
 
 #include <string>
 
+enum class GameState {
+	GameState_Game,
+	GameState_Menu,
+	GameState_Edit
+};
+
 class Game {
 public:
 	Game();
@@ -24,7 +30,7 @@ public:
 	void render();
 	void clean();
 
-	static SDL_Renderer* renderer;
+	static GameState gameState;
 	static SDL_Event event;
 	static double deltaTime;
 private:

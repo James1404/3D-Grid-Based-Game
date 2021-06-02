@@ -3,7 +3,7 @@
 #include "Entities/Player.h"
 
 
-SDL_Renderer* Game::renderer = nullptr;
+GameState Game::gameState = GameState::GameState_Game;
 SDL_Event Game::event;
 double Game::deltaTime;
 
@@ -52,6 +52,16 @@ void Game::handleEvents() {
 			SDL_SetWindowSize(window, event.window.data1, event.window.data2);
 			glViewport(0, 0, event.window.data1, event.window.data2);
 			break;
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_RETURN) {
+				if (gameState == GameState::GameState_Game) {
+					gameState = GameState::GameState_Edit;
+					break;
+				}
+
+				gameState = GameState::GameState_Game;
+			}
+			break;
 		default:
 			break;
 		}
@@ -68,21 +78,23 @@ void Game::update() {
 	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 	// update entities
+	printf("Current game state %d\n", gameState);
 }
 
 void Game::render() {
 	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(window);
-	ImGui::NewFrame();
+	if (gameState == GameState::GameState_Edit) {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame(window);
+		ImGui::NewFrame();
 
-	ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 
-	ImGui::Render();
-
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 	SDL_GL_SwapWindow(window);
 }
 
