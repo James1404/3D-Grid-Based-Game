@@ -57,9 +57,6 @@ public:
 		rect.y = position.y;
 		rect.w = 20;
 		rect.h = 20;
-
-		SDL_SetRenderDrawColor(Game::renderer, 0, 0, 0, 255);
-		SDL_RenderDrawRect(Game::renderer, &rect);
 	}
 private:
 	Vector2 velocity;
