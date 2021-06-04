@@ -78,12 +78,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;$(IncludePath)</IncludePath>
+    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
     <LibraryPath>E:\C++ Libraries\SDL2-2.0.14\lib\x64;E:\C++ Libraries\SDL2_image-2.0.5\lib\x64;E:\C++ Libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;$(IncludePath)</IncludePath>
+    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
     <LibraryPath>E:\C++ Libraries\SDL2-2.0.14\lib\x64;E:\C++ Libraries\SDL2_image-2.0.5\lib\x64;E:\C++ Libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -154,6 +154,7 @@
     <ClCompile Include="includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Vector2.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
   </ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="src\Entities\Player.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Vector2.h" />
     <ClInclude Include="src\Texture2D.h" />
   </ItemGroup>
