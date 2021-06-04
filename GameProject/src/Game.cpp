@@ -7,9 +7,6 @@ GameState Game::gameState = GameState::GameState_Game;
 SDL_Event Game::event;
 double Game::deltaTime;
 
-Game::Game() { }
-Game::~Game() { }
-
 void Game::init(const char* title, int width, int height) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -53,7 +50,7 @@ void Game::handleEvents() {
 			glViewport(0, 0, event.window.data1, event.window.data2);
 			break;
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_RETURN) {
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
 				if (gameState == GameState::GameState_Game) {
 					gameState = GameState::GameState_Edit;
 					break;
@@ -76,9 +73,6 @@ void Game::update() {
 	NOW = SDL_GetPerformanceCounter();
 
 	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-
-	// update entities
-	printf("Current game state %d\n", gameState);
 }
 
 void Game::render() {
