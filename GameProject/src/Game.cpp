@@ -7,6 +7,8 @@ GameState Game::gameState = GameState::GameState_Game;
 SDL_Event Game::event;
 double Game::deltaTime;
 
+Player* player = new Player();
+
 void Game::init(const char* title, int width, int height) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -27,6 +29,8 @@ void Game::init(const char* title, int width, int height) {
 		}
 
 		glViewport(0, 0, width, height);
+
+		player->init();
 
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
@@ -73,11 +77,16 @@ void Game::update() {
 	NOW = SDL_GetPerformanceCounter();
 
 	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+	player->update();
 }
 
 void Game::render() {
 	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	player->render();
 
 	if (gameState == GameState::GameState_Edit) {
 		ImGui_ImplOpenGL3_NewFrame();

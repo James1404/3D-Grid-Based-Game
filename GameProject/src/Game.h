@@ -41,7 +41,7 @@ public:
 	static SDL_Event event;
 	static double deltaTime;
 private:
-	bool isRunning;
+	bool isRunning = false;
 	SDL_Window* window;
 	SDL_GLContext context;
 };
