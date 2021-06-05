@@ -1,11 +1,15 @@
 #pragma once
 #include "../Entity.h"
 #include "../Game.h"
+#include "../SpriteRenderer.h"
 
 class Player : public Entity {
 public:
-	Player() {
-		
+	Player() { }
+
+	void init() override {
+		renderer = new SpriteRenderer();
+		renderer->InitSprite();
 	}
 
 	void update() override {
@@ -52,13 +56,12 @@ public:
 	}
 
 	void render() override {
-		SDL_Rect rect;
-		rect.x = position.x;
-		rect.y = position.y;
-		rect.w = 20;
-		rect.h = 20;
+		renderer->DrawSprite(position);
 	}
 private:
-	Vector2 velocity;
+	SpriteRenderer* renderer;
+
+	glm::vec2 position;
+	glm::vec2 velocity;
 	float speed = 0.5f;
 };
