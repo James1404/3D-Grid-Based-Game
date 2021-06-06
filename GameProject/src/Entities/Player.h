@@ -16,10 +16,10 @@ public:
 		if (Game::event.type == SDL_KEYDOWN) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_w:
-				this->velocity.y = -speed;
+				this->velocity.y = speed;
 				break;
 			case SDLK_s:
-				this->velocity.y = speed;
+				this->velocity.y = -speed;
 				break;
 			case SDLK_a:
 				this->velocity.x = -speed;
@@ -56,12 +56,12 @@ public:
 	}
 
 	void render() override {
-		renderer->DrawSprite(position);
+		renderer->DrawSprite(position, glm::vec2(100.0f, 100.0f));
 	}
 private:
 	SpriteRenderer* renderer;
 
 	glm::vec2 position;
 	glm::vec2 velocity;
-	float speed = 0.5f;
+	float speed = 1.0f;
 };
