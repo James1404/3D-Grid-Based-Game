@@ -15,6 +15,7 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+// stb_image
 #include "stb_image.h"
 
 #include <string>
@@ -37,6 +38,8 @@ public:
 	void render();
 	void clean();
 
+	static glm::mat4 projection;
+	static glm::mat4 view;
 	static GameState gameState;
 	static SDL_Event event;
 	static double deltaTime;

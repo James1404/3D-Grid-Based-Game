@@ -2,7 +2,8 @@
 #include "Entity.h"
 #include "Entities/Player.h"
 
-
+glm::mat4 Game::projection;
+glm::mat4 Game::view;
 GameState Game::gameState = GameState::GameState_Game;
 SDL_Event Game::event;
 double Game::deltaTime;
@@ -29,6 +30,7 @@ void Game::init(const char* title, int width, int height) {
 		}
 
 		glViewport(0, 0, width, height);
+		projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
 
 		player->init();
 
@@ -85,7 +87,6 @@ void Game::render() {
 	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	player->render();
 
 	if (gameState == GameState::GameState_Edit) {
