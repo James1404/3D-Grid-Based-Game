@@ -8,7 +8,7 @@ public:
 	unsigned int ID;
 
 	void InitSprite();
-	void DrawSprite(glm::vec2 position, glm::vec2 scale);
+	void DrawSprite(glm::vec2 position);
 private:
 	void CheckCompileErrors(unsigned int shader);
 
