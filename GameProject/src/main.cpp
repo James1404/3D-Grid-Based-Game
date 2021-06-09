@@ -5,7 +5,7 @@ Game* game = nullptr;
 
 int main(int argc, char* args[]) {
 	game = new Game();
-	game->init("Window", 1280, 720);
+	game->init("Window");
 
 	while (game->running()) {
 		game->handleEvents();
