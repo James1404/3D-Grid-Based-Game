@@ -1,6 +1,7 @@
 #include "SpriteRenderer.h"
 
 #include "Game.h"
+#include "ResourceManager.h"
 
 #include <GL/glew.h>
 #include "stb_image.h"
@@ -11,6 +12,7 @@
 #include <iostream>
 
 void SpriteRenderer::InitSprite() {
+	// Load and Generate Textures Shaders
 	std::string vShaderCode, fShaderCode;
 	std::ifstream vShaderFile, fShaderFile;
 
@@ -69,6 +71,8 @@ void SpriteRenderer::InitSprite() {
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 
+	texture = ResourceManager::LoadTexture("resources/textures/awesomeface.png");
+
 	unsigned int VBO, EBO;
 	float vertices[] = {
 		// positions	// texture coords
@@ -97,46 +101,24 @@ void SpriteRenderer::InitSprite() {
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	stbi_set_flip_vertically_on_load(true);
-	
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("resources/textures/awesomeface.png", &width, &height, &nrChannels, 0);
-
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		printf("Failed to load texture\n");
-	}
-
-	stbi_image_free(data);
-
-	glUniform1i(glGetUniformLocation(this->ID, "image"), texture);
+	glUniform1i(glGetUniformLocation(this->ID, "image"), 0);
 
 	glUseProgram(this->ID);
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, "projection"), 1, GL_FALSE, glm::value_ptr(Game::projection));
 }
 
-void SpriteRenderer::DrawSprite(glm::vec2 position, glm::vec2 scale) {
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
+void SpriteRenderer::DrawSprite(glm::vec2 position) {
 	glUseProgram(this->ID);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(position, 0.0f));
-	model = glm::scale(model, glm::vec3(scale, 1.0f));
+	model = glm::scale(model, glm::vec3(100.0f, 100.0f, 1.0f));
 
+	glUniformMatrix4fv(glGetUniformLocation(this->ID, "view"), 1, GL_FALSE, glm::value_ptr(Game::view));
 	glUniformMatrix4fv(glGetUniformLocation(this->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glBindVertexArray(this->quadVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

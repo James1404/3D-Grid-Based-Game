@@ -1,5 +1,5 @@
 #pragma once
-#include "../Entity.h"
+#include "Entity.h"
 #include "../Game.h"
 #include "../SpriteRenderer.h"
 
@@ -53,10 +53,11 @@ public:
 
 		this->position.x += this->velocity.x * Game::deltaTime;
 		this->position.y += this->velocity.y * Game::deltaTime;
+		glm::normalize(position);
 	}
 
 	void render() override {
-		renderer->DrawSprite(position, glm::vec2(100.0f, 100.0f));
+		renderer->DrawSprite(position);
 	}
 private:
 	SpriteRenderer* renderer;

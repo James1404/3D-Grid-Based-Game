@@ -31,18 +31,23 @@ public:
 	Game() { }
 	~Game() { }
 
-	void init(const char* title, int width, int height);
+	void init(const char* title);
 	void handleEvents();
 	void update();
 	bool running() { return isRunning; }
 	void render();
 	void clean();
 
+	static int Width, Height;
+
 	static glm::mat4 projection;
 	static glm::mat4 view;
-	static GameState gameState;
+
 	static SDL_Event event;
+
 	static double deltaTime;
+
+	static GameState gameState;
 private:
 	bool isRunning = false;
 	SDL_Window* window;

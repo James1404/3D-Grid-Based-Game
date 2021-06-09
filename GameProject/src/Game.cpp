@@ -1,18 +1,26 @@
 #include "Game.h"
-#include "Entity.h"
 #include "Entities/Player.h"
+#include "Entities/EditmodeCamera.h"
 
 glm::mat4 Game::projection;
-glm::mat4 Game::view;
+glm::mat4 Game::view = glm::mat4(1.0f);
+
 GameState Game::gameState = GameState::GameState_Game;
+
 SDL_Event Game::event;
+
 double Game::deltaTime;
+
+int Game::Width = 1280;
+int Game::Height = 720;
+
+EditmodeCamera* camera = new EditmodeCamera();
 
 Player* player = new Player();
 
-void Game::init(const char* title, int width, int height) {
+void Game::init(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 		
 		const char* glsl_version = "#version 330";
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -20,6 +28,10 @@ void Game::init(const char* title, int width, int height) {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 		context = SDL_GL_CreateContext(window);
+		glViewport(0, 0, Width, Height);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
 
 		if (context != NULL) {
 			glewExperimental = GL_TRUE;
@@ -29,11 +41,13 @@ void Game::init(const char* title, int width, int height) {
 			}
 		}
 
-		glViewport(0, 0, width, height);
-		projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
+		projection = glm::ortho(0.0f, static_cast<float>(Width), 0.0f, static_cast<float>(Height), -1.0f, 1.0f);
 
+
+		// Initialize Entites
 		player->init();
 
+		// Initialize Imgui
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
@@ -52,8 +66,10 @@ void Game::handleEvents() {
 			isRunning = false;
 			break;
 		case SDL_WINDOWEVENT_RESIZED:
-			SDL_SetWindowSize(window, event.window.data1, event.window.data2);
-			glViewport(0, 0, event.window.data1, event.window.data2);
+			Width = event.window.data1;
+			Height = event.window.data2;
+			SDL_SetWindowSize(window, Width, Height);
+			glViewport(0, 0, Width, Height);
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -80,7 +96,12 @@ void Game::update() {
 
 	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-	player->update();
+	if (gameState == GameState::GameState_Edit) {
+		camera->update();
+	}
+	else {
+		player->update();
+	}
 }
 
 void Game::render() {
@@ -99,6 +120,7 @@ void Game::render() {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
+
 	SDL_GL_SwapWindow(window);
 }
 
