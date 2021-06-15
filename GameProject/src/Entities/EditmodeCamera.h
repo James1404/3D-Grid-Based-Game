@@ -4,20 +4,20 @@
 
 class EditmodeCamera : public Entity {
 public:
-	void update() override {
+	void update(double dt) override {
 		if (Game::event.type == SDL_KEYDOWN) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_w:
-				this->velocity.y = speed;
-				break;
-			case SDLK_s:
 				this->velocity.y = -speed;
 				break;
+			case SDLK_s:
+				this->velocity.y = speed;
+				break;
 			case SDLK_a:
-				this->velocity.x = -speed;
+				this->velocity.x = speed;
 				break;
 			case SDLK_d:
-				this->velocity.x = speed;
+				this->velocity.x = -speed;
 				break;
 			default:
 				break;
