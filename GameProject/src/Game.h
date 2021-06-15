@@ -45,8 +45,6 @@ public:
 
 	static SDL_Event event;
 
-	static double deltaTime;
-
 	static GameState gameState;
 private:
 	bool isRunning = false;

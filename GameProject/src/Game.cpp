@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "Entities/Player.h"
 #include "Entities/EditmodeCamera.h"
+#include "Entities/Sprite.h"
+#include "Scene.h"
 
 glm::mat4 Game::projection;
 glm::mat4 Game::view = glm::mat4(1.0f);
@@ -9,14 +11,11 @@ GameState Game::gameState = GameState::GameState_Game;
 
 SDL_Event Game::event;
 
-double Game::deltaTime;
-
 int Game::Width = 1280;
 int Game::Height = 720;
 
-EditmodeCamera* camera = new EditmodeCamera();
-
-Player* player = new Player();
+EditmodeCamera camera;
+Scene scene;
 
 void Game::init(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -43,9 +42,8 @@ void Game::init(const char* title) {
 
 		projection = glm::ortho(0.0f, static_cast<float>(Width), 0.0f, static_cast<float>(Height), -1.0f, 1.0f);
 
-
 		// Initialize Entites
-		player->init();
+		scene.loadScene();
 
 		// Initialize Imgui
 		ImGui::CreateContext();
@@ -94,13 +92,13 @@ void Game::update() {
 	LAST = NOW;
 	NOW = SDL_GetPerformanceCounter();
 
-	deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+	double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 	if (gameState == GameState::GameState_Edit) {
-		camera->update();
+		camera.update(dt);
 	}
 	else {
-		player->update();
+		scene.update(dt);
 	}
 }
 
@@ -108,7 +106,7 @@ void Game::render() {
 	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	player->render();
+	scene.render();
 
 	if (gameState == GameState::GameState_Edit) {
 		ImGui_ImplOpenGL3_NewFrame();
