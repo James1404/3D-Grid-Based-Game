@@ -11,7 +11,7 @@ public:
 	void init() override {
 		this->renderer.InitSprite();
 
-		CollisionManager::AddCollider("playerCollider", this->position, { 100,100 });
+		CollisionManager::AddCollider(id, this->position, { 100,100 });
 	}
 
 	void update(double dt) {
@@ -53,11 +53,11 @@ public:
 			}
 		}
 
-		CollisionManager::UpdateCollider("playerCollider", this->position + this->velocity, { 100,100 });
+		CollisionManager::UpdateCollider(id, this->position + this->velocity, { 100,100 });
 
-		for (auto collider : CollisionManager::colliders) {
-			if (collider.first != "playerCollider") {
-				if (CollisionManager::colliders["playerCollider"].isCollision(collider.second)) {
+		for (const auto& collider : CollisionManager::colliders) {
+			if (collider.first != id) {
+				if (CollisionManager::colliders[id].isCollision(collider.second)) {
 					velocity *= -1;
 					printf("isColliding");
 				}
