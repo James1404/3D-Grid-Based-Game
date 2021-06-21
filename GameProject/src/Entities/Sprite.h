@@ -8,13 +8,16 @@ class Sprite : public Entity {
 public:
 	void init() override {
 		this->position = glm::vec2(rand() % Game::Width, rand() % Game::Height);
-		this->renderer.InitSprite();
+		this->renderer.InitSprite("resources/textures/face.png");
 
-		CollisionManager::AddCollider(id, position, { 100,100 });
+		collider.pos = this->position;
+		collider.size = { this->renderer.width,this->renderer.height };
+
+		CollisionManager::AddCollider(id, &this->collider);
 	}
 
 	void update(double dt) override {
-		CollisionManager::UpdateCollider(id, position, { 100,100 });
+		CollisionManager::UpdateCollider(id, &this->collider);
 	}
 
 	void render() override {
@@ -22,6 +25,7 @@ public:
 	}
 private:
 	SpriteRenderer renderer;
+	Rect collider;
 
 	glm::vec2 position;
 };
