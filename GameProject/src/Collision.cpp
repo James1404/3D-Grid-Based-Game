@@ -1,45 +1,22 @@
 #include "Collision.h"
 
-std::map<int, Collider> CollisionManager::colliders;
+std::map<int, Rect*> CollisionManager::colliders;
 
-void CollisionManager::AddCollider(int id, glm::vec2 pos, glm::vec2 size) {
-    Collider col;
-    col.pos = pos;
-    col.size = size;
-
-    colliders[id] = col;
+bool Collision::RectVsRect(const Rect* rect1, const Rect* rect2) {
+    return rect1->pos.x < rect2->pos.x + rect2->size.x &&
+        rect1->pos.x + rect1->size.x > rect2->pos.x &&
+        rect1->pos.y < rect2->pos.y + rect2->size.y &&
+        rect1->pos.y + rect1->size.y > rect2->pos.y;
 }
 
-void CollisionManager::UpdateCollider(int id, glm::vec2 pos, glm::vec2 size) {
-    colliders[id].pos = pos;
-    colliders[id].size = size;
+bool Collision::RayVsRect(const Ray* ray, const Rect* rect) {
+    return false;
 }
 
-bool Collider::isCollision(const Collider& col)
-{
-    return this->pos.x < col.pos.x + col.size.x &&
-        this->pos.x + this->size.x > col.pos.x &&
-        this->pos.y < col.pos.y + col.size.y &&
-        this->pos.y + this->size.y > col.pos.y;
+void CollisionManager::AddCollider(int id, Rect* rect) {
+    colliders[id] = rect;
 }
 
-glm::vec2 Collider::CalculateDistance(const Collider& col)
-{
-    glm::vec2 d = { 0,0 };
-
-    if (this->pos.x < col.pos.x) {
-        d.x = col.pos.x - (this->pos.x + this->size.x);
-    }
-    else if (this->pos.x > col.pos.x) {
-        d.x = this->pos.x - (col.pos.x + col.size.x);
-    }
-
-    if (this->pos.y < col.pos.y) {
-        d.y = col.pos.y - (this->pos.y + this->size.y);
-    }
-    else if (this->pos.y > col.pos.y) {
-        d.y = this->pos.y - (col.pos.y + col.size.y);
-    }
-
-    return d;
+void CollisionManager::UpdateCollider(int id, Rect* rect) {
+    colliders[id] = rect;
 }
