@@ -1,7 +1,5 @@
 #include "Game.h"
-#include "Entities/Player.h"
 #include "Entities/EditmodeCamera.h"
-#include "Entities/Sprite.h"
 #include "Scene.h"
 
 glm::mat4 Game::projection;
@@ -13,6 +11,9 @@ SDL_Event Game::event;
 
 int Game::Width = 1280;
 int Game::Height = 720;
+
+int Game::ResolutionX = 320;
+int Game::ResolutionY = 200;
 
 EditmodeCamera camera;
 Scene scene;
@@ -40,7 +41,7 @@ void Game::init(const char* title) {
 			}
 		}
 
-		projection = glm::ortho(0.0f, static_cast<float>(Width), 0.0f, static_cast<float>(Height), -1.0f, 1.0f);
+		projection = glm::ortho(0.0f, static_cast<float>(ResolutionX), 0.0f, static_cast<float>(ResolutionY), -1.0f, 1.0f);
 
 		// Initialize Entites
 		scene.loadScene();
@@ -103,7 +104,7 @@ void Game::update() {
 }
 
 void Game::render() {
-	glClearColor(0.6f, 0.6f, 0.6f, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	scene.render();

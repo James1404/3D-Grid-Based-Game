@@ -39,6 +39,7 @@ public:
 	void clean();
 
 	static int Width, Height;
+	static int ResolutionX, ResolutionY;
 
 	static glm::mat4 projection;
 	static glm::mat4 view;
