@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\C++ Libraries\SDL2-2.0.14\lib\x64;E:\C++ Libraries\SDL2_image-2.0.5\lib\x64;E:\C++ Libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>includes/sdl2/include;includes/glew/include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
+    <LibraryPath>includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\C++ Libraries\SDL2-2.0.14\include;E:\C++ Libraries\SDL2_image-2.0.5\include;E:\C++ Libraries\glew-2.1.0\include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\C++ Libraries\SDL2-2.0.14\lib\x64;E:\C++ Libraries\SDL2_image-2.0.5\lib\x64;E:\C++ Libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>includes/sdl2/include;includes/glew/include;includes/imgui;includes/glm;$(IncludePath)</IncludePath>
+    <LibraryPath>includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,7 +141,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
