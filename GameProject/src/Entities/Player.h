@@ -9,25 +9,26 @@
 class Player : public Entity {
 public:
 	void init() override {
-		this->renderer.InitSprite();
-
-		CollisionManager::AddCollider(id, this->position, { 100,100 });
+		this->renderer.InitSprite("resources/textures/player.png");
+		this->collider.pos = this->position;
+		this->collider.size = { this->renderer.width,this->renderer.height };
+		CollisionManager::AddCollider(id, &this->collider);
 	}
 
 	void update(double dt) {
 		if (Game::event.type == SDL_KEYDOWN) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_w:
-				this->velocity.y = speed;
+				this->velocity.y = 1;
 				break;
 			case SDLK_s:
-				this->velocity.y = -speed;
+				this->velocity.y = -1;
 				break;
 			case SDLK_a:
-				this->velocity.x = -speed;
+				this->velocity.x = -1;
 				break;
 			case SDLK_d:
-				this->velocity.x = speed;
+				this->velocity.x = 1;
 				break;
 			default:
 				break;
@@ -52,14 +53,18 @@ public:
 				break;
 			}
 		}
+		
+		glm::normalize(velocity);
+		velocity *= speed;
 
-		CollisionManager::UpdateCollider(id, this->position + this->velocity, { 100,100 });
+		this->collider.pos = this->position + this->velocity;
+
+		CollisionManager::UpdateCollider(id, &this->collider);
 
 		for (const auto& collider : CollisionManager::colliders) {
 			if (collider.first != id) {
-				if (CollisionManager::colliders[id].isCollision(collider.second)) {
-					velocity *= -1;
-					printf("isColliding");
+				if (Collision::RectVsRect(&this->collider, collider.second)) {
+					return;
 				}
 			}
 		}
@@ -69,13 +74,14 @@ public:
 	}
 
 	void render() override {
-		this->renderer.DrawSprite(position);
+		this->renderer.DrawSprite(static_cast<glm::ivec2>(position));
 	}
 
 	glm::vec2 position;
 	glm::vec2 velocity;
 private:
 	SpriteRenderer renderer;
+	Rect collider;
 
 	float speed = 1.0f;
 };
