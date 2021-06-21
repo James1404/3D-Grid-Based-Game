@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include "stb_image.h"
 
-unsigned int ResourceManager::LoadTexture(const char* path) {
+unsigned int ResourceManager::LoadTexture(const char* path, int &width, int &height) {
 	unsigned int texture;
 
 	// Load and Generate Textures
@@ -16,7 +16,7 @@ unsigned int ResourceManager::LoadTexture(const char* path) {
 
 	stbi_set_flip_vertically_on_load(true);
 
-	int width, height, nrChannels;
+	int nrChannels;
 	unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
