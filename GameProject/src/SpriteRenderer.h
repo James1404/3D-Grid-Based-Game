@@ -1,16 +1,16 @@
 #pragma once
 #include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
+
+#include "Shader.h"
 
 class SpriteRenderer {
 public:
-	unsigned int ID;
-
-	void InitSprite();
+	void InitSprite(const char* path);
 	void DrawSprite(glm::vec2 position);
+
+	int width, height;
 private:
-	void CheckCompileErrors(unsigned int shader);
+	Shader shader;
 
 	unsigned int quadVAO;
 	unsigned int texture;
