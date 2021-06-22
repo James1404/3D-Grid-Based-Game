@@ -83,5 +83,5 @@ private:
 	SpriteRenderer renderer;
 	Rect collider;
 
-	float speed = 1.0f;
+	float speed = 1;
 };
