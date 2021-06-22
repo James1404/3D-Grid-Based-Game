@@ -64,11 +64,13 @@ void Game::handleEvents() {
 		case SDL_QUIT:
 			isRunning = false;
 			break;
-		case SDL_WINDOWEVENT_RESIZED:
-			Width = event.window.data1;
-			Height = event.window.data2;
-			SDL_SetWindowSize(window, Width, Height);
-			glViewport(0, 0, Width, Height);
+		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+				Width = event.window.data1;
+				Height = event.window.data2;
+				SDL_SetWindowSize(window, Width, Height);
+				glViewport(0, 0, Width, Height);
+			}
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
