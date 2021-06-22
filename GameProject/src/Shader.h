@@ -5,7 +5,6 @@ class Shader {
 public:
 	unsigned int ID;
 
-	Shader() { }
 	Shader& Use();
 
 	void Compile(const char* vertexSource, const char* fragmentSource);
