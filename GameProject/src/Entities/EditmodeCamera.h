@@ -8,16 +8,16 @@ public:
 		if (Game::event.type == SDL_KEYDOWN) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_w:
-				this->velocity.y = -speed;
+				this->velocity.y = -1;
 				break;
 			case SDLK_s:
-				this->velocity.y = speed;
+				this->velocity.y = 1;
 				break;
 			case SDLK_a:
-				this->velocity.x = speed;
+				this->velocity.x = 1;
 				break;
 			case SDLK_d:
-				this->velocity.x = -speed;
+				this->velocity.x = -1;
 				break;
 			default:
 				break;
@@ -43,9 +43,12 @@ public:
 			}
 		}
 
+		glm::normalize(velocity);
+		velocity *= speed;
+
 		Game::view = glm::translate(Game::view, glm::vec3(velocity, 0.0f));
 	}
 private:
 	glm::vec2 velocity;
-	float speed = 1.0f;
+	float speed = 1;
 };
