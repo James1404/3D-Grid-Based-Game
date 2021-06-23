@@ -5,8 +5,6 @@
 
 #include "SpriteRenderer.h"
 
-
-std::vector<std::shared_ptr<Entity>> entities;
 SpriteRenderer background;
 
 void Scene::saveScene() {

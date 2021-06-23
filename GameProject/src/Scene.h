@@ -7,6 +7,8 @@
 
 class Scene {
 public:
+	std::vector<std::shared_ptr<Entity>> entities;
+
 	void saveScene();
 	void loadScene();
 	void init();
