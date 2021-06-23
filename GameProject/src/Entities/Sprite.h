@@ -7,28 +7,41 @@
 class Sprite : public Entity {
 public:
 	void save(std::ofstream& f) override {
-		f.write((char*)&position, sizeof(position));
+		f.write((char*)&this->position, sizeof(this->position));
 	}
 
 	void load(std::ifstream& f) override {
-		f.read((char*)&position, sizeof(position));
+		f.read((char*)&this->position, sizeof(this->position));
 	}
 
 	void init() override {
 		this->renderer.InitSprite("resources/textures/face.png");
 
-		collider.pos = this->position;
-		collider.size = { this->renderer.width,this->renderer.height };
+		this->collider.pos = this->position;
+		this->collider.size = { this->renderer.width,this->renderer.height };
 
 		CollisionManager::AddCollider(id, &this->collider);
 	}
 
 	void update(double dt) override {
+		this->collider.pos = this->position;
+
 		CollisionManager::UpdateCollider(id, &this->collider);
 	}
 
 	void render() override {
 		this->renderer.DrawSprite(this->position);
+	}
+
+	void editmodeRender() override {
+		{
+			ImGui::Begin("Sprite");
+
+			ImGui::DragFloat("Position.x", &this->position.x);
+			ImGui::DragFloat("Position.y", &this->position.y);
+
+			ImGui::End();
+		}
 	}
 private:
 	SpriteRenderer renderer;

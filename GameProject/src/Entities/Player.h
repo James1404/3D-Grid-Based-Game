@@ -85,6 +85,17 @@ public:
 		this->renderer.DrawSprite(static_cast<glm::ivec2>(position));
 	}
 
+	void editmodeRender() override {
+		{
+			ImGui::Begin("Player");
+
+			ImGui::DragFloat("Position.x", &this->position.x);
+			ImGui::DragFloat("Position.y", &this->position.y);
+
+			ImGui::End();
+		}
+	}
+
 	glm::vec2 position;
 	glm::vec2 velocity;
 private:
