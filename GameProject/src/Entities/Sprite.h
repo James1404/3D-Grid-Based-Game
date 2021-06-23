@@ -6,8 +6,15 @@
 
 class Sprite : public Entity {
 public:
+	void save(std::ofstream& f) override {
+		f.write((char*)&position, sizeof(position));
+	}
+
+	void load(std::ifstream& f) override {
+		f.read((char*)&position, sizeof(position));
+	}
+
 	void init() override {
-		this->position = glm::vec2(rand() % Game::Width, rand() % Game::Height);
 		this->renderer.InitSprite("resources/textures/face.png");
 
 		collider.pos = this->position;
