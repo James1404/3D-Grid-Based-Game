@@ -44,7 +44,7 @@ void Game::init(const char* title) {
 		projection = glm::ortho(0.0f, static_cast<float>(ResolutionX), 0.0f, static_cast<float>(ResolutionY), -1.0f, 1.0f);
 
 		// Initialize Entites
-		scene.loadScene();
+		scene.init();
 
 		// Initialize Imgui
 		ImGui::CreateContext();
@@ -116,7 +116,35 @@ void Game::render() {
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
-		ImGui::ShowDemoWindow();
+		{
+			ImGui::BeginMainMenuBar();
+
+			if (ImGui::BeginMenu("File")) {
+				ImGui::MenuItem("New");
+				ImGui::MenuItem("Save");
+				ImGui::MenuItem("Load");
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMainMenuBar();
+		}
+
+		{
+			ImGui::Begin("Toolbar");
+
+			if (ImGui::Button("Create Sprite")) {
+				scene.CreateSprite();
+			}
+
+			if (ImGui::Button("Create Player")) {
+				scene.CreatePlayer();
+			}
+
+
+			ImGui::End();
+		}
+
+		ImGui::EndFrame();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
