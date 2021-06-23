@@ -116,30 +116,30 @@ void Game::render() {
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
-		{
-			ImGui::BeginMainMenuBar();
-
-			if (ImGui::BeginMenu("File")) {
-				ImGui::MenuItem("New");
-				ImGui::MenuItem("Save");
-				ImGui::MenuItem("Load");
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMainMenuBar();
+		for (auto entity : scene.entities) {
+			entity->editmodeRender();
 		}
 
 		{
-			ImGui::Begin("Toolbar");
+			static bool myToolActive = true;
+			ImGui::Begin("Toolbar", &myToolActive, ImGuiWindowFlags_MenuBar);
 
-			if (ImGui::Button("Create Sprite")) {
-				scene.CreateSprite();
+			if (ImGui::BeginMenuBar()) {
+				if (ImGui::BeginMenu("File")) {
+					if (ImGui::MenuItem("New")) { printf("New Scene"); }
+					if (ImGui::MenuItem("Save")) { printf("Save Scene"); }
+					if (ImGui::MenuItem("Load")) { printf("Load Scene"); }
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Entities")) {
+					if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
+					if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenuBar();
 			}
-
-			if (ImGui::Button("Create Player")) {
-				scene.CreatePlayer();
-			}
-
 
 			ImGui::End();
 		}
