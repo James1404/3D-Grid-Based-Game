@@ -5,31 +5,44 @@
 
 #include "SpriteRenderer.h"
 
-#include <memory>
 
 std::vector<std::shared_ptr<Entity>> entities;
 SpriteRenderer background;
 
+void Scene::saveScene() {
+	std::ofstream fs;
+	fs.open("Level1.bin", std::ios::out | std::ios::binary | std::ios::app);
+	if (fs.is_open()) {
+		for (auto entity : entities) {
+			entity->save(fs);
+		}
+	}
+	else {
+		printf("Cannot open file\n");
+	}
+
+	fs.close();
+}
+
 void Scene::loadScene() {
-	entities.push_back(std::make_shared<Player>());
+	std::ifstream binaryFile;
+	int size = 0;
 
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
-	entities.push_back(std::make_shared<Sprite>());
+	binaryFile.open("Level1.bin", std::ios::in | std::ios::binary);
+	binaryFile.seekg(0, std::ios::end);
+	size = (int)binaryFile.tellg();
+	binaryFile.seekg(0, std::ios::beg);
 
-	background.InitSprite("resources/textures/background.png");
+	for (auto entity : entities) {
+		entity->load(binaryFile);
+	}
 
-	this->init();
+	binaryFile.close();
 }
 
 void Scene::init() {
+	background.InitSprite("resources/textures/background.png");
+
 	for (auto entity : entities) {
 		entity->init();
 	}
@@ -47,4 +60,16 @@ void Scene::render() {
 	for (auto entity : entities) {
 		entity->render();
 	}
+}
+
+void Scene::CreateSprite() {
+	auto s = std::make_shared<Sprite>();
+	s->init();
+	entities.push_back(s);
+}
+
+void Scene::CreatePlayer() {
+	auto p = std::make_shared<Player>();
+	p->init();
+	entities.push_back(p);
 }
