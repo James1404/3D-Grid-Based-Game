@@ -15,6 +15,8 @@ public:
 	virtual void init() {}
 	virtual void update(double dt) {}
 	virtual void render() {}
+
+	virtual void editmodeRender() {}
 private:
 	static int currentID;
 };
