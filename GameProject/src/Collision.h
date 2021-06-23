@@ -17,7 +17,7 @@ struct Ray {
 class Collision {
 public:
     static bool RectVsRect(const Rect* rect1, const Rect* rect2);
-    static bool RayVsRect(const Ray* ray, const Rect* rect);
+    static bool PointVsRect(const glm::vec2* point, const Rect* rect);
 };
 
 class CollisionManager {

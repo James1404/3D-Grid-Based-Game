@@ -9,8 +9,8 @@ bool Collision::RectVsRect(const Rect* rect1, const Rect* rect2) {
         rect1->pos.y + rect1->size.y > rect2->pos.y;
 }
 
-bool Collision::RayVsRect(const Ray* ray, const Rect* rect) {
-    return false;
+bool Collision::PointVsRect(const glm::vec2* point, const Rect* rect) {
+    return (point->x >= rect->pos.x && point->y >= rect->pos.y && point->x < rect->pos.x + rect->size.x && point->y < rect->pos.y + rect->size.y);
 }
 
 void CollisionManager::AddCollider(int id, Rect* rect) {
