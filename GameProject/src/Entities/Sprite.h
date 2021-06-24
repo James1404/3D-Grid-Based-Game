@@ -34,14 +34,9 @@ public:
 	}
 
 	void editmodeRender() override {
-		{
-			ImGui::Begin("Sprite");
-
-			ImGui::DragFloat("Position.x", &this->position.x);
-			ImGui::DragFloat("Position.y", &this->position.y);
-
-			ImGui::End();
-		}
+		ImGui::Text("Sprite");
+		ImGui::DragFloat("Position.x", &this->position.x);
+		ImGui::DragFloat("Position.y", &this->position.y);
 	}
 private:
 	SpriteRenderer renderer;
