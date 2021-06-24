@@ -116,10 +116,6 @@ void Game::render() {
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
-		for (auto entity : scene.entities) {
-			entity->editmodeRender();
-		}
-
 		{
 			static bool myToolActive = true;
 			ImGui::Begin("Toolbar", &myToolActive, ImGuiWindowFlags_MenuBar);
@@ -139,6 +135,10 @@ void Game::render() {
 				}
 
 				ImGui::EndMenuBar();
+			}
+
+			for (auto entity : scene.entities) {
+				entity->editmodeRender();
 			}
 
 			ImGui::End();
