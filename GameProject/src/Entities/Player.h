@@ -62,10 +62,10 @@ public:
 			}
 		}
 		
-		glm::normalize(velocity);
-		velocity *= speed;
+		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+		moveVector /= speed;
 
-		this->collider.pos = this->position + this->velocity;
+		this->collider.pos = this->position + moveVector;
 
 		CollisionManager::UpdateCollider(id, &this->collider);
 
@@ -77,8 +77,8 @@ public:
 			}
 		}
 
-		this->position.x += this->velocity.x * dt;
-		this->position.y += this->velocity.y * dt;
+		this->position.x += moveVector.x * dt;
+		this->position.y += moveVector.y * dt;
 	}
 
 	void render() override {
@@ -86,14 +86,9 @@ public:
 	}
 
 	void editmodeRender() override {
-		{
-			ImGui::Begin("Player");
-
-			ImGui::DragFloat("Position.x", &this->position.x);
-			ImGui::DragFloat("Position.y", &this->position.y);
-
-			ImGui::End();
-		}
+		ImGui::Text("Player");
+		ImGui::DragFloat("Position.x", &this->position.x);
+		ImGui::DragFloat("Position.y", &this->position.y);
 	}
 
 	glm::vec2 position;
@@ -102,5 +97,5 @@ private:
 	SpriteRenderer renderer;
 	Rect collider;
 
-	float speed = 1;
+	float speed = 10;
 };
