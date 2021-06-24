@@ -43,12 +43,13 @@ public:
 			}
 		}
 
-		glm::normalize(velocity);
-		velocity *= speed;
+		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+		moveVector /= speed;
+		moveVector *= dt;
 
-		Game::view = glm::translate(Game::view, glm::vec3(velocity, 0.0f));
+		Game::view = glm::translate(Game::view, glm::vec3(moveVector, 0.0f));
 	}
 private:
 	glm::vec2 velocity;
-	float speed = 1;
+	float speed = 2;
 };
