@@ -87,8 +87,8 @@ public:
 
 	void editmodeRender() override {
 		ImGui::Text("Player");
-		ImGui::DragFloat("Position.x", &this->position.x);
-		ImGui::DragFloat("Position.y", &this->position.y);
+		ImGui::DragFloat("Position.x##" + this->id, &this->position.x);
+		ImGui::DragFloat("Position.y##" + this->id, &this->position.y);
 	}
 
 	glm::vec2 position;
