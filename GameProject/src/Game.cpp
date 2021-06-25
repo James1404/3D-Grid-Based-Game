@@ -18,6 +18,8 @@ int Game::ResolutionY = 200;
 EditmodeCamera camera;
 Scene scene;
 
+std::shared_ptr<Entity> selectedEntity;
+
 void Game::init(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -137,8 +139,11 @@ void Game::render() {
 				ImGui::EndMenuBar();
 			}
 
-			for (auto entity : scene.entities) {
-				entity->editmodeRender();
+			if(!scene.entities.empty())
+				selectedEntity = scene.entities.back();
+
+			if (selectedEntity != nullptr) {
+				selectedEntity->editmodeRender();
 			}
 
 			ImGui::End();
