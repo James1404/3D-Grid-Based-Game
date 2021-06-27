@@ -7,6 +7,10 @@
 
 SpriteRenderer background;
 
+void Scene::newScene() {
+	entities.clear();
+}
+
 void Scene::saveScene() {
 	std::ofstream fs;
 	fs.open("Level1.bin", std::ios::out | std::ios::binary | std::ios::app);
@@ -23,6 +27,8 @@ void Scene::saveScene() {
 }
 
 void Scene::loadScene() {
+	entities.clear();
+
 	std::ifstream binaryFile;
 	int size = 0;
 
