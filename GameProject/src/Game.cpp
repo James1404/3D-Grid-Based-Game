@@ -124,9 +124,9 @@ void Game::render() {
 
 			if (ImGui::BeginMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
-					if (ImGui::MenuItem("New")) { printf("New Scene"); }
-					if (ImGui::MenuItem("Save")) { printf("Save Scene"); }
-					if (ImGui::MenuItem("Load")) { printf("Load Scene"); }
+					if (ImGui::MenuItem("New")) { scene.newScene(); }
+					if (ImGui::MenuItem("Save")) { scene.saveScene(); }
+					if (ImGui::MenuItem("Load")) { scene.loadScene(); }
 					ImGui::EndMenu();
 				}
 
