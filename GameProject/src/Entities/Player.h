@@ -64,6 +64,7 @@ public:
 		
 		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
 		moveVector /= speed;
+		moveVector *= dt;
 
 		this->collider.pos = this->position + moveVector;
 
@@ -77,8 +78,7 @@ public:
 			}
 		}
 
-		this->position.x += moveVector.x * dt;
-		this->position.y += moveVector.y * dt;
+		this->position += moveVector;
 	}
 
 	void render() override {
