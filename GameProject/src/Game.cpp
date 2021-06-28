@@ -9,11 +9,11 @@ GameState Game::gameState = GameState::GameState_Game;
 
 SDL_Event Game::event;
 
-int Game::Width = 1280;
-int Game::Height = 720;
+int Game::screen_width = 1280;
+int Game::screen_height = 720;
 
-int Game::ResolutionX = 320;
-int Game::ResolutionY = 200;
+const int Game::screen_resolution_x = 320;
+const int Game::screen_resolution_y = 200;
 
 EditmodeCamera camera;
 Scene scene;
@@ -22,7 +22,7 @@ std::shared_ptr<Entity> selectedEntity;
 
 void Game::init(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 		
 		const char* glsl_version = "#version 330";
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -30,7 +30,6 @@ void Game::init(const char* title) {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 		context = SDL_GL_CreateContext(window);
-		glViewport(0, 0, Width, Height);
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
@@ -43,7 +42,7 @@ void Game::init(const char* title) {
 			}
 		}
 
-		projection = glm::ortho(0.0f, static_cast<float>(ResolutionX), 0.0f, static_cast<float>(ResolutionY), -1.0f, 1.0f);
+		projection = glm::ortho(0.0f, static_cast<float>(screen_resolution_x), 0.0f, static_cast<float>(screen_resolution_y), -1.0f, 1.0f);
 
 		// Initialize Entites
 		scene.init();
@@ -68,10 +67,9 @@ void Game::handleEvents() {
 			break;
 		case SDL_WINDOWEVENT:
 			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-				Width = event.window.data1;
-				Height = event.window.data2;
-				SDL_SetWindowSize(window, Width, Height);
-				glViewport(0, 0, Width, Height);
+				screen_width = event.window.data1;
+				screen_height = event.window.data2;
+				SDL_SetWindowSize(window, screen_width, screen_height);
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -110,6 +108,18 @@ void Game::update() {
 void Game::render() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	float ratioX = screen_width / (float)screen_resolution_x;
+	float ratioY = screen_height / (float)screen_resolution_y;
+	float ratio = ratioX < ratioY ? ratioX : ratioY;
+
+	int viewWidth = screen_resolution_x * ratio;
+	int viewHeight = screen_resolution_y * ratio;
+
+	int viewX = (screen_width - screen_resolution_x * ratio) / 2;
+	int viewY = (screen_height - screen_resolution_y * ratio) / 2;
+
+	glViewport(viewX, viewY, viewWidth, viewHeight);
 
 	scene.render();
 

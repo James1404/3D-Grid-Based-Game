@@ -38,8 +38,8 @@ public:
 	void render();
 	void clean();
 
-	static int Width, Height;
-	static int ResolutionX, ResolutionY;
+	static int screen_width, screen_height;
+	static const int screen_resolution_x, screen_resolution_y;
 
 	static glm::mat4 projection;
 	static glm::mat4 view;
