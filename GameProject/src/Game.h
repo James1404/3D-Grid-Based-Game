@@ -15,11 +15,6 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
-// stb_image
-#include "stb_image.h"
-
-#include <string>
-
 enum class GameState {
 	GameState_Game,
 	GameState_Menu,
@@ -28,9 +23,6 @@ enum class GameState {
 
 class Game {
 public:
-	Game() { }
-	~Game() { }
-
 	void init(const char* title);
 	void handleEvents();
 	void update();
