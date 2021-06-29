@@ -88,8 +88,7 @@ void Game::handleEvents() {
 	}
 }
 
-Uint64 NOW = SDL_GetPerformanceCounter();
-Uint64 LAST = 0;
+Uint64 NOW = SDL_GetPerformanceCounter(), LAST = 0;
 void Game::update() {
 	// calculate delta time;
 	LAST = NOW;
@@ -106,33 +105,34 @@ void Game::update() {
 }
 
 void Game::render() {
+	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	float ratioX = screen_width / (float)screen_resolution_x;
-	float ratioY = screen_height / (float)screen_resolution_y;
-	float ratio = ratioX < ratioY ? ratioX : ratioY;
+	// Set aspect ratio
+	float x = screen_width / (float)screen_resolution_x;
+	float y = screen_height / (float)screen_resolution_y;
+	float aspect = std::min(x, y);
 
-	int viewWidth = screen_resolution_x * ratio;
-	int viewHeight = screen_resolution_y * ratio;
+	int viewWidth = screen_resolution_x * aspect;
+	int viewHeight = screen_resolution_y * aspect;
 
-	int viewX = (screen_width - screen_resolution_x * ratio) / 2;
-	int viewY = (screen_height - screen_resolution_y * ratio) / 2;
+	int viewX = (screen_width - screen_resolution_x * aspect) / 2;
+	int viewY = (screen_height - screen_resolution_y * aspect) / 2;
 
 	glViewport(viewX, viewY, viewWidth, viewHeight);
 
+	// render scene
 	scene.render();
 
+	// render imgui windows
 	if (gameState == GameState::GameState_Edit) {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
 		{
-			static bool myToolActive = true;
-			ImGui::Begin("Toolbar", &myToolActive, ImGuiWindowFlags_MenuBar);
-
-			if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMainMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
 					if (ImGui::MenuItem("New")) { scene.newScene(); }
 					if (ImGui::MenuItem("Save")) { scene.saveScene(); }
@@ -146,17 +146,107 @@ void Game::render() {
 					ImGui::EndMenu();
 				}
 
-				ImGui::EndMenuBar();
+				ImGui::EndMainMenuBar();
+			}
+		}
+
+		{
+			{
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImVec2 work_pos = viewport->WorkPos;
+				ImVec2 work_size = viewport->WorkSize;
+				ImVec2 window_pos, window_pos_pivot;
+
+				const float PAD = 10.0f;
+
+				window_pos.x = work_pos.x + PAD;
+				window_pos.y = work_pos.y + PAD;
+				window_pos_pivot.x = 0.0f;
+				window_pos_pivot.y = 0.0f;
+
+				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
 			}
 
-			if(!scene.entities.empty())
-				selectedEntity = scene.entities.back();
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoDecoration;
+			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+			window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
 
-			if (selectedEntity != nullptr) {
-				selectedEntity->editmodeRender();
+			static bool p_open = true;
+			ImGui::SetNextWindowBgAlpha(0.9f);
+			if (ImGui::Begin("Overlay", &p_open, window_flags)) {
+				ImGui::Text("Game Stats");
+
+				ImGui::Separator();
+				ImGui::Text("Screen Size: (%i, %i)", screen_width, screen_height);
+
+				ImGui::End();
 			}
+		}
 
-			ImGui::End();
+		{
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+			ImVec2 work_pos = viewport->WorkPos;
+			ImVec2 work_size = viewport->WorkSize;
+
+			ImVec2 window_pos_pivot = { 1.0f, 0.0f };
+
+			const float PAD = 10.0f;
+
+			ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, work_pos.y + PAD), ImGuiCond_Always, window_pos_pivot);
+			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - work_pos.y - PAD), ImGuiCond_Always);
+
+			// Set Windows Flags
+			ImGuiWindowFlags window_flags = 0;
+			window_flags |= ImGuiWindowFlags_NoDecoration;
+			window_flags |= ImGuiWindowFlags_NoResize;
+			window_flags |= ImGuiWindowFlags_NoCollapse;
+			window_flags |= ImGuiWindowFlags_NoNav;
+			window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+			// Entites List Window
+			static bool p_open = NULL;
+			if (ImGui::Begin("Entities", &p_open, window_flags)) {
+				if (ImGui::BeginPopupContextWindow()) {
+					if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
+					if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::ListBoxHeader("Entities", ImVec2(300.0f, (work_size.y / 4) + PAD))) {
+					for (auto const& entity : scene.entities) {
+						const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
+
+						if (ImGui::Selectable("Entity", is_selected)) {
+							selectedEntity = entity;
+						}
+
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+
+					ImGui::ListBoxFooter();
+				}
+
+				ImGui::End();
+			}
+			
+			// Toolbar Window
+			ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, (work_size.y / 2) + PAD), ImGuiCond_Always, window_pos_pivot);
+			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - PAD), ImGuiCond_Always);
+
+			if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
+				if (!scene.entities.empty())
+					selectedEntity = scene.entities.back();
+
+				if (selectedEntity != nullptr) {
+					selectedEntity->editmodeRender();
+				}
+
+				ImGui::End();
+			}
 		}
 
 		ImGui::EndFrame();
@@ -165,6 +255,7 @@ void Game::render() {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
+	// Swap buffer
 	SDL_GL_SwapWindow(window);
 }
 
