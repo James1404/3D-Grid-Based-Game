@@ -132,53 +132,46 @@ void Game::render() {
 		ImGui::NewFrame();
 
 		{
-			if (ImGui::BeginMainMenuBar()) {
-				if (ImGui::BeginMenu("File")) {
-					if (ImGui::MenuItem("New")) { scene.newScene(); }
-					if (ImGui::MenuItem("Save")) { scene.saveScene(); }
-					if (ImGui::MenuItem("Load")) { scene.loadScene(); }
-					ImGui::EndMenu();
-				}
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImVec2 work_pos = viewport->WorkPos;
+			ImVec2 work_size = viewport->WorkSize;
+			ImVec2 window_pos, window_pos_pivot;
 
-				if (ImGui::BeginMenu("Entities")) {
-					if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
-					if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
-					ImGui::EndMenu();
-				}
+			const float PAD = 10.0f;
 
-				ImGui::EndMainMenuBar();
-			}
-		}
+			window_pos.x = work_pos.x + PAD;
+			window_pos.y = work_pos.y + PAD;
+			window_pos_pivot.x = 0.0f;
+			window_pos_pivot.y = 0.0f;
 
-		{
-			{
-				const ImGuiViewport* viewport = ImGui::GetMainViewport();
-				ImVec2 work_pos = viewport->WorkPos;
-				ImVec2 work_size = viewport->WorkSize;
-				ImVec2 window_pos, window_pos_pivot;
-
-				const float PAD = 10.0f;
-
-				window_pos.x = work_pos.x + PAD;
-				window_pos.y = work_pos.y + PAD;
-				window_pos_pivot.x = 0.0f;
-				window_pos_pivot.y = 0.0f;
-
-				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-			}
+			ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
 
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoDecoration;
 			window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 			window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+			window_flags |= ImGuiWindowFlags_NoNav;
+			window_flags |= ImGuiWindowFlags_MenuBar;
 
 			static bool p_open = true;
 			ImGui::SetNextWindowBgAlpha(0.9f);
 			if (ImGui::Begin("Overlay", &p_open, window_flags)) {
+				if (ImGui::BeginMenuBar()) {
+					if (ImGui::BeginMenu("File")) {
+						if (ImGui::MenuItem("New")) { scene.newScene(); }
+						if (ImGui::MenuItem("Save")) { scene.saveScene(); }
+						if (ImGui::MenuItem("Load")) { scene.loadScene(); }
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenuBar();
+				}
+
 				ImGui::Text("Game Stats");
 
 				ImGui::Separator();
 				ImGui::Text("Screen Size: (%i, %i)", screen_width, screen_height);
+				ImGui::Text("No. of Entities: %i", scene.entities.size());
 
 				ImGui::End();
 			}
@@ -190,12 +183,7 @@ void Game::render() {
 			ImVec2 work_pos = viewport->WorkPos;
 			ImVec2 work_size = viewport->WorkSize;
 
-			ImVec2 window_pos_pivot = { 1.0f, 0.0f };
-
 			const float PAD = 10.0f;
-
-			ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, work_pos.y + PAD), ImGuiCond_Always, window_pos_pivot);
-			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - work_pos.y - PAD), ImGuiCond_Always);
 
 			// Set Windows Flags
 			ImGuiWindowFlags window_flags = 0;
@@ -205,50 +193,61 @@ void Game::render() {
 			window_flags |= ImGuiWindowFlags_NoNav;
 			window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
 
-			// Entites List Window
 			static bool p_open = NULL;
-			if (ImGui::Begin("Entities", &p_open, window_flags)) {
-				if (ImGui::BeginPopupContextWindow()) {
-					if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
-					if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
-					ImGui::EndPopup();
-				}
 
-				if (ImGui::ListBoxHeader("Entities", ImVec2(300.0f, (work_size.y / 4) + PAD))) {
-					for (auto const& entity : scene.entities) {
-						const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
+			{
+				// Entites List Window
+				ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, work_pos.y + PAD), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+				ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - work_pos.y - (PAD * 1.5f)), ImGuiCond_Always);
 
-						if (ImGui::Selectable("Entity", is_selected)) {
-							selectedEntity = entity;
-						}
+				ImGui::SetNextWindowBgAlpha(0.9f);
 
-						if (is_selected) {
-							ImGui::SetItemDefaultFocus();
-						}
+				if (ImGui::Begin("Entities", &p_open, window_flags)) {
+					if (ImGui::BeginPopupContextWindow()) {
+						if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
+						if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
+						ImGui::EndPopup();
 					}
 
-					ImGui::ListBoxFooter();
-				}
+					if (ImGui::ListBoxHeader("Entities", ImVec2(300.0f, (work_size.y / 4) + PAD))) {
+						for (auto const& entity : scene.entities) {
+							const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
 
-				ImGui::End();
+							if (ImGui::Selectable("Entity", is_selected)) {
+								selectedEntity = entity;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					ImGui::End();
+				}
 			}
-			
-			// Toolbar Window
-			ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, (work_size.y / 2) + PAD), ImGuiCond_Always, window_pos_pivot);
-			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - PAD), ImGuiCond_Always);
 
-			if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
-				if (!scene.entities.empty())
-					selectedEntity = scene.entities.back();
+			{
+				// Toolbar Window
+				ImGui::SetNextWindowPos(ImVec2(work_pos.x + work_size.x - PAD, work_size.y - PAD), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
+				ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) + work_pos.y - (PAD * 1.5f)), ImGuiCond_Always);
 
-				if (selectedEntity != nullptr) {
-					selectedEntity->editmodeRender();
+				ImGui::SetNextWindowBgAlpha(0.9f);
+
+				if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
+					if (!scene.entities.empty())
+						selectedEntity = scene.entities.back();
+
+					if (selectedEntity != nullptr) {
+						selectedEntity->editmodeRender();
+					}
+
+					ImGui::End();
 				}
-
-				ImGui::End();
 			}
 		}
-
 		ImGui::EndFrame();
 
 		ImGui::Render();
