@@ -213,13 +213,15 @@ void Game::render() {
 						for (auto const& entity : scene.entities) {
 							const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
 
-							if (ImGui::Selectable("Entity", is_selected)) {
+							ImGui::PushID(entity->id);
+							if (ImGui::Selectable(entity->name, is_selected)) {
 								selectedEntity = entity;
 							}
 
 							if (is_selected) {
 								ImGui::SetItemDefaultFocus();
 							}
+							ImGui::PopID();
 						}
 
 						ImGui::ListBoxFooter();
@@ -237,9 +239,6 @@ void Game::render() {
 				ImGui::SetNextWindowBgAlpha(0.9f);
 
 				if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
-					if (!scene.entities.empty())
-						selectedEntity = scene.entities.back();
-
 					if (selectedEntity != nullptr) {
 						selectedEntity->editmodeRender();
 					}
