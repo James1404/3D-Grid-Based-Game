@@ -17,6 +17,8 @@ public:
 	}
 
 	void init() override {
+		strcpy_s(name, "Player");
+
 		this->renderer.InitSprite("resources/textures/player.png");
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
@@ -86,9 +88,15 @@ public:
 	}
 
 	void editmodeRender() override {
-		ImGui::Text("Player");
-		ImGui::DragFloat("Position.x##" + this->id, &this->position.x);
-		ImGui::DragFloat("Position.y##" + this->id, &this->position.y);
+		ImGui::PushID(this->id);
+		ImGui::InputText("Name", this->name, IM_ARRAYSIZE(this->name));
+		ImGui::Text("ID: %i", this->id);
+
+		ImGui::Separator();
+
+		ImGui::DragFloat("Position.x", &this->position.x);
+		ImGui::DragFloat("Position.y", &this->position.y);
+		ImGui::PopID();
 	}
 
 	glm::vec2 position;
