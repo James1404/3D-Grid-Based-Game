@@ -5,6 +5,7 @@
 class Entity {
 public:
 	int id;
+	char name[128] = "name";
 
 	Entity() : id(currentID++) { printf("Entity %i Created\n", id); }
 	~Entity() { printf("Entity %i Destroyed\n", id); }
