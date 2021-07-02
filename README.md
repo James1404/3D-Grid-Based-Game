@@ -1,4 +1,4 @@
-# GameProject
+# Roadside Inn (temporary name)
 
 Art Style:
   - 320 x 200
