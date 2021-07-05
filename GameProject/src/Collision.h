@@ -4,26 +4,32 @@
 #include <map>
 #include <string>
 
-struct Rect {
-	glm::vec2 pos;
-	glm::vec2 size;
-};
+namespace Collision {
+    struct Rect {
+        glm::vec2 pos;
+        glm::vec2 size;
+    };
 
-struct Ray {
-    glm::vec2 origin;
-    glm::vec2 direction;
-};
+    struct Ray {
+        glm::vec2 origin;
+        glm::vec2 direction;
+    };
 
-class Collision {
-public:
-    static bool RectVsRect(const Rect* rect1, const Rect* rect2);
-    static bool PointVsRect(const glm::vec2* point, const Rect* rect);
-};
+    struct RayHit {
+        glm::vec2 point;
+        glm::vec2 normal;
+        float distance;
+    };
+
+    bool RectVsRect(const Rect* rect1, const Rect* rect2);
+    bool PointVsRect(const glm::vec2& point, const Rect* rect);
+    bool RayVsRect(const Ray* ray, const Rect* target, RayHit& hit);
+}
 
 class CollisionManager {
 public:
-    static std::map<int, Rect*> colliders;
+    static std::map<int, Collision::Rect*> colliders;
 
-    static void AddCollider(int id, Rect* rect);
-    static void UpdateCollider(int id, Rect* rect);
+    static void AddCollider(int id, Collision::Rect* rect);
+    static void UpdateCollider(int id, Collision::Rect* rect);
 };
