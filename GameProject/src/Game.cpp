@@ -204,8 +204,8 @@ void Game::render() {
 
 				if (ImGui::Begin("Entities", &p_open, window_flags)) {
 					if (ImGui::BeginPopupContextWindow()) {
-						if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); }
-						if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); }
+						if (ImGui::MenuItem("Create Sprite")) { scene.CreateSprite(); selectedEntity = scene.entities.back(); }
+						if (ImGui::MenuItem("Create Player")) { scene.CreatePlayer(); selectedEntity = scene.entities.back(); }
 						ImGui::EndPopup();
 					}
 

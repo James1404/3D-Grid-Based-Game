@@ -64,9 +64,8 @@ public:
 			}
 		}
 		
-		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+		glm::vec2 moveVector = glm::vec2(std::floor(this->velocity.x), std::floor(this->velocity.y));
 		moveVector /= speed;
-		moveVector *= dt;
 
 		this->collider.pos = this->position + moveVector;
 
@@ -103,7 +102,7 @@ public:
 	glm::vec2 velocity;
 private:
 	SpriteRenderer renderer;
-	Rect collider;
+	Collision::Rect collider;
 
-	float speed = 10;
+	float speed = 50;
 };
