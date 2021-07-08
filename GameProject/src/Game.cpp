@@ -1,7 +1,6 @@
 #pragma once
 #include "Game.h"
-#include "Entities/EditmodeCamera.h"
-#include "Entities/DebugMode.h"
+#include "Entities/Editor.h"
 
 enum class GameState {
 	GameState_Game,
@@ -24,8 +23,9 @@ int Game::screen_height = 720;
 const int Game::screen_resolution_x = 320;
 const int Game::screen_resolution_y = 200;
 
-DebugMode debugMode;
 Scene Game::scene;
+
+Editor editor;
 
 void Game::init(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -52,7 +52,7 @@ void Game::init(const char* title) {
 
 		// Initialize Entites
 		scene.init();
-		debugMode.init();
+		editor.init();
 
 		isRunning = true;
 	}
@@ -97,7 +97,7 @@ void Game::update() {
 	double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 	if (gameState == GameState::GameState_Edit) {
-		debugMode.update(dt);
+		editor.update(dt);
 	}
 	else {
 		scene.update(dt);
@@ -127,7 +127,7 @@ void Game::render() {
 
 	// render imgui windows
 	if (gameState == GameState::GameState_Edit) {
-		debugMode.render();
+		editor.render();
 	}
 
 	// Swap buffer
