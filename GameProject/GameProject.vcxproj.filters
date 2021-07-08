@@ -113,9 +113,6 @@
     <ClInclude Include="src\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\EditmodeCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -128,7 +125,7 @@
     <ClInclude Include="src\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\DebugMode.h">
+    <ClInclude Include="src\Entities\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
