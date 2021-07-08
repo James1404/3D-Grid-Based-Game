@@ -15,20 +15,17 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
-enum class GameState {
-	GameState_Game,
-	GameState_Menu,
-	GameState_Edit
-};
+#include "Scene.h"
 
 class Game {
 public:
 	void init(const char* title);
 	void handleEvents();
 	void update();
-	bool running() { return isRunning; }
 	void render();
 	void clean();
+
+	bool running() { return isRunning; }
 
 	static int screen_width, screen_height;
 	static const int screen_resolution_x, screen_resolution_y;
@@ -37,10 +34,10 @@ public:
 	static glm::mat4 view;
 
 	static SDL_Event event;
+	static SDL_Window* window;
+	static SDL_GLContext context;
 
-	static GameState gameState;
+	static Scene scene;
 private:
 	bool isRunning = false;
-	SDL_Window* window;
-	SDL_GLContext context;
 };
