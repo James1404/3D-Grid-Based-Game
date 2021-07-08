@@ -2,7 +2,7 @@
 #include "Entity.h"
 #include "../Game.h"
 
-class DebugMode : public Entity {
+class Editor : public Entity {
 public:
 	void init() override {
 		ImGui::CreateContext();
