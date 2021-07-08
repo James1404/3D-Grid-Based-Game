@@ -1,19 +1,18 @@
 #include <SDL.h>
 #include "Game.h"
 
-Game* game = nullptr;
+Game game;
 
 int main(int argc, char* args[]) {
-	game = new Game();
-	game->init("Window");
+	game.init("Window");
 
-	while (game->running()) {
-		game->handleEvents();
-		game->update();
-		game->render();
+	while (game.running()) {
+		game.handleEvents();
+		game.update();
+		game.render();
 	}
 
-	game->clean();
+	game.clean();
 
 	return 0;
 }
