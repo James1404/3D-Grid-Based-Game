@@ -171,6 +171,7 @@
     <ClInclude Include="includes\imgui\imstb_rectpack.h" />
     <ClInclude Include="includes\imgui\imstb_textedit.h" />
     <ClInclude Include="includes\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Entities\DebugMode.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Collision.h" />
