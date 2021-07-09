@@ -74,7 +74,19 @@ public:
 		for (const auto& collider : CollisionManager::colliders) {
 			if (collider.first != id) {
 				if (Collision::RectVsRect(&this->collider, collider.second)) {
-					return;
+					this->collider.pos = glm::vec2(this->position.x + moveVector.x, this->position.y);
+					if (Collision::RectVsRect(&this->collider, collider.second)) {
+						this->collider.pos = glm::vec2(this->position.x, this->position.y + moveVector.y);
+						if (Collision::RectVsRect(&this->collider, collider.second)) {
+							return;
+						}
+						else {
+							moveVector.x = 0;
+						}
+					}
+					else {
+						moveVector.y = 0;
+					}
 				}
 			}
 		}
