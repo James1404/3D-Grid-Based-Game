@@ -16,7 +16,7 @@ void Scene::saveScene() {
 	fs.open("Level1.bin", std::ios::out | std::ios::binary | std::ios::app);
 	if (fs.is_open()) {
 		for (auto entity : entities) {
-			entity->save(fs);
+			fs.write((char*)&entity, sizeof(entity));
 		}
 	}
 	else {
@@ -29,16 +29,13 @@ void Scene::saveScene() {
 void Scene::loadScene() {
 	entities.clear();
 
-	std::ifstream binaryFile;
-	int size = 0;
+	std::ifstream binaryFile("Level1.bin", std::ios::binary);
 
-	binaryFile.open("Level1.bin", std::ios::in | std::ios::binary);
-	binaryFile.seekg(0, std::ios::end);
-	size = (int)binaryFile.tellg();
-	binaryFile.seekg(0, std::ios::beg);
-
-	for (auto entity : entities) {
-		entity->load(binaryFile);
+	Entity entity;
+	while (binaryFile.read(reinterpret_cast<char*>(&entity), sizeof(entity))) {
+		auto e = std::make_shared<Entity>(entity);
+		e->init();
+		entities.push_back(e);
 	}
 
 	binaryFile.close();
