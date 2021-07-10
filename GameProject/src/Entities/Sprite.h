@@ -6,14 +6,6 @@
 
 class Sprite : public Entity {
 public:
-	void save(std::ofstream& f) override {
-		f.write((char*)&this->position, sizeof(this->position));
-	}
-
-	void load(std::ifstream& f) override {
-		f.read((char*)&this->position, sizeof(this->position));
-	}
-
 	void init() override {
 		strcpy_s(name, "Sprite");
 

@@ -8,14 +8,6 @@
 
 class Player : public Entity {
 public:
-	void save(std::ofstream& f) override {
-		f.write((char*)&position, sizeof(position));
-	}
-
-	void load(std::ifstream& f) override {
-		f.read((char*)&position, sizeof(position));
-	}
-
 	void init() override {
 		strcpy_s(name, "Player");
 
