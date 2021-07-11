@@ -128,5 +128,8 @@
     <ClInclude Include="src\Entities\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
