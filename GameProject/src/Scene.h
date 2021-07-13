@@ -1,9 +1,8 @@
 #pragma once
-#include "Entities/Entity.h"
+#include "Entity.h"
 
 #include <vector>
 #include <memory>
-#include <fstream>
 
 class Scene {
 public:

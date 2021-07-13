@@ -5,40 +5,57 @@
 
 #include "SpriteRenderer.h"
 
+#include <json.hpp>
+#include <fstream>
+
 SpriteRenderer background;
 
 void Scene::newScene() {
 	entities.clear();
+	printf("New Scene\n");
 }
 
 void Scene::saveScene() {
-	std::ofstream fs;
-	fs.open("Level1.bin", std::ios::out | std::ios::binary | std::ios::app);
-	if (fs.is_open()) {
-		for (auto entity : entities) {
-			fs.write((char*)&entity, sizeof(entity));
-		}
+	// Write entity data to json file
+	nlohmann::json j;
+	for (auto const& entity : entities) {
+		j += entity->to_json();
+	}
+
+	// Open a new file and write json into it.
+	std::ofstream ofs("Level1.json");
+	if (ofs.is_open()) {
+		ofs << j.dump(4) << std::endl;
 	}
 	else {
 		printf("Cannot open file\n");
 	}
 
-	fs.close();
+	ofs.close();
+	printf("Save Scene\n");
 }
 
 void Scene::loadScene() {
 	entities.clear();
 
-	std::ifstream binaryFile("Level1.bin", std::ios::binary);
-
-	Entity entity;
-	while (binaryFile.read(reinterpret_cast<char*>(&entity), sizeof(entity))) {
-		auto e = std::make_shared<Entity>(entity);
-		e->init();
-		entities.push_back(e);
+	// Write files data to the json variable.
+	nlohmann::json j;
+	std::ifstream ifs("Level1.json");
+	if (ifs.is_open()) {
+		ifs >> j;
+	}
+	else {
+		printf("Cannot open file\n");
 	}
 
-	binaryFile.close();
+	ifs.close();
+	
+	// loop through the json items.
+	for (const auto& item : j.items()) {
+
+	}
+
+	printf("Load Scene\n");
 }
 
 void Scene::init() {
