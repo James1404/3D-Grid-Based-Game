@@ -1,8 +1,9 @@
 #pragma once
-#include "Entity.h"
+#include "../Entity.h"
 #include "../SpriteRenderer.h"
-#include "../Game.h"
 #include "../Collision.h"
+
+#include <json.hpp>
 
 class Sprite : public Entity {
 public:
@@ -38,9 +39,23 @@ public:
 		ImGui::DragFloat("Position.y", &this->position.y);
 		ImGui::PopID();
 	}
+
+	nlohmann::json to_json() override {
+		return nlohmann::json{
+			{"name", this->name},
+			{"position.x", this->position.x},
+			{"position.y", this->position.y}
+		};
+	}
+
+	void from_json(nlohmann::json& j) {
+		j.at("name").get_to(this->name);
+		j.at("position.x").get_to(this->position.x);
+		j.at("position.y").get_to(this->position.y);
+	}
+
+	glm::vec2 position;
 private:
 	SpriteRenderer renderer;
 	Collision::Rect collider;
-
-	glm::vec2 position;
 };
