@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "../Entity.h"
 #include "../Game.h"
 
 class Editor : public Entity {

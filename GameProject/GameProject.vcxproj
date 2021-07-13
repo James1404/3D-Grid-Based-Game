@@ -154,7 +154,7 @@
     <ClCompile Include="includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Collision.cpp" />
-    <ClCompile Include="src\Entities\Entity.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\SpriteRenderer.cpp" />
@@ -180,7 +180,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\Entities\Player.h" />
-    <ClInclude Include="src\Entities\Entity.h" />
+    <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
