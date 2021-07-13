@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <fstream>
 
+#include <json.hpp>
+
 class Entity {
 public:
 	int id;
@@ -15,6 +17,9 @@ public:
 	virtual void render() {}
 
 	virtual void editmodeRender() {}
+
+	virtual nlohmann::json to_json() { return nlohmann::json{}; }
+	virtual void from_json(nlohmann::json& j) { }
 private:
 	static int currentID;
 };
