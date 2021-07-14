@@ -18,8 +18,8 @@ public:
 
 	virtual void editmodeRender() {}
 
-	virtual nlohmann::json to_json() { return nlohmann::json{}; }
-	virtual void from_json(nlohmann::json& j) { }
+	virtual void to_json(nlohmann::json& j) { }
+	virtual void from_json(const nlohmann::json& j) { }
 private:
 	static int currentID;
 };
