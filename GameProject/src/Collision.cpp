@@ -1,19 +1,19 @@
 #include "Collision.h"
 
-std::map<int, Collision::Rect*> CollisionManager::colliders;
+std::map<int, Collision::Collider*> CollisionManager::colliders;
 
-bool Collision::RectVsRect(const Rect* rect1, const Rect* rect2) {
-    return rect1->pos.x < rect2->pos.x + rect2->size.x &&
-        rect1->pos.x + rect1->size.x > rect2->pos.x &&
-        rect1->pos.y < rect2->pos.y + rect2->size.y &&
-        rect1->pos.y + rect1->size.y > rect2->pos.y;
+bool Collision::ColliderVsCollider(const Collider* collider1, const Collider* collider2) {
+    return collider1->pos.x < collider2->pos.x + collider2->size.x &&
+           collider1->pos.x + collider1->size.x > collider2->pos.x &&
+           collider1->pos.y < collider2->pos.y + collider2->size.y &&
+           collider1->pos.y + collider1->size.y > collider2->pos.y;
 }
 
-bool Collision::PointVsRect(const glm::vec2& point, const Rect* rect) {
-    return (point.x >= rect->pos.x && point.y >= rect->pos.y && point.x < rect->pos.x + rect->size.x && point.y < rect->pos.y + rect->size.y);
+bool Collision::PointVsCollider(const glm::vec2& point, const Collider* collider) {
+    return (point.x >= collider->pos.x && point.y >= collider->pos.y && point.x < collider->pos.x + collider->size.x && point.y < collider->pos.y + collider->size.y);
 }
 
-bool Collision::RayVsRect(const Ray* ray, const Rect* target, RayHit& hit) {
+bool Collision::RayVsCollider(const Ray* ray, const Collider* target, RayHit& hit) {
     hit.normal = { 0,0 };
     hit.point = { 0,0 };
 
@@ -53,10 +53,6 @@ bool Collision::RayVsRect(const Ray* ray, const Rect* target, RayHit& hit) {
     return true;
 }
 
-void CollisionManager::AddCollider(int id, Collision::Rect* rect) {
-    colliders[id] = rect;
-}
-
-void CollisionManager::UpdateCollider(int id, Collision::Rect* rect) {
-    colliders[id] = rect;
+void CollisionManager::AddCollider(int id, Collision::Collider* collider) {
+    colliders[id] = collider;
 }

@@ -20,8 +20,6 @@ public:
 
 	void update(double dt) override {
 		this->collider.pos = this->position;
-
-		CollisionManager::UpdateCollider(id, &this->collider);
 	}
 
 	void render() override {
@@ -59,5 +57,5 @@ public:
 	glm::vec2 position;
 private:
 	SpriteRenderer renderer;
-	Collision::Rect collider;
+	Collision::Collider collider;
 };

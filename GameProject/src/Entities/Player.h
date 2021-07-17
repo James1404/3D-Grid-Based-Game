@@ -61,15 +61,13 @@ public:
 
 		this->collider.pos = this->position + moveVector;
 
-		CollisionManager::UpdateCollider(id, &this->collider);
-
 		for (const auto& collider : CollisionManager::colliders) {
 			if (collider.first != id) {
-				if (Collision::RectVsRect(&this->collider, collider.second)) {
+				if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
 					this->collider.pos = glm::vec2(this->position.x + moveVector.x, this->position.y);
-					if (Collision::RectVsRect(&this->collider, collider.second)) {
+					if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
 						this->collider.pos = glm::vec2(this->position.x, this->position.y + moveVector.y);
-						if (Collision::RectVsRect(&this->collider, collider.second)) {
+						if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
 							return;
 						}
 						else {
@@ -122,7 +120,7 @@ public:
 	glm::vec2 velocity;
 private:
 	SpriteRenderer renderer;
-	Collision::Rect collider;
+	Collision::Collider collider;
 
 	float speed = 50;
 };
