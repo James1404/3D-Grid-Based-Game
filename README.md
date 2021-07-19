@@ -6,8 +6,8 @@ Art Style:
   - No filled colors, only outlines.
 
 TODO:
-  - ~~Finally finish level saving / loading~~.
-  - ~~Build a robust input system (https://www.gamedev.net/tutorials/_/technical/game-programming/designing-a-robust-input-handling-system-for-games-r2975/, https://gameprogrammingpatterns.com/command.html).~~
+  - ~~Finally finish level saving / loading.~~
+  - ~~Build a robust input system.~~
   - Batch Rendering
   - Sprite Sheet Support
   - Spatial Hashing (for collision)
