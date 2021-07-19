@@ -3,6 +3,7 @@
 #include "../Game.h"
 #include "../SpriteRenderer.h"
 #include "../Collision.h"
+#include "../Input.h"
 
 #include <json.hpp>
 
@@ -18,46 +19,33 @@ public:
 	}
 
 	void update(double dt) {
-		if (Game::event.type == SDL_KEYDOWN) {
-			switch (Game::event.key.keysym.sym) {
-			case SDLK_w:
-				this->velocity.y = 1;
-				break;
-			case SDLK_s:
-				this->velocity.y = -1;
-				break;
-			case SDLK_a:
-				this->velocity.x = -1;
-				break;
-			case SDLK_d:
-				this->velocity.x = 1;
-				break;
-			default:
-				break;
-			}
+		if (Input::instance().ButtonPressed("MoveUp")) {
+			this->velocity.y = 1;
+		}
+		else if (Input::instance().ButtonPressed("MoveDown")) {
+			this->velocity.y = -1;
+		}
+		else {
+			this->velocity.y = 0;
 		}
 
-		if (Game::event.type == SDL_KEYUP) {
-			switch (Game::event.key.keysym.sym) {
-			case SDLK_w:
-				this->velocity.y = 0;
-				break;
-			case SDLK_s:
-				this->velocity.y = 0;
-				break;
-			case SDLK_a:
-				this->velocity.x = 0;
-				break;
-			case SDLK_d:
-				this->velocity.x = 0;
-				break;
-			default:
-				break;
-			}
+		if (Input::instance().ButtonPressed("MoveLeft")) {
+			this->velocity.x = -1;
+		}
+		else if (Input::instance().ButtonPressed("MoveRight")) {
+			this->velocity.x = 1;
+		}
+		else {
+			this->velocity.x = 0;
+		}
+
+		if (Input::instance().ButtonDown("Shoot")) {
+			printf("Shoot\n");
 		}
 		
 		glm::vec2 moveVector = glm::vec2(std::floor(this->velocity.x), std::floor(this->velocity.y));
 		moveVector /= speed;
+		moveVector *= dt;
 
 		this->collider.pos = this->position + moveVector;
 

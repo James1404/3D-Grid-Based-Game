@@ -1,6 +1,7 @@
 #pragma once
 #include "../Entity.h"
 #include "../Game.h"
+#include "../Input.h"
 
 class Editor : public Entity {
 public:
@@ -13,49 +14,35 @@ public:
 	}
 
 	void update(double dt) override {
-		if (Game::event.type == SDL_KEYDOWN) {
-			switch (Game::event.key.keysym.sym) {
-			case SDLK_w:
-				this->velocity.y = -1;
-				break;
-			case SDLK_s:
-				this->velocity.y = 1;
-				break;
-			case SDLK_a:
-				this->velocity.x = 1;
-				break;
-			case SDLK_d:
-				this->velocity.x = -1;
-				break;
-			default:
-				break;
-			}
+		if (Input::instance().ButtonPressed("MoveUp")) {
+			this->velocity.y = 1;
+		}
+		else if (Input::instance().ButtonPressed("MoveDown")) {
+			this->velocity.y = -1;
+		}
+		else {
+			this->velocity.y = 0;
 		}
 
-		if (Game::event.type == SDL_KEYUP) {
-			switch (Game::event.key.keysym.sym) {
-			case SDLK_w:
-				this->velocity.y = 0;
-				break;
-			case SDLK_s:
-				this->velocity.y = 0;
-				break;
-			case SDLK_a:
-				this->velocity.x = 0;
-				break;
-			case SDLK_d:
-				this->velocity.x = 0;
-				break;
-			default:
-				break;
-			}
+		if (Input::instance().ButtonPressed("MoveLeft")) {
+			this->velocity.x = -1;
+		}
+		else if (Input::instance().ButtonPressed("MoveRight")) {
+			this->velocity.x = 1;
+		}
+		else {
+			this->velocity.x = 0;
+		}
+
+		if (Input::instance().ButtonDown("Shoot")) {
+			printf("Shoot\n");
 		}
 
 		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
 		moveVector /= speed;
 		moveVector *= dt;
 
-		Game::view = glm::translate(Game::view, glm::vec3(moveVector, 0.0f));
+		Game::view = glm::translate(Game::view, glm::vec3(-moveVector, 0.0f));
 	}
 
 	void render() override {
@@ -114,10 +101,16 @@ public:
 
 				if (ImGui::Begin("Entities", &p_open, window_flags)) {
 					if (ImGui::BeginMenuBar()) {
-						if (ImGui::BeginMenu("File")) {
+						if (ImGui::BeginMenu("Scene")) {
 							if (ImGui::MenuItem("New")) { Game::scene.newScene(); }
 							if (ImGui::MenuItem("Save")) { Game::scene.saveScene(); }
 							if (ImGui::MenuItem("Load")) { Game::scene.loadScene(); }
+							ImGui::EndMenu();
+						}
+
+						if (ImGui::BeginMenu("Input")) {
+							if (ImGui::MenuItem("Save")) { Input::instance().SaveInput(); }
+							if (ImGui::MenuItem("Load")) { Input::instance().LoadInput(); }
 							ImGui::EndMenu();
 						}
 
