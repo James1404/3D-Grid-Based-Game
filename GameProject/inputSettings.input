@@ -1,0 +1,17 @@
+{
+    "MoveDown": [
+        115
+    ],
+    "MoveLeft": [
+        97
+    ],
+    "MoveRight": [
+        100
+    ],
+    "MoveUp": [
+        119
+    ],
+    "Shoot": [
+        32
+    ]
+}
