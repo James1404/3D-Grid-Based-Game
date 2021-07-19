@@ -7,7 +7,7 @@ Art Style:
 
 TODO:
   - ~~Finally finish level saving / loading~~.
-  - Build a robust input system (https://www.gamedev.net/tutorials/_/technical/game-programming/designing-a-robust-input-handling-system-for-games-r2975/, https://gameprogrammingpatterns.com/command.html).
+  - ~~Build a robust input system (https://www.gamedev.net/tutorials/_/technical/game-programming/designing-a-robust-input-handling-system-for-games-r2975/, https://gameprogrammingpatterns.com/command.html).~~
   - Batch Rendering
   - Sprite Sheet Support
   - Spatial Hashing (for collision)
