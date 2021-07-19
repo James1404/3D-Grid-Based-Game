@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Entities/Editor.h"
+#include "Input.h"
 
 enum class GameState {
 	GameState_Game,
@@ -85,6 +86,8 @@ void Game::handleEvents() {
 		default:
 			break;
 		}
+
+		Input::instance().UpdateInput(event);
 	}
 }
 
