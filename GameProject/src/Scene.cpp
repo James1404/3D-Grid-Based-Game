@@ -30,7 +30,7 @@ void Scene::saveScene() {
 		ofs << j.dump(4) << std::endl;
 	}
 	else {
-		printf("Cannot open file\n");
+		printf("Cannot open scene file\n");
 	}
 
 	ofs.close();
@@ -47,7 +47,7 @@ void Scene::loadScene() {
 		j = nlohmann::json::parse(ifs);
 	}
 	else {
-		printf("Cannot open file\n");
+		printf("Cannot open scene file\n");
 	}
 
 	ifs.close();
