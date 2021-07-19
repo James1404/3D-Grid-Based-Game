@@ -8,6 +8,7 @@ Art Style:
 TODO:
   - ~~Finally finish level saving / loading~~
   - ~~Build a robust input system~~
+  - Centred Sprites and Colliders
   - Batch Rendering
   - Sprite Sheet Support
   - Spatial Hashing (for collision)
