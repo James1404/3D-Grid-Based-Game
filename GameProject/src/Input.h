@@ -10,10 +10,10 @@
 class Input {
 private:
 	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
-	
-	Uint8* mPrevKeyboardState;
-	const Uint8* mKeyboardState;
-	int mKeyLength;
+
+	const Uint8* KEYBOARD;
+	Uint8* P_KEYBOARD;
+	int KEYBOARD_SIZE;
 
 	Input();
 	~Input();
