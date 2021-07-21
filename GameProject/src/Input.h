@@ -9,10 +9,10 @@
 
 class Input {
 private:
-	std::multimap<std::string, SDL_KeyCode> MAPPED_KEYS;
+	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
 	
-	bool KEYS[322];
-	bool P_KEYS[322];
+	bool KEYS[512];
+	bool P_KEYS[512];
 
 	Input();
 	~Input();

@@ -1,25 +1,25 @@
 #include "Input.h"
 
 Input::Input() {
-	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDLK_w));
-	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDLK_s));
-	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDLK_a));
-	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDLK_d));
-	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDLK_SPACE));
+	MAPPED_KEYS.insert(std::make_pair("Exit",		SDL_SCANCODE_ESCAPE));
+	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_W));
+	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDL_SCANCODE_S));
+	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDL_SCANCODE_A));
+	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_D));
+	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_LSHIFT));
+	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_SPACE));
 }
 
-Input::~Input() {
-
-}
+Input::~Input() { }
 
 void Input::UpdateInput(SDL_Event& e) {
-	memcpy(P_KEYS, KEYS, 322);
+	memcpy(P_KEYS, KEYS, 512);
 	if (e.type == SDL_KEYDOWN) {
-		KEYS[e.key.keysym.sym] = true;
+		KEYS[e.key.keysym.scancode] = true;
 	}
 
 	if (e.type == SDL_KEYUP) {
-		KEYS[e.key.keysym.sym] = false;
+		KEYS[e.key.keysym.scancode] = false;
 	}
 }
 
