@@ -11,13 +11,14 @@ class Input {
 private:
 	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
 	
-	bool KEYS[512];
-	bool P_KEYS[512];
+	Uint8* mPrevKeyboardState;
+	const Uint8* mKeyboardState;
+	int mKeyLength;
 
 	Input();
 	~Input();
 public:
-	void UpdateInput(SDL_Event& e);
+	void UpdatePrevInput();
 
 	bool ButtonDown(std::string button);
 	bool ButtonPressed(std::string button);

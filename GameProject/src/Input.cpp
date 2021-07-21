@@ -8,25 +8,25 @@ Input::Input() {
 	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_D));
 	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_LSHIFT));
 	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_SPACE));
+
+	mKeyboardState = SDL_GetKeyboardState(&mKeyLength);
+	mPrevKeyboardState = new Uint8[mKeyLength];
+	memcpy(mPrevKeyboardState, mKeyboardState, mKeyLength);
 }
 
-Input::~Input() { }
+Input::~Input() {
+	delete[] mPrevKeyboardState;
+	mPrevKeyboardState = NULL;
+}
 
-void Input::UpdateInput(SDL_Event& e) {
-	memcpy(P_KEYS, KEYS, 512);
-	if (e.type == SDL_KEYDOWN) {
-		KEYS[e.key.keysym.scancode] = true;
-	}
-
-	if (e.type == SDL_KEYUP) {
-		KEYS[e.key.keysym.scancode] = false;
-	}
+void Input::UpdatePrevInput() {
+	memcpy(mPrevKeyboardState, mKeyboardState, mKeyLength);
 }
 
 bool Input::ButtonDown(std::string button) {
 	auto range = MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (KEYS[KEY->second] && !P_KEYS[KEY->second]) {
+		if (mKeyboardState[KEY->second] && !mPrevKeyboardState[KEY->second]) {
 			return true;
 		}
 	}
@@ -37,7 +37,7 @@ bool Input::ButtonDown(std::string button) {
 bool Input::ButtonPressed(std::string button) {
 	auto range = MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (KEYS[KEY->second]) {
+		if (mKeyboardState[KEY->second]) {
 			return true;
 		}
 	}
@@ -48,7 +48,7 @@ bool Input::ButtonPressed(std::string button) {
 bool Input::ButtonReleased(std::string button) {
 	auto range = MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (!KEYS[KEY->second] && P_KEYS[KEY->second]) {
+		if (!mKeyboardState[KEY->second] && mPrevKeyboardState[KEY->second]) {
 			return true;
 		}
 	}
