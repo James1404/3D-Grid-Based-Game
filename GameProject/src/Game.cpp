@@ -3,16 +3,8 @@
 #include "Entities/Editor.h"
 #include "Input.h"
 
-enum class GameState {
-	GameState_Game,
-	GameState_Menu,
-	GameState_Edit
-};
-
 glm::mat4 Game::projection;
 glm::mat4 Game::view = glm::mat4(1.0f);
-
-GameState gameState = GameState::GameState_Game;
 
 SDL_Event Game::event;
 SDL_Window* Game::window;
@@ -26,6 +18,7 @@ const int Game::screen_resolution_y = 200;
 
 Scene Game::scene;
 
+bool inEditor = false;
 Editor editor;
 
 void Game::init(const char* title) {
@@ -73,16 +66,6 @@ void Game::handleEvents() {
 				SDL_SetWindowSize(window, screen_width, screen_height);
 			}
 			break;
-		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE) {
-				if (gameState == GameState::GameState_Game) {
-					gameState = GameState::GameState_Edit;
-					break;
-				}
-
-				gameState = GameState::GameState_Game;
-			}
-			break;
 		default:
 			break;
 		}
@@ -99,7 +82,11 @@ void Game::update() {
 
 	double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-	if (gameState == GameState::GameState_Edit) {
+	if (Input::instance().ButtonDown("Exit")) {
+		inEditor = !inEditor;
+	}
+
+	if (inEditor) {
 		editor.update(dt);
 	}
 	else {
@@ -129,7 +116,7 @@ void Game::render() {
 	scene.render();
 
 	// render imgui windows
-	if (gameState == GameState::GameState_Edit) {
+	if (inEditor) {
 		editor.render();
 	}
 
