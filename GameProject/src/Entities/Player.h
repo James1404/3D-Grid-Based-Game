@@ -19,16 +19,6 @@ public:
 	}
 
 	void update(double dt) {
-		if (Input::instance().ButtonPressed("MoveUp")) {
-			this->velocity.y = 1;
-		}
-		else if (Input::instance().ButtonPressed("MoveDown")) {
-			this->velocity.y = -1;
-		}
-		else {
-			this->velocity.y = 0;
-		}
-
 		if (Input::instance().ButtonPressed("MoveLeft")) {
 			this->velocity.x = -1;
 		}

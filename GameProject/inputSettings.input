@@ -1,17 +1,23 @@
 {
+    "Exit": [
+        41
+    ],
     "MoveDown": [
-        115
+        22
     ],
     "MoveLeft": [
-        97
+        4
     ],
     "MoveRight": [
-        100
+        7
     ],
     "MoveUp": [
-        119
+        26
+    ],
+    "Run": [
+        225
     ],
     "Shoot": [
-        32
+        44
     ]
 }
