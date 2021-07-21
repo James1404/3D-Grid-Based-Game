@@ -69,8 +69,6 @@ void Game::handleEvents() {
 		default:
 			break;
 		}
-
-		Input::instance().UpdateInput(event);
 	}
 }
 
@@ -92,6 +90,8 @@ void Game::update() {
 	else {
 		scene.update(dt);
 	}
+
+	Input::instance().UpdatePrevInput();
 }
 
 void Game::render() {
