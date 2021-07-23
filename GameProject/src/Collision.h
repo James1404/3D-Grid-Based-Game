@@ -6,13 +6,17 @@
 
 namespace Collision {
     struct Collider {
+        Collider();
+        ~Collider();
+
+        unsigned int id;
+
         glm::vec2 pos;
         glm::vec2 size;
-    };
 
-    struct Ray {
-        glm::vec2 origin;
-        glm::vec2 direction;
+        bool ColliderVsCollider();
+    private:
+        static unsigned int currentID;
     };
 
     struct RayHit {
@@ -21,14 +25,17 @@ namespace Collision {
         float distance;
     };
 
-    bool ColliderVsCollider(const Collider* collider1, const Collider* collider2);
-    bool PointVsCollider(const glm::vec2& point, const Collider* collider);
-    bool RayVsCollider(const Ray* ray, const Collider* target, RayHit& hit);
+    struct Ray {
+        glm::vec2 origin;
+        glm::vec2 direction;
+
+        bool RayVsCollider(RayHit& hit);
+    };
+
+    bool PointVsCollider(const glm::vec2& point);
 }
 
 class CollisionManager {
 public:
     static std::map<int, Collision::Collider*> colliders;
-
-    static void AddCollider(int id, Collision::Collider* collider);
 };
