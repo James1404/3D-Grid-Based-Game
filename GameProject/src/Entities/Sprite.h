@@ -14,8 +14,6 @@ public:
 
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
-
-		CollisionManager::AddCollider(id, &this->collider);
 	}
 
 	void update(double dt) override {

@@ -1,5 +1,8 @@
 #include "Input.h"
 
+#include <fstream>
+#include <json.hpp>
+
 Input::Input() {
 	MAPPED_KEYS.insert(std::make_pair("Exit",		SDL_SCANCODE_ESCAPE));
 	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_W));
@@ -60,7 +63,7 @@ void Input::SaveInput() {
 	nlohmann::json j;
 
 	for (auto KEY : MAPPED_KEYS) {
-		std::cout << KEY.first << " : " << KEY.second << std::endl;
+		printf("%s : %i\n", KEY.first.c_str(), KEY.second);
 		j[KEY.first] += KEY.second;
 	}
 

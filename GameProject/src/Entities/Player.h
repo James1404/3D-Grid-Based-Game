@@ -15,7 +15,6 @@ public:
 		this->renderer.InitSprite("resources/textures/player.png");
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
-		CollisionManager::AddCollider(id, &this->collider);
 	}
 
 	void update(double dt) {
@@ -29,6 +28,16 @@ public:
 			this->velocity.x = 0;
 		}
 
+		if (Input::instance().ButtonPressed("MoveUp")) {
+			this->velocity.y = 1;
+		}
+		else if (Input::instance().ButtonPressed("MoveDown")) {
+			this->velocity.y = -1;
+		}
+		else {
+			this->velocity.y = 0;
+		}
+
 		if (Input::instance().ButtonDown("Shoot")) {
 			printf("Shoot\n");
 		}
@@ -39,23 +48,19 @@ public:
 
 		this->collider.pos = this->position + moveVector;
 
-		for (const auto& collider : CollisionManager::colliders) {
-			if (collider.first != id) {
-				if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
-					this->collider.pos = glm::vec2(this->position.x + moveVector.x, this->position.y);
-					if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
-						this->collider.pos = glm::vec2(this->position.x, this->position.y + moveVector.y);
-						if (Collision::ColliderVsCollider(&this->collider, collider.second)) {
-							return;
-						}
-						else {
-							moveVector.x = 0;
-						}
-					}
-					else {
-						moveVector.y = 0;
-					}
+		if (collider.ColliderVsCollider()) {
+			this->collider.pos = glm::vec2(this->position.x + moveVector.x, this->position.y);
+			if (collider.ColliderVsCollider()) {
+				this->collider.pos = glm::vec2(this->position.x, this->position.y + moveVector.y);
+				if (collider.ColliderVsCollider()) {
+					return;
 				}
+				else {
+					moveVector.x = 0;
+				}
+			}
+			else {
+				moveVector.y = 0;
 			}
 		}
 

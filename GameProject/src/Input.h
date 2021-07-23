@@ -1,11 +1,7 @@
 #pragma once
-#include <functional>
 #include <map>
 #include <string>
 #include <SDL.h>
-#include <json.hpp>
-#include <fstream>
-#include <iostream>
 
 class Input {
 private:
