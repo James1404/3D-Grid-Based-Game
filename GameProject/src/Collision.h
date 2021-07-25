@@ -35,6 +35,7 @@ namespace Collision {
     bool PointVsCollider(const glm::vec2& point);
 }
 
+// TODO: Spatial Hashing
 class CollisionManager {
 public:
     static std::map<int, Collision::Collider*> colliders;

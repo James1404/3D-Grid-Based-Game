@@ -3,6 +3,9 @@
 #include <string>
 #include <SDL.h>
 
+// TODO: Add Controller Support
+// TODO: Add Mouse Support
+
 class Input {
 private:
 	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;

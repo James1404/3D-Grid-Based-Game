@@ -3,6 +3,9 @@
 
 #include "Shader.h"
 
+// TODO: Add Sprite Sheet
+// TODO: Batch Rendering
+
 class SpriteRenderer {
 public:
 	void InitSprite(const char* path);

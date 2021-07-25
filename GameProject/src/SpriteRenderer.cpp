@@ -48,6 +48,7 @@ void SpriteRenderer::InitSprite(const char* path) {
 	shader.SetMatrix4("projection", Game::projection, true);
 }
 
+// TODO: Centre Sprite
 void SpriteRenderer::DrawSprite(glm::vec2 position) {
 	shader.Use();
 
