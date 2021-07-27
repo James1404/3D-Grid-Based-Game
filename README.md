@@ -16,5 +16,5 @@ TODO:
   - Write a basic story outline
 
 Story:
-  The Story is about a man who dies in a car crash and awakes in a place roadside inn,
-  where he needs to come to terms with his own mortality.
+The Story is about a man who dies in a car crash and awakes in a place roadside inn,
+where he needs to come to terms with his own mortality.
