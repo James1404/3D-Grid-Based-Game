@@ -15,6 +15,5 @@ TODO:
   - Draw the main character (so every sprite is to scale with the main character)
   - Write a basic story outline
 
-Story:
-The Story is about a man who dies in a car crash and awakes in a place roadside inn,
+The story is about a man who dies in a car crash and awakes in a place roadside inn,
 where he needs to come to terms with his own mortality.
