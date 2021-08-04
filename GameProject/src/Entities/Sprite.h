@@ -36,20 +36,12 @@ public:
 		ImGui::PopID();
 	}
 
-	void to_json(nlohmann::json& j) override {
+	void SerializeEntity(nlohmann::json& j) override {
 		j["Sprite"] += {
 			{"name", this->name},
 			{ "position.x", this->position.x },
 			{ "position.y", this->position.y }
 		};
-	}
-
-	void from_json(const nlohmann::json& j) override {
-		std::string name = j["name"];
-		strcpy_s(this->name, name.c_str());
-
-		this->position.x = j["position.x"];
-		this->position.y = j["position.y"];
 	}
 
 	glm::vec2 position;
