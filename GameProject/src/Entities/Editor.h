@@ -2,6 +2,10 @@
 #include "../Entity.h"
 #include "../Game.h"
 #include "../Input.h"
+#include "../SceneSerialization.h"
+
+#include "../Entities/Player.h"
+#include "../Entities/Sprite.h"
 
 class Editor : public Entity {
 public:
@@ -102,9 +106,10 @@ public:
 				if (ImGui::Begin("Entities", &p_open, window_flags)) {
 					if (ImGui::BeginMenuBar()) {
 						if (ImGui::BeginMenu("Scene")) {
-							if (ImGui::MenuItem("New")) { Game::scene.newScene(); }
-							if (ImGui::MenuItem("Save")) { Game::scene.saveScene(); }
-							if (ImGui::MenuItem("Load")) { Game::scene.loadScene(); }
+							SceneSerialization serializer(Game::scene);
+							if (ImGui::MenuItem("New")) { serializer.ClearScene(); }
+							if (ImGui::MenuItem("Save")) { serializer.Serialize("resources/scenes/Level1.scene"); }
+							if (ImGui::MenuItem("Load")) { serializer.Deserialize("resources/scenes/Level1.scene"); }
 							ImGui::EndMenu();
 						}
 
@@ -115,8 +120,18 @@ public:
 						}
 
 						if (ImGui::BeginMenu("Create")) {
-							if (ImGui::MenuItem("Create Sprite")) { Game::scene.CreateSprite(); selectedEntity = Game::scene.entities.back(); }
-							if (ImGui::MenuItem("Create Player")) { Game::scene.CreatePlayer(); selectedEntity = Game::scene.entities.back(); }
+							if (ImGui::MenuItem("Create Sprite")) {
+								auto s = std::make_shared<Sprite>();
+								s->init();
+								Game::scene.entities.push_back(s);
+								selectedEntity = Game::scene.entities.back();
+							}
+							if (ImGui::MenuItem("Create Player")) {
+								auto p = std::make_shared<Player>();
+								p->init();
+								Game::scene.entities.push_back(p);
+								selectedEntity = Game::scene.entities.back();
+							}
 							ImGui::EndMenu();
 						}
 						ImGui::EndMenuBar();
