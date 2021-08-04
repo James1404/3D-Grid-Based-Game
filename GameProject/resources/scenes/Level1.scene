@@ -2,15 +2,15 @@
     "Player": [
         {
             "name": "Pla 12378  yer",
-            "position.x": 122.0,
-            "position.y": 56.0
+            "position.x": 138.5615692138672,
+            "position.y": 21.00023651123047
         }
     ],
     "Sprite": [
         {
             "name": "prayer",
-            "position.x": 125.0,
-            "position.y": -27.0
+            "position.x": 189.0,
+            "position.y": 13.0
         },
         {
             "name": "Sprite9735",
@@ -24,7 +24,7 @@
         },
         {
             "name": "Spr ayer",
-            "position.x": 210.0,
+            "position.x": 227.0,
             "position.y": 90.0
         }
     ]
