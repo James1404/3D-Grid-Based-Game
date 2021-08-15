@@ -9,7 +9,7 @@
 class SpriteRenderer {
 public:
 	void InitSprite(const char* path);
-	void DrawSprite(glm::vec2 position);
+	void DrawSprite(glm::vec2 position, int drawLayer);
 
 	int width, height;
 private:

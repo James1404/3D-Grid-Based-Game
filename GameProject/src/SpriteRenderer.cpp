@@ -49,11 +49,11 @@ void SpriteRenderer::InitSprite(const char* path) {
 }
 
 // TODO: Centre Sprite
-void SpriteRenderer::DrawSprite(glm::vec2 position) {
+void SpriteRenderer::DrawSprite(glm::vec2 position, int drawLayer) {
 	shader.Use();
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(position, 0.0f));
+	model = glm::translate(model, glm::vec3(position, drawLayer));
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));
 
 	shader.SetMatrix4("view", Game::view);
