@@ -4,13 +4,15 @@
 #include <map>
 #include <string>
 
+// TODO: Replace entire collision system with box2D
+
 namespace Collision {
+    // TODO: Add Layers for Collision
     struct Collider {
         Collider();
         ~Collider();
 
         unsigned int id;
-
         glm::vec2 pos;
         glm::vec2 size;
 

@@ -1,10 +1,10 @@
 #include "Collision.h"
 
 std::map<int, Collision::Collider*> CollisionManager::colliders;
-
 unsigned int Collision::Collider::currentID = 0;
 
-Collision::Collider::Collider() : id(currentID++) {
+Collision::Collider::Collider()
+    : id(currentID++), pos(0,0), size(0,0) {
     CollisionManager::colliders[id] = this;
 }
 
@@ -25,6 +25,7 @@ bool Collision::Collider::ColliderVsCollider() {
     return false;
 }
 
+// TODO: Fix Raycasting Implementation
 bool Collision::Ray::RayVsCollider(RayHit& hit) {
     for (const auto& collider : CollisionManager::colliders) {
         hit.normal = { 0,0 };
