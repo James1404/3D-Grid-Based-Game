@@ -38,10 +38,6 @@ public:
 			this->velocity.x = 0;
 		}
 
-		if (Input::instance().ButtonDown("Shoot")) {
-			printf("Shoot\n");
-		}
-
 		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
 		moveVector /= speed;
 		moveVector *= dt;
@@ -105,6 +101,7 @@ public:
 
 				if (ImGui::Begin("Entities", &p_open, window_flags)) {
 					if (ImGui::BeginMenuBar()) {
+						// Custom save / load name
 						if (ImGui::BeginMenu("Scene")) {
 							SceneSerialization serializer(Game::scene);
 							if (ImGui::MenuItem("New")) { serializer.ClearScene(); }
