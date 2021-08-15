@@ -34,6 +34,8 @@ void Game::init(const char* title) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 
+		glEnable(GL_DEPTH_TEST);
+
 		if (context != NULL) {
 			glewExperimental = GL_TRUE;
 			GLenum glewError = glewInit();
@@ -42,7 +44,7 @@ void Game::init(const char* title) {
 			}
 		}
 
-		projection = glm::ortho(0.0f, static_cast<float>(screen_resolution_x), 0.0f, static_cast<float>(screen_resolution_y), -1.0f, 1.0f);
+		projection = glm::ortho(0.0f, static_cast<float>(screen_resolution_x), 0.0f, static_cast<float>(screen_resolution_y), -100.0f, 100.0f);
 
 		// Initialize Entites
 		scene.init();
@@ -97,7 +99,7 @@ void Game::update() {
 void Game::render() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Set aspect ratio
 	float x = screen_width / (float)screen_resolution_x;
