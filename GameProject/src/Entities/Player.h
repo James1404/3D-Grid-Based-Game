@@ -12,63 +12,42 @@ public:
 	void init() override {
 		strcpy_s(name, "Player");
 
+		this->layer = Layers::Player;
 		this->renderer.InitSprite("resources/textures/player.png");
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
 	}
 
 	void update(double dt) {
-		if (Input::instance().ButtonPressed("MoveLeft")) {
-			this->velocity.x = -1;
-		}
-		else if (Input::instance().ButtonPressed("MoveRight")) {
-			this->velocity.x = 1;
-		}
-		else {
-			this->velocity.x = 0;
-		}
+		position.y = 0;
 
-		if (Input::instance().ButtonPressed("MoveUp")) {
-			this->velocity.y = 1;
-		}
-		else if (Input::instance().ButtonPressed("MoveDown")) {
-			this->velocity.y = -1;
-		}
-		else {
-			this->velocity.y = 0;
-		}
+		if (Input::instance().ButtonPressed("MoveLeft"))
+		{ this->velocity.x = -1; }
+		else if (Input::instance().ButtonPressed("MoveRight"))
+		{ this->velocity.x = 1; }
+		else
+		{ this->velocity.x = 0; }
 
-		if (Input::instance().ButtonDown("Shoot")) {
-			printf("Shoot\n");
-		}
-		
+		float movementSpeed = speed;
+		if (Input::instance().ButtonPressed("Run")) { movementSpeed *= .5f; }
+
+		// TODO: Add raycasting for shooting
+		if (Input::instance().ButtonDown("Shoot")) { printf("Shoot\n"); }
+
 		glm::vec2 moveVector = glm::vec2(std::floor(this->velocity.x), std::floor(this->velocity.y));
-		moveVector /= speed;
+		moveVector /= movementSpeed;
 		moveVector *= dt;
 
 		this->collider.pos = this->position + moveVector;
-
 		if (collider.ColliderVsCollider()) {
-			this->collider.pos = glm::vec2(this->position.x + moveVector.x, this->position.y);
-			if (collider.ColliderVsCollider()) {
-				this->collider.pos = glm::vec2(this->position.x, this->position.y + moveVector.y);
-				if (collider.ColliderVsCollider()) {
-					return;
-				}
-				else {
-					moveVector.x = 0;
-				}
-			}
-			else {
-				moveVector.y = 0;
-			}
+			return;
 		}
 
 		this->position += moveVector;
 	}
 
 	void render() override {
-		this->renderer.DrawSprite(static_cast<glm::ivec2>(position));
+		this->renderer.DrawSprite((glm::ivec2)this->position, (int)this->layer);
 	}
 
 	void editmodeRender() override {
