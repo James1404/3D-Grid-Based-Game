@@ -10,8 +10,8 @@ public:
 	void init() override {
 		strcpy_s(name, "Sprite");
 
+		this->layer = Layers::StaticCollider;
 		this->renderer.InitSprite("resources/textures/face.png");
-
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
 	}
@@ -21,7 +21,7 @@ public:
 	}
 
 	void render() override {
-		this->renderer.DrawSprite(this->position);
+		this->renderer.DrawSprite((glm::ivec2)this->position, (int)this->layer);
 	}
 
 	void editmodeRender() override {
