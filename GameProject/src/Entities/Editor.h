@@ -17,7 +17,12 @@ public:
 		ImGui_ImplOpenGL3_Init("#version 330");
 	}
 
+	Uint64 start, end;
+	float FPS;
+
 	void update(double dt) override {
+		start = SDL_GetPerformanceCounter();
+
 		if (Input::instance().ButtonPressed("MoveUp")) {
 			this->velocity.y = 1;
 		}
@@ -74,6 +79,7 @@ public:
 				ImGui::Separator();
 				ImGui::Text("Screen Size: (%i, %i)", Game::screen_width, Game::screen_height);
 				ImGui::Text("No. of Entities: %i", Game::scene.entities.size());
+				ImGui::Text("%f FPS", FPS);
 
 				ImGui::End();
 			}
@@ -189,6 +195,12 @@ public:
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		end = SDL_GetPerformanceCounter();
+
+		float elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+		FPS = 1.0f / elapsed;
+
 	}
 private:
 	glm::vec2 velocity;
