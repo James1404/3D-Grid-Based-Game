@@ -4,13 +4,23 @@
 #include <json.hpp>
 
 Input::Input() {
-	MAPPED_KEYS.insert(std::make_pair("Exit",		SDL_SCANCODE_ESCAPE));
 	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_W));
 	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDL_SCANCODE_S));
 	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDL_SCANCODE_A));
 	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_D));
+
+	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_UP));
+	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDL_SCANCODE_DOWN));
+	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDL_SCANCODE_LEFT));
+	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_RIGHT));
+
 	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_LSHIFT));
+	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_RSHIFT));
+
 	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_SPACE));
+	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_LCTRL));
+	
+	MAPPED_KEYS.insert(std::make_pair("Exit",		SDL_SCANCODE_ESCAPE));
 
 	KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
 	P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
