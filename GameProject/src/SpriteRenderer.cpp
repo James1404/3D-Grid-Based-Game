@@ -6,11 +6,6 @@
 #include <GL/glew.h>
 #include "stb_image.h"
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
 void SpriteRenderer::InitSprite(const char* path) {
 	shader.Compile("resources/shaders/core.vs", "resources/shaders/core.fs");
 
@@ -48,7 +43,6 @@ void SpriteRenderer::InitSprite(const char* path) {
 	shader.SetMatrix4("projection", Game::projection, true);
 }
 
-// TODO: Centre Sprite
 void SpriteRenderer::DrawSprite(glm::vec2 position, int drawLayer) {
 	shader.Use();
 
