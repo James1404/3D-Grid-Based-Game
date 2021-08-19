@@ -4,39 +4,38 @@
 #include <map>
 #include <string>
 
-namespace Collision {
-    // TODO: Add Layers for Collision
-    struct Collider {
-        Collider();
-        ~Collider();
+// TODO: Add Layers for Collision
+struct Collider {
+    Collider();
+    ~Collider();
 
-        unsigned int id;
-        glm::vec2 pos;
-        glm::vec2 size;
+    unsigned int id;
 
-        bool ColliderVsCollider();
-    private:
-        static unsigned int currentID;
-    };
+    glm::vec2 pos;
+    glm::vec2 size;
 
-    struct RayHit {
-        glm::vec2 point;
-        glm::vec2 normal;
-        float distance;
-    };
+    bool ColliderVsCollider();
+private:
+    static unsigned int currentID;
+};
 
-    struct Ray {
-        glm::vec2 origin;
-        glm::vec2 direction;
+struct RayHit {
+    glm::vec2 point;
+    glm::vec2 normal;
+    float distance;
+};
 
-        bool RayVsCollider(RayHit& hit);
-    };
+struct Ray {
+    glm::vec2 origin;
+    glm::vec2 direction;
 
-    bool PointVsCollider(const glm::vec2& point);
-}
+    bool RayVsCollider(RayHit& hit);
+};
+
+bool PointVsCollider(const glm::vec2& point);
 
 // TODO: Spatial Hashing
 class CollisionManager {
 public:
-    static std::map<int, Collision::Collider*> colliders;
+    static std::vector<Collider*> colliders;
 };
