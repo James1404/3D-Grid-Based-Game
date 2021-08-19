@@ -74,7 +74,7 @@ public:
 	glm::vec2 velocity;
 private:
 	SpriteRenderer renderer;
-	Collision::Collider collider;
+	Collider collider;
 
 	float speed = 50;
 };

@@ -47,5 +47,5 @@ public:
 	glm::vec2 position;
 private:
 	SpriteRenderer renderer;
-	Collision::Collider collider;
+	Collider collider;
 };
