@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-// TODO: Add Layers for Collision
+// TODO: Have Collide Use Owners ID
 struct Collider {
     Collider();
     ~Collider();
@@ -25,6 +25,7 @@ struct RayHit {
     float distance;
 };
 
+// TODO: Have Ray Use Owners ID
 struct Ray {
     glm::vec2 origin;
     glm::vec2 direction;
