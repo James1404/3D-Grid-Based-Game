@@ -6,7 +6,6 @@
 
 #include "Entity.h"
 
-// TODO: Have Collide Use Owners ID
 struct Collider {
     Collider();
     ~Collider();
@@ -28,7 +27,6 @@ struct RayHit {
     Collider* collider;
 };
 
-// TODO: Have Ray Use Owners ID
 struct Ray {
     Ray(Entity* _owner, glm::vec2 _origin, glm::vec2 _direction);
     ~Ray();
