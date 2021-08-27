@@ -14,6 +14,8 @@ public:
 
 		this->layer = Layers::Player;
 		this->renderer.InitSprite("resources/textures/player.png");
+
+		this->collider.InitCollider(this);
 		this->collider.pos = this->position;
 		this->collider.size = { this->renderer.width,this->renderer.height };
 	}
@@ -31,8 +33,15 @@ public:
 		float movementSpeed = speed;
 		if (Input::instance().ButtonPressed("Run")) { movementSpeed *= .5f; }
 
-		// TODO: Add raycasting for shooting
-		if (Input::instance().ButtonDown("Shoot")) { printf("Shoot\n"); }
+		if (Input::instance().ButtonDown("Shoot")) {
+			Ray ray(this, position, { 20,0 });
+			RayHit hit;
+
+			printf("Shoot\n");
+			if (ray.RayVsCollider(hit)) {
+				printf("You Hit %s\n", hit.collider->owner->name);
+			}
+		}
 
 		glm::vec2 moveVector = glm::vec2(std::floor(this->velocity.x), std::floor(this->velocity.y));
 		moveVector /= movementSpeed;
