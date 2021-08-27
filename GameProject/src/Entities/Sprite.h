@@ -12,7 +12,8 @@ public:
 
 		this->layer = Layers::StaticCollider;
 		this->renderer.InitSprite("resources/textures/face.png");
-		this->collider.pos = this->position;
+
+		this->collider.InitCollider(this);
 		this->collider.size = { this->renderer.width,this->renderer.height };
 	}
 
