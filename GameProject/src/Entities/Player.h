@@ -13,7 +13,7 @@ public:
 		strcpy_s(name, "Player");
 
 		this->layer = Layers::Player;
-		this->renderer.InitSprite("resources/textures/player.png");
+		this->renderer.InitSprite("data/textures/player.png");
 
 		this->collider.InitCollider(this);
 		this->collider.pos = this->position;

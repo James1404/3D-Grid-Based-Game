@@ -33,7 +33,6 @@ void Game::init(const char* title) {
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
-
 		glEnable(GL_DEPTH_TEST);
 
 		if (context != NULL) {
@@ -98,7 +97,7 @@ void Game::update() {
 
 void Game::render() {
 	// Clear screen
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Set aspect ratio

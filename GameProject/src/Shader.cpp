@@ -23,8 +23,8 @@ void Shader::Compile(const char* vertexSource, const char* fragmentSource) {
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try {
-		vShaderFile.open("resources/shaders/core.vs");
-		fShaderFile.open("resources/shaders/core.fs");
+		vShaderFile.open("data/shaders/core.vs");
+		fShaderFile.open("data/shaders/core.fs");
 		std::stringstream vShaderStream, fShaderStream;
 
 		vShaderStream << vShaderFile.rdbuf();

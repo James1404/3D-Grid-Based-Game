@@ -111,8 +111,8 @@ public:
 						if (ImGui::BeginMenu("Scene")) {
 							SceneSerialization serializer(Game::scene);
 							if (ImGui::MenuItem("New")) { serializer.ClearScene(); }
-							if (ImGui::MenuItem("Save")) { serializer.Serialize("resources/scenes/Level1.scene"); }
-							if (ImGui::MenuItem("Load")) { serializer.Deserialize("resources/scenes/Level1.scene"); }
+							if (ImGui::MenuItem("Save")) { serializer.Serialize("data/scenes/Level1.scene"); }
+							if (ImGui::MenuItem("Load")) { serializer.Deserialize("data/scenes/Level1.scene"); }
 							ImGui::EndMenu();
 						}
 

@@ -7,7 +7,7 @@
 #include "stb_image.h"
 
 void SpriteRenderer::InitSprite(const char* path) {
-	shader.Compile("resources/shaders/core.vs", "resources/shaders/core.fs");
+	shader.Compile("data/shaders/core.vs", "data/shaders/core.fs");
 
 	texture = ResourceManager::LoadTexture(path, this->width, this->height);
 
