@@ -45,6 +45,8 @@ void Game::init(const char* title) {
 
 		projection = glm::ortho(0.0f, static_cast<float>(screen_resolution_x), 0.0f, static_cast<float>(screen_resolution_y), -100.0f, 100.0f);
 
+		LoadInput();
+
 		// Initialize Entites
 		scene.init();
 		editor.init();
@@ -81,7 +83,7 @@ void Game::update() {
 
 	double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-	if (Input::instance().ButtonDown("Exit")) {
+	if (ButtonDown("Exit")) {
 		inEditor = !inEditor;
 	}
 
@@ -92,7 +94,7 @@ void Game::update() {
 		scene.update(dt);
 	}
 
-	Input::instance().UpdatePrevInput();
+	UpdatePrevInput();
 }
 
 void Game::render() {

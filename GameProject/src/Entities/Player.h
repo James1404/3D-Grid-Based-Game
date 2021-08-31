@@ -23,17 +23,17 @@ public:
 	void update(double dt) {
 		position.y = 0;
 
-		if (Input::instance().ButtonPressed("MoveLeft"))
+		if (ButtonPressed("MoveLeft"))
 		{ this->velocity.x = -1; }
-		else if (Input::instance().ButtonPressed("MoveRight"))
+		else if (ButtonPressed("MoveRight"))
 		{ this->velocity.x = 1; }
 		else
 		{ this->velocity.x = 0; }
 
 		float movementSpeed = speed;
-		if (Input::instance().ButtonPressed("Run")) { movementSpeed *= .5f; }
+		if (ButtonPressed("Run")) { movementSpeed *= .5f; }
 
-		if (Input::instance().ButtonDown("Shoot")) {
+		if (ButtonDown("Shoot")) {
 			Ray ray(this, position, { 20,0 });
 			RayHit hit;
 

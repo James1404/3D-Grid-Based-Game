@@ -23,20 +23,20 @@ public:
 	void update(double dt) override {
 		start = SDL_GetPerformanceCounter();
 
-		if (Input::instance().ButtonPressed("MoveUp")) {
+		if (ButtonPressed("MoveUp")) {
 			this->velocity.y = 1;
 		}
-		else if (Input::instance().ButtonPressed("MoveDown")) {
+		else if (ButtonPressed("MoveDown")) {
 			this->velocity.y = -1;
 		}
 		else {
 			this->velocity.y = 0;
 		}
 
-		if (Input::instance().ButtonPressed("MoveLeft")) {
+		if (ButtonPressed("MoveLeft")) {
 			this->velocity.x = -1;
 		}
-		else if (Input::instance().ButtonPressed("MoveRight")) {
+		else if (ButtonPressed("MoveRight")) {
 			this->velocity.x = 1;
 		}
 		else {
@@ -109,16 +109,15 @@ public:
 					if (ImGui::BeginMenuBar()) {
 						// Custom save / load name
 						if (ImGui::BeginMenu("Scene")) {
-							SceneSerialization serializer(Game::scene);
-							if (ImGui::MenuItem("New")) { serializer.ClearScene(); }
-							if (ImGui::MenuItem("Save")) { serializer.Serialize("data/scenes/Level1.scene"); }
-							if (ImGui::MenuItem("Load")) { serializer.Deserialize("data/scenes/Level1.scene"); }
+							if (ImGui::MenuItem("New")) { ClearScene(Game::scene); }
+							if (ImGui::MenuItem("Save")) { Serialize(Game::scene, "data/scenes/Level1.scene"); }
+							if (ImGui::MenuItem("Load")) { Deserialize(Game::scene, "data/scenes/Level1.scene"); }
 							ImGui::EndMenu();
 						}
 
 						if (ImGui::BeginMenu("Input")) {
-							if (ImGui::MenuItem("Save")) { Input::instance().SaveInput(); }
-							if (ImGui::MenuItem("Load")) { Input::instance().LoadInput(); }
+							if (ImGui::MenuItem("Save")) { SaveInput(); }
+							if (ImGui::MenuItem("Load")) { LoadInput(); }
 							ImGui::EndMenu();
 						}
 

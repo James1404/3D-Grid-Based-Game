@@ -1,29 +1,8 @@
-{
-    "Exit": [
-        41
-    ],
-    "MoveDown": [
-        22,
-        81
-    ],
-    "MoveLeft": [
-        4,
-        80
-    ],
-    "MoveRight": [
-        7,
-        79
-    ],
-    "MoveUp": [
-        26,
-        82
-    ],
-    "Run": [
-        225,
-        229
-    ],
-    "Shoot": [
-        44,
-        224
-    ]
-}
+Aim 224
+Exit 41
+MoveDown 22
+MoveLeft 4
+MoveRight 7
+MoveUp 26
+Run 225
+Shoot 44
