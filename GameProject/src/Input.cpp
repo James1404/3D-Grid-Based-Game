@@ -1,27 +1,9 @@
 #include "Input.h"
 
 #include <fstream>
-#include <json.hpp>
+#include <sstream>
 
 Input::Input() {
-	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_W));
-	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDL_SCANCODE_S));
-	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDL_SCANCODE_A));
-	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_D));
-
-	MAPPED_KEYS.insert(std::make_pair("MoveUp",		SDL_SCANCODE_UP));
-	MAPPED_KEYS.insert(std::make_pair("MoveDown",	SDL_SCANCODE_DOWN));
-	MAPPED_KEYS.insert(std::make_pair("MoveLeft",	SDL_SCANCODE_LEFT));
-	MAPPED_KEYS.insert(std::make_pair("MoveRight",	SDL_SCANCODE_RIGHT));
-
-	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_LSHIFT));
-	MAPPED_KEYS.insert(std::make_pair("Run",		SDL_SCANCODE_RSHIFT));
-
-	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_SPACE));
-	MAPPED_KEYS.insert(std::make_pair("Shoot",		SDL_SCANCODE_LCTRL));
-	
-	MAPPED_KEYS.insert(std::make_pair("Exit",		SDL_SCANCODE_ESCAPE));
-
 	KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
 	P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
 	memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
@@ -32,14 +14,14 @@ Input::~Input() {
 	P_KEYBOARD = NULL;
 }
 
-void Input::UpdatePrevInput() {
-	memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
+void UpdatePrevInput() {
+	memcpy(m_input.P_KEYBOARD, m_input.KEYBOARD, m_input.KEYBOARD_SIZE);
 }
 
-bool Input::ButtonDown(std::string button) {
-	auto range = MAPPED_KEYS.equal_range(button);
+bool ButtonDown(std::string button) {
+	auto range = m_input.MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (KEYBOARD[KEY->second] && !P_KEYBOARD[KEY->second]) {
+		if (m_input.KEYBOARD[KEY->second] && !m_input.P_KEYBOARD[KEY->second]) {
 			return true;
 		}
 	}
@@ -47,10 +29,10 @@ bool Input::ButtonDown(std::string button) {
 	return false;
 }
 
-bool Input::ButtonPressed(std::string button) {
-	auto range = MAPPED_KEYS.equal_range(button);
+bool ButtonPressed(std::string button) {
+	auto range = m_input.MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (KEYBOARD[KEY->second]) {
+		if (m_input.KEYBOARD[KEY->second]) {
 			return true;
 		}
 	}
@@ -58,10 +40,10 @@ bool Input::ButtonPressed(std::string button) {
 	return false;
 }
 
-bool Input::ButtonReleased(std::string button) {
-	auto range = MAPPED_KEYS.equal_range(button);
+bool ButtonReleased(std::string button) {
+	auto range = m_input.MAPPED_KEYS.equal_range(button);
 	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (!KEYBOARD[KEY->second] && P_KEYBOARD[KEY->second]) {
+		if (!m_input.KEYBOARD[KEY->second] && m_input.P_KEYBOARD[KEY->second]) {
 			return true;
 		}
 	}
@@ -69,17 +51,12 @@ bool Input::ButtonReleased(std::string button) {
 	return false;
 }
 
-void Input::SaveInput() {
-	nlohmann::json j;
-
-	for (auto KEY : MAPPED_KEYS) {
-		printf("%s : %i\n", KEY.first.c_str(), KEY.second);
-		j[KEY.first] += KEY.second;
-	}
-
+void SaveInput() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {
-		ofs << j.dump(4) << std::endl;
+		for (auto KEY : m_input.MAPPED_KEYS) {
+			ofs << KEY.first << " " << KEY.second << std::endl;
+		}
 	}
 	else {
 		printf("Cannot open input settings file\n");
@@ -90,19 +67,38 @@ void Input::SaveInput() {
 }
 
 // TODO: Finish Loading Function
-void Input::LoadInput() {
-	MAPPED_KEYS.clear();
+void LoadInput() {
+	m_input.MAPPED_KEYS.clear();
 
-	nlohmann::json j;
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {
-		j = nlohmann::json::parse(ifs);
+		std::string line;
+		while (std::getline(ifs, line)) {
+			std::string key;
+			unsigned int value;
+
+			std::istringstream iss(line);
+			if (!(iss >> key >> value)) { break; }
+
+			printf("%s : %u\n", key.c_str(), value);
+			m_input.MAPPED_KEYS.insert(std::make_pair(key, (SDL_Scancode)value));
+		}
 	}
 	else {
 		printf("Cannot open input settings file\n");
+
+		m_input.MAPPED_KEYS.insert(std::make_pair("MoveUp", SDL_SCANCODE_W));
+		m_input.MAPPED_KEYS.insert(std::make_pair("MoveDown", SDL_SCANCODE_S));
+		m_input.MAPPED_KEYS.insert(std::make_pair("MoveLeft", SDL_SCANCODE_A));
+		m_input.MAPPED_KEYS.insert(std::make_pair("MoveRight", SDL_SCANCODE_D));
+		m_input.MAPPED_KEYS.insert(std::make_pair("Run", SDL_SCANCODE_LSHIFT));
+		m_input.MAPPED_KEYS.insert(std::make_pair("Aim", SDL_SCANCODE_LCTRL));
+		m_input.MAPPED_KEYS.insert(std::make_pair("Shoot", SDL_SCANCODE_SPACE));
+		m_input.MAPPED_KEYS.insert(std::make_pair("Exit", SDL_SCANCODE_ESCAPE));
+
+		SaveInput();
 	}
 
 	ifs.close();
-
 	printf("Input Settings Loaded\n");
 }

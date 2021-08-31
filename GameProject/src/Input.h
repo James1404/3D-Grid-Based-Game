@@ -6,8 +6,7 @@
 // TODO: Add Controller Support
 // TODO: Add Mouse Support
 
-class Input {
-private:
+struct Input {
 	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
 
 	const Uint8* KEYBOARD;
@@ -16,18 +15,15 @@ private:
 
 	Input();
 	~Input();
-public:
-	void UpdatePrevInput();
-
-	bool ButtonDown(std::string button);
-	bool ButtonPressed(std::string button);
-	bool ButtonReleased(std::string button);
-
-	void SaveInput();
-	void LoadInput();
-
-	static Input& instance() {
-		static Input* instance = new Input();
-		return *instance;
-	}
 };
+
+static Input m_input;
+
+void SaveInput();
+void LoadInput();
+
+void UpdatePrevInput();
+
+bool ButtonDown(std::string button);
+bool ButtonPressed(std::string button);
+bool ButtonReleased(std::string button);
