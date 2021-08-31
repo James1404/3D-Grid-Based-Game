@@ -5,17 +5,14 @@
 #include "Entities/Player.h"
 #include "Entities/Sprite.h"
 
-SceneSerialization::SceneSerialization(Scene& t_scene)
-	: scene(&t_scene) { }
-
-void SceneSerialization::ClearScene() {
-	scene->entities.clear();
+void ClearScene(Scene& t_scene) {
+	t_scene.entities.clear();
 	printf("New Scene\n");
 }
 
-void SceneSerialization::Serialize(const std::string& filePath) {
+void Serialize(Scene& t_scene, const std::string& filePath) {
 	nlohmann::json j;
-	for (auto const& entity : scene->entities) {
+	for (auto const& entity : t_scene.entities) {
 		entity->SerializeEntity(j);
 	}
 
@@ -29,8 +26,8 @@ void SceneSerialization::Serialize(const std::string& filePath) {
 }
 
 // TODO: Add Reflection For Deserializeation|
-void SceneSerialization::Deserialize(const std::string& filePath) {
-	ClearScene();
+void Deserialize(Scene& t_scene, const std::string& filePath) {
+	ClearScene(t_scene);
 
 	nlohmann::json j;
 	std::ifstream ifs(filePath);
@@ -54,7 +51,7 @@ void SceneSerialization::Deserialize(const std::string& filePath) {
 			p->position.x = player["position.x"];
 			p->position.y = player["position.y"];
 
-			scene->entities.push_back(p);
+			t_scene.entities.push_back(p);
 		}
 	}
 
@@ -69,7 +66,7 @@ void SceneSerialization::Deserialize(const std::string& filePath) {
 			s->position.x = sprite["position.x"];
 			s->position.y = sprite["position.y"];
 
-			scene->entities.push_back(s);
+			t_scene.entities.push_back(s);
 		}
 	}
 }
