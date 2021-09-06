@@ -28,25 +28,17 @@ bool Collider::ColliderVsCollider() {
     return false;
 }
 
-Ray::Ray(Entity* _owner, glm::vec2 _origin, glm::vec2 _direction) {
-    this->owner = _owner;
-    this->origin = _origin;
-    this->direction = _direction;
-}
-
-Ray::~Ray() { }
-
 // TODO: Fix Raycasting Implementation
-bool Ray::RayVsCollider(RayHit& hit) {
+bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direction) {
     for (const auto& collider : CollisionManager::colliders) {
-        if (collider->owner->id != this->owner->id) {
+        if (collider->owner->id != owner->id) {
             hit.normal = { 0,0 };
             hit.point = { 0,0 };
 
-            glm::vec2 invdir = 1.0f / this->direction;
+            glm::vec2 invdir = 1.0f / direction;
 
-            glm::vec2 t_near = (collider->pos - this->origin) * invdir;
-            glm::vec2 t_far = (collider->pos + collider->size - this->origin) * invdir;
+            glm::vec2 t_near = (collider->pos - origin) * invdir;
+            glm::vec2 t_far = (collider->pos + collider->size - origin) * invdir;
 
             if (std::isnan(t_far.y) || std::isnan(t_far.x)) continue;
             if (std::isnan(t_near.y) || std::isnan(t_near.x)) continue;
@@ -63,7 +55,7 @@ bool Ray::RayVsCollider(RayHit& hit) {
             if (t_hit_far < 0)
                 continue;
 
-            hit.point = this->origin + hit.distance * this->direction;
+            hit.point = origin + hit.distance * direction;
 
             if (t_near.x > t_near.y)
                 if (invdir.x < 0)

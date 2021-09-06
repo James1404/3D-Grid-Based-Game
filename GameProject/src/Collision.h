@@ -27,18 +27,7 @@ struct RayHit {
     Collider* collider;
 };
 
-struct Ray {
-    Ray(Entity* _owner, glm::vec2 _origin, glm::vec2 _direction);
-    ~Ray();
-
-    Entity* owner;
-
-    glm::vec2 origin;
-    glm::vec2 direction;
-
-    bool RayVsCollider(RayHit& hit);
-};
-
+bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direction);
 bool PointVsCollider(const glm::vec2& point);
 
 // TODO: Spatial Hashing
