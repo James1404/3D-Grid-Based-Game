@@ -2,17 +2,28 @@
 
 #include <fstream>
 #include <sstream>
+#include <SDL.h>
 
-Input::Input() {
-	KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
-	P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
-	memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
-}
+// TODO: Add Controller Support
+// TODO: Add Mouse Support
+struct Input {
+	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
 
-Input::~Input() {
-	delete[] P_KEYBOARD;
-	P_KEYBOARD = NULL;
-}
+	const Uint8* KEYBOARD;
+	Uint8* P_KEYBOARD;
+	int KEYBOARD_SIZE;
+
+	Input() {
+		KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
+		P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
+		memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
+	}
+
+	~Input() {
+		delete[] P_KEYBOARD;
+		P_KEYBOARD = NULL;
+	}
+} static m_input;
 
 void UpdatePrevInput() {
 	memcpy(m_input.P_KEYBOARD, m_input.KEYBOARD, m_input.KEYBOARD_SIZE);
@@ -66,7 +77,6 @@ void SaveInput() {
 	printf("Input Settings Saved\n");
 }
 
-// TODO: Finish Loading Function
 void LoadInput() {
 	m_input.MAPPED_KEYS.clear();
 
