@@ -9,73 +9,91 @@
 
 class Player : public Entity {
 public:
+	enum class PlayerState {
+		STATE_IDLE,
+		STATE_MOVING,
+		STATE_AIMING
+	} CurrentState;
+
 	void init() override {
 		strcpy_s(name, "Player");
 
-		this->layer = Layers::Player;
-		this->renderer.InitSprite("data/textures/player.png");
+		layer = Layers::Player;
+		renderer.InitSprite("data/textures/player.png");
 
-		this->collider.InitCollider(this);
-		this->collider.pos = this->position;
-		this->collider.size = { this->renderer.width,this->renderer.height };
+		collider.InitCollider(this);
+		collider.pos = position;
+		collider.size = { renderer.width,renderer.height };
 	}
 
 	void update(double dt) {
 		position.y = 0;
 
-		if (ButtonPressed("MoveLeft"))
-		{ this->velocity.x = -1; }
-		else if (ButtonPressed("MoveRight"))
-		{ this->velocity.x = 1; }
-		else
-		{ this->velocity.x = 0; }
+		switch (CurrentState) {
+			case PlayerState::STATE_IDLE: {
+				if (ButtonDown("MoveLeft") || ButtonDown("MoveRight")) { CurrentState = PlayerState::STATE_MOVING; }
+				if (ButtonDown("Aim")) { CurrentState = PlayerState::STATE_AIMING; }
+				break;
+			}
+			case PlayerState::STATE_MOVING: {
+				if (ButtonPressed("MoveLeft")) { velocity.x = -1; }
+				else if (ButtonPressed("MoveRight")) { velocity.x = 1; }
+				else { CurrentState = PlayerState::STATE_IDLE; }
 
-		float movementSpeed = speed;
-		if (ButtonPressed("Run")) { movementSpeed *= .5f; }
+				float movementSpeed = speed;
+				if (ButtonPressed("Run")) { movementSpeed *= .5f; }
 
-		if (ButtonDown("Shoot")) {
-			Ray ray(this, position, { 20,0 });
-			RayHit hit;
+				glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+				moveVector /= movementSpeed;
+				moveVector *= dt;
 
-			printf("Shoot\n");
-			if (ray.RayVsCollider(hit)) {
-				printf("You Hit %s\n", hit.collider->owner->name);
+				collider.pos = position + moveVector;
+				if (collider.ColliderVsCollider()) {
+					return;
+				}
+
+				this->position += moveVector;
+				break;
+			}
+			case PlayerState::STATE_AIMING: {
+				if (ButtonDown("Shoot")) {
+					printf("Shoot\n");
+
+					RayHit hit;
+					if (RayVsCollider(this, hit, position, { 20,0 })) {
+						printf("You Hit %s\n", hit.collider->owner->name);
+					}
+				}
+
+				if (ButtonReleased("Aim")) {
+					CurrentState = PlayerState::STATE_IDLE;
+				}
+				break;
 			}
 		}
-
-		glm::vec2 moveVector = glm::vec2(std::floor(this->velocity.x), std::floor(this->velocity.y));
-		moveVector /= movementSpeed;
-		moveVector *= dt;
-
-		this->collider.pos = this->position + moveVector;
-		if (collider.ColliderVsCollider()) {
-			return;
-		}
-
-		this->position += moveVector;
 	}
 
 	void render() override {
-		this->renderer.DrawSprite((glm::ivec2)this->position, (int)this->layer);
+		renderer.DrawSprite((glm::ivec2)this->position, (int)layer);
 	}
 
 	void editmodeRender() override {
-		ImGui::PushID(this->id);
-		ImGui::InputText("Name", this->name, IM_ARRAYSIZE(this->name));
-		ImGui::Text("ID: %i", this->id);
+		ImGui::PushID(id);
+		ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
+		ImGui::Text("ID: %i", id);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Position.x", &this->position.x);
-		ImGui::DragFloat("Position.y", &this->position.y);
+		ImGui::DragFloat("Position.x", &position.x);
+		ImGui::DragFloat("Position.y", &position.y);
 		ImGui::PopID();
 	}
 
 	void SerializeEntity(nlohmann::json& j) override {
 		j["Player"] += {
-			{"name", this->name},
-			{ "position.x", this->position.x },
-			{ "position.y", this->position.y }
+			{"name", name},
+			{ "position.x", position.x },
+			{ "position.y", position.y }
 		};
 	}
 
