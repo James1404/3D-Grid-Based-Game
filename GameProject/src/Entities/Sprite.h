@@ -10,38 +10,38 @@ public:
 	void init() override {
 		strcpy_s(name, "Sprite");
 
-		this->layer = Layers::StaticCollider;
-		this->renderer.InitSprite("data/textures/face.png");
+		layer = Layers::StaticCollider;
+		renderer.InitSprite("data/textures/face.png");
 
-		this->collider.InitCollider(this);
-		this->collider.size = { this->renderer.width,this->renderer.height };
+		collider.InitCollider(this);
+		collider.size = { renderer.width,renderer.height };
 	}
 
 	void update(double dt) override {
-		this->collider.pos = this->position;
+		collider.pos = position;
 	}
 
 	void render() override {
-		this->renderer.DrawSprite((glm::ivec2)this->position, (int)this->layer);
+		renderer.DrawSprite((glm::ivec2)position, (int)layer);
 	}
 
 	void editmodeRender() override {
-		ImGui::PushID(this->id);
-		ImGui::InputText("Name", this->name, IM_ARRAYSIZE(this->name));
-		ImGui::Text("ID: %i", this->id);
+		ImGui::PushID(id);
+		ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
+		ImGui::Text("ID: %i", id);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Position.x", &this->position.x);
-		ImGui::DragFloat("Position.y", &this->position.y);
+		ImGui::DragFloat("Position.x", &position.x);
+		ImGui::DragFloat("Position.y", &position.y);
 		ImGui::PopID();
 	}
 
 	void SerializeEntity(nlohmann::json& j) override {
 		j["Sprite"] += {
-			{"name", this->name},
-			{ "position.x", this->position.x },
-			{ "position.y", this->position.y }
+			{"name", name},
+			{ "position.x", position.x },
+			{ "position.y", position.y }
 		};
 	}
 
