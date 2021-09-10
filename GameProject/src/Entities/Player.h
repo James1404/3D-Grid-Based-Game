@@ -9,12 +9,6 @@
 
 class Player : public Entity {
 public:
-	enum class PlayerState {
-		STATE_IDLE,
-		STATE_MOVING,
-		STATE_AIMING
-	} CurrentState;
-
 	void init() override {
 		strcpy_s(name, "Player");
 
@@ -29,48 +23,36 @@ public:
 	void update(double dt) {
 		position.y = 0;
 
-		switch (CurrentState) {
-			case PlayerState::STATE_IDLE: {
-				if (ButtonDown("MoveLeft") || ButtonDown("MoveRight")) { CurrentState = PlayerState::STATE_MOVING; }
-				if (ButtonDown("Aim")) { CurrentState = PlayerState::STATE_AIMING; }
-				break;
-			}
-			case PlayerState::STATE_MOVING: {
-				if (ButtonPressed("MoveLeft")) { velocity.x = -1; }
-				else if (ButtonPressed("MoveRight")) { velocity.x = 1; }
-				else { CurrentState = PlayerState::STATE_IDLE; }
+		if (ButtonPressed("Aim")) {
+			if (ButtonDown("Shoot")) {
+				printf("Shoot\n");
 
-				float movementSpeed = speed;
-				if (ButtonPressed("Run")) { movementSpeed *= .5f; }
-
-				glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
-				moveVector /= movementSpeed;
-				moveVector *= dt;
-
-				collider.pos = position + moveVector;
-				if (collider.ColliderVsCollider()) {
-					return;
+				RayHit hit;
+				if (RayVsCollider(this, hit, position, { 20,0 })) {
+					printf("You Hit %s\n", hit.collider->owner->name);
 				}
-
-				this->position += moveVector;
-				break;
 			}
-			case PlayerState::STATE_AIMING: {
-				if (ButtonDown("Shoot")) {
-					printf("Shoot\n");
 
-					RayHit hit;
-					if (RayVsCollider(this, hit, position, { 20,0 })) {
-						printf("You Hit %s\n", hit.collider->owner->name);
-					}
-				}
-
-				if (ButtonReleased("Aim")) {
-					CurrentState = PlayerState::STATE_IDLE;
-				}
-				break;
-			}
+			return;
 		}
+
+		if (ButtonPressed("MoveLeft")) { velocity.x = -1; }
+		else if (ButtonPressed("MoveRight")) { velocity.x = 1; }
+		else { velocity.x = 0; }
+
+		float movementSpeed = speed;
+		if (ButtonPressed("Run")) { movementSpeed *= .5f; }
+
+		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+		moveVector /= movementSpeed;
+		moveVector *= dt;
+
+		collider.pos = position + moveVector;
+		if (collider.ColliderVsCollider()) {
+			return;
+		}
+
+		this->position += moveVector;
 	}
 
 	void render() override {
