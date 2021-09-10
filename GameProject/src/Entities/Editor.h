@@ -23,25 +23,13 @@ public:
 	void update(double dt) override {
 		start = SDL_GetPerformanceCounter();
 
-		if (ButtonPressed("MoveUp")) {
-			this->velocity.y = 1;
-		}
-		else if (ButtonPressed("MoveDown")) {
-			this->velocity.y = -1;
-		}
-		else {
-			this->velocity.y = 0;
-		}
+		if (ButtonPressed("MoveUp")) { this->velocity.y = 1; }
+		else if (ButtonPressed("MoveDown")) { this->velocity.y = -1; }
+		else { this->velocity.y = 0; }
 
-		if (ButtonPressed("MoveLeft")) {
-			this->velocity.x = -1;
-		}
-		else if (ButtonPressed("MoveRight")) {
-			this->velocity.x = 1;
-		}
-		else {
-			this->velocity.x = 0;
-		}
+		if (ButtonPressed("MoveLeft")) { this->velocity.x = -1; }
+		else if (ButtonPressed("MoveRight")) { this->velocity.x = 1; }
+		else { this->velocity.x = 0; }
 
 		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
 		moveVector /= speed;

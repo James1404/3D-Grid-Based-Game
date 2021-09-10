@@ -2,37 +2,93 @@
 
 #include <fstream>
 #include <sstream>
+#include <map>
+#include <memory>
+
 #include <SDL.h>
 
 // TODO: Add Controller Support
-// TODO: Add Mouse Support
-struct Input {
-	std::multimap<std::string, SDL_Scancode> MAPPED_KEYS;
-
+struct InputData {
 	const Uint8* KEYBOARD;
 	Uint8* P_KEYBOARD;
 	int KEYBOARD_SIZE;
 
-	Input() {
+	Uint32 MOUSE;
+	Uint32 P_MOUSE;
+	glm::ivec2 MOUSE_POS;
+
+	InputData() {
 		KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
 		P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
 		memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
 	}
 
-	~Input() {
+	~InputData() {
 		delete[] P_KEYBOARD;
 		P_KEYBOARD = NULL;
 	}
-} static m_input;
+} static INPUT_DATA;
 
-void UpdatePrevInput() {
-	memcpy(m_input.P_KEYBOARD, m_input.KEYBOARD, m_input.KEYBOARD_SIZE);
+enum MOUSE_BUTTON { LEFT = 0, RIGHT, MIDDLE, BACK, FORWARD };
+
+enum INPUT_TYPE { KEYBOARD = 0, MOUSE };
+struct INPUT {
+	unsigned int input;
+	INPUT_TYPE type;
+
+	INPUT(Uint8 _input, INPUT_TYPE _type) : input(_input), type(_type) {}
+	~INPUT() {}
+
+	virtual bool State() {
+		if (type == KEYBOARD) {
+			return INPUT_DATA.KEYBOARD[input];
+		} else if (type == MOUSE) {
+			Uint32 mask = 0;
+
+			switch (input) {
+			case LEFT: mask = SDL_BUTTON_LMASK; break;
+			case RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case BACK: mask = SDL_BUTTON_X1MASK; break;
+			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			}
+
+			return (INPUT_DATA.MOUSE & mask);
+		}
+
+		return false;
+	}
+	virtual bool P_State() {
+		if (type == KEYBOARD) {
+			return INPUT_DATA.P_KEYBOARD[input];
+		} else if (type == MOUSE) {
+			Uint32 mask = 0;
+
+			switch (input) {
+			case LEFT: mask = SDL_BUTTON_LMASK; break;
+			case RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case BACK: mask = SDL_BUTTON_X1MASK; break;
+			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			}
+
+			return (INPUT_DATA.P_MOUSE & mask);
+		}
+	}
+};
+
+static std::multimap<std::string, INPUT> MAPPED_INPUTS;
+
+void UpdateInput() {
+	INPUT_DATA.P_MOUSE = INPUT_DATA.MOUSE;
+	INPUT_DATA.MOUSE = SDL_GetMouseState(&INPUT_DATA.MOUSE_POS.x, &INPUT_DATA.MOUSE_POS.y);
+	memcpy(INPUT_DATA.P_KEYBOARD, INPUT_DATA.KEYBOARD, INPUT_DATA.KEYBOARD_SIZE);
 }
 
 bool ButtonDown(std::string button) {
-	auto range = m_input.MAPPED_KEYS.equal_range(button);
-	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (m_input.KEYBOARD[KEY->second] && !m_input.P_KEYBOARD[KEY->second]) {
+	auto range = MAPPED_INPUTS.equal_range(button);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second.State() && !i->second.P_State()) {
 			return true;
 		}
 	}
@@ -41,9 +97,9 @@ bool ButtonDown(std::string button) {
 }
 
 bool ButtonPressed(std::string button) {
-	auto range = m_input.MAPPED_KEYS.equal_range(button);
-	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (m_input.KEYBOARD[KEY->second]) {
+	auto range = MAPPED_INPUTS.equal_range(button);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second.State()) {
 			return true;
 		}
 	}
@@ -52,9 +108,9 @@ bool ButtonPressed(std::string button) {
 }
 
 bool ButtonReleased(std::string button) {
-	auto range = m_input.MAPPED_KEYS.equal_range(button);
-	for (auto KEY = range.first; KEY != range.second; KEY++) {
-		if (!m_input.KEYBOARD[KEY->second] && m_input.P_KEYBOARD[KEY->second]) {
+	auto range = MAPPED_INPUTS.equal_range(button);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (!i->second.State() && i->second.P_State()) {
 			return true;
 		}
 	}
@@ -62,11 +118,15 @@ bool ButtonReleased(std::string button) {
 	return false;
 }
 
+const glm::ivec2* GetMousePos() {
+	return &INPUT_DATA.MOUSE_POS;
+}
+
 void SaveInput() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {
-		for (auto KEY : m_input.MAPPED_KEYS) {
-			ofs << KEY.first << " " << KEY.second << std::endl;
+		for (auto KEY : MAPPED_INPUTS) {
+			ofs << KEY.first << " " << KEY.second.type << " " << KEY.second.input << std::endl;
 		}
 	}
 	else {
@@ -78,7 +138,7 @@ void SaveInput() {
 }
 
 void LoadInput() {
-	m_input.MAPPED_KEYS.clear();
+	MAPPED_INPUTS.clear();
 
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {
@@ -86,29 +146,35 @@ void LoadInput() {
 		while (std::getline(ifs, line)) {
 			std::string key;
 			unsigned int value;
+			int type;
 
 			std::istringstream iss(line);
-			if (!(iss >> key >> value)) { break; }
+			if (!(iss >> key >> type >> value)) { break; }
 
 			printf("%s : %u\n", key.c_str(), value);
-			m_input.MAPPED_KEYS.insert(std::make_pair(key, (SDL_Scancode)value));
+
+			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (INPUT_TYPE)type)));
 		}
+		printf("Input Settings Loaded\n");
 	}
 	else {
 		printf("Cannot open input settings file\n");
 
-		m_input.MAPPED_KEYS.insert(std::make_pair("MoveUp", SDL_SCANCODE_W));
-		m_input.MAPPED_KEYS.insert(std::make_pair("MoveDown", SDL_SCANCODE_S));
-		m_input.MAPPED_KEYS.insert(std::make_pair("MoveLeft", SDL_SCANCODE_A));
-		m_input.MAPPED_KEYS.insert(std::make_pair("MoveRight", SDL_SCANCODE_D));
-		m_input.MAPPED_KEYS.insert(std::make_pair("Run", SDL_SCANCODE_LSHIFT));
-		m_input.MAPPED_KEYS.insert(std::make_pair("Aim", SDL_SCANCODE_LCTRL));
-		m_input.MAPPED_KEYS.insert(std::make_pair("Shoot", SDL_SCANCODE_SPACE));
-		m_input.MAPPED_KEYS.insert(std::make_pair("Exit", SDL_SCANCODE_ESCAPE));
+		MAPPED_INPUTS.insert(std::make_pair("MoveUp", INPUT(SDL_SCANCODE_W, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("MoveDown", INPUT(SDL_SCANCODE_S, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("MoveLeft", INPUT(SDL_SCANCODE_A, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("MoveRight", INPUT(SDL_SCANCODE_D, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("Run", INPUT(SDL_SCANCODE_LSHIFT, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("Aim", INPUT(SDL_SCANCODE_LCTRL, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("Shoot", INPUT(SDL_SCANCODE_SPACE, KEYBOARD)));
+		MAPPED_INPUTS.insert(std::make_pair("Exit", INPUT(SDL_SCANCODE_ESCAPE, KEYBOARD)));
+
+		MAPPED_INPUTS.insert(std::make_pair("Shoot", INPUT(LEFT, MOUSE)));
+		MAPPED_INPUTS.insert(std::make_pair("Aim", INPUT(RIGHT, MOUSE)));
 
 		SaveInput();
+		LoadInput();
 	}
 
 	ifs.close();
-	printf("Input Settings Loaded\n");
 }

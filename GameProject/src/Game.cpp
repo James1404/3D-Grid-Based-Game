@@ -87,14 +87,12 @@ void Game::update() {
 		inEditor = !inEditor;
 	}
 
-	if (inEditor) {
+	if (inEditor)
 		editor.update(dt);
-	}
-	else {
+	else
 		scene.update(dt);
-	}
 
-	UpdatePrevInput();
+	UpdateInput();
 }
 
 void Game::render() {
