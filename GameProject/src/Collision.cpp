@@ -1,20 +1,21 @@
-#include "Collision.h"
+#include "collision.h"
 
-std::vector<Collider*> CollisionManager::colliders;
+// TODO: Spatial Hashing
+std::vector<collider*> collider_list;
 
-Collider::Collider()
+collider::collider()
     : pos(0,0), size(0,0) {
-    CollisionManager::colliders.push_back(this);
+    collider_list.push_back(this);
 }
 
-Collider::~Collider() { }
+collider::~collider() { }
 
-void Collider::InitCollider(Entity* _owner) {
+void collider::init_collider(entity* _owner) {
     this->owner = _owner;
 }
 
-bool Collider::ColliderVsCollider() {
-    for (const auto& collider : CollisionManager::colliders) {
+bool collider::collider_vs_collider() {
+    for (const auto& collider : collider_list) {
         if (collider->owner->id != this->owner->id) {
             if (this->pos.x < collider->pos.x + collider->size.x &&
                 this->pos.x + this->size.x >    collider->pos.x &&
@@ -29,8 +30,8 @@ bool Collider::ColliderVsCollider() {
 }
 
 // TODO: Fix Raycasting Implementation
-bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direction) {
-    for (const auto& collider : CollisionManager::colliders) {
+bool ray_vs_collider(entity* owner, ray_hit& hit, glm::vec2 origin, glm::vec2 direction) {
+    for (const auto& collider : collider_list) {
         if (collider->owner->id != owner->id) {
             hit.normal = { 0,0 };
             hit.point = { 0,0 };
@@ -48,14 +49,14 @@ bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direc
 
             if (t_near.x > t_far.y || t_near.y > t_far.x) continue;
 
-            hit.distance = std::max(t_near.x, t_near.y);
+            hit.dist = std::max(t_near.x, t_near.y);
 
             float t_hit_far = std::min(t_far.x, t_far.y);
 
             if (t_hit_far < 0)
                 continue;
 
-            hit.point = origin + hit.distance * direction;
+            hit.point = origin + hit.dist * direction;
 
             if (t_near.x > t_near.y)
                 if (invdir.x < 0)
@@ -68,7 +69,7 @@ bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direc
                 else
                     hit.normal = { 0, -1 };
 
-            hit.collider = collider;
+            hit.col = collider;
 
             return true;
         }
@@ -77,8 +78,8 @@ bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direc
     return false;
 }
 
-bool PointVsCollider(const glm::vec2& point) {
-    for (const auto& collider : CollisionManager::colliders) {
+bool point_vs_collider(const glm::vec2& point) {
+    for (const auto& collider : collider_list) {
         if (point.x >= collider->pos.x &&
             point.y >= collider->pos.y &&
             point.x <  collider->pos.x + collider->size.x &&

@@ -1,19 +1,14 @@
-#include "Scene.h"
+#include "scene.h"
 
-void Scene::init() {
-	for (auto entity : entities) {
-		entity->init();
-	}
-}
-
-void Scene::update(double dt) {
+void scene::update(double dt) {
 	for (auto entity : entities) {
 		entity->update(dt);
 	}
 }
 
-void Scene::render() {
-	for (auto entity : entities) {
-		entity->render();
+void scene::copy_scene_data(scene& _scene) {
+	entities.clear();
+	for (auto t_entity : _scene.entities) {
+		entities.push_back(std::make_shared<entity>(*t_entity));
 	}
 }

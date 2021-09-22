@@ -1,0 +1,201 @@
+#ifdef _DEBUG
+
+#include "editor.h"
+
+#include <SDL.h>
+
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
+#include "input.h"
+#include "renderer.h"
+
+#include "scene.h"
+#include "scene_serialization.h"
+
+#include "entity.h"
+#include "player.h"
+#include "obstacle.h"
+
+static std::shared_ptr<entity> selectedEntity;
+
+void editor::init() {
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplSDL2_InitForOpenGL(renderer::window, renderer::context);
+	ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+Uint64 start, end;
+float FPS;
+
+glm::vec2 velocity;
+float speed = 2;
+void editor::update(double dt) {
+	start = SDL_GetPerformanceCounter();
+
+	if (input::button_pressed("MoveUp")) { velocity.y = 1; }
+	else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
+	else { velocity.y = 0; }
+
+	if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
+	else if (input::button_pressed("MoveRight")) { velocity.x = 1; }
+	else { velocity.x = 0; }
+
+	glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+	moveVector /= speed;
+	moveVector *= dt;
+
+	renderer::view = glm::translate(renderer::view, glm::vec3(-moveVector, 0.0f));
+}
+
+void editor::draw() {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame(renderer::window);
+	ImGui::NewFrame();
+
+	const float PAD = 10.0f;
+	static bool p_open = true;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(PAD, PAD));
+	/* ----- OVERLAY ----- */ {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImVec2 work_size = viewport->WorkSize;
+
+		ImGui::SetNextWindowPos(ImVec2(PAD, PAD), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+		window_flags |= ImGuiWindowFlags_NoNav;
+
+		ImGui::SetNextWindowBgAlpha(0.9f);
+		if (ImGui::Begin("Overlay", &p_open, window_flags)) {
+			ImGui::Text("Game Stats");
+
+			ImGui::Separator();
+			ImGui::Text("Screen Size: (%i, %i)", renderer::screen_width, renderer::screen_height);
+			ImGui::Text("No. of Entities: %i", editor_scene.entities.size());
+			ImGui::Text("%f FPS", FPS);
+
+			ImGui::End();
+		}
+	}
+	/* ----- INSPECTOR ----- */ {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImVec2 work_size = viewport->WorkSize;
+
+		// Set Windows Flags
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+		window_flags |= ImGuiWindowFlags_MenuBar;
+
+		{
+			// Entites List Window
+			ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, PAD), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
+
+			ImGui::SetNextWindowBgAlpha(0.9f);
+
+			if (ImGui::Begin("Entities", &p_open, window_flags)) {
+				if (ImGui::BeginMenuBar()) {
+					// Custom save / load name
+					if (ImGui::BeginMenu("Scene")) {
+						if (ImGui::MenuItem("New")) { clear_scene(editor_scene); }
+						if (ImGui::MenuItem("Save")) { save_scene(editor_scene, "data/scenes/Level1.scene"); }
+						if (ImGui::MenuItem("Load")) { load_scene(editor_scene, "data/scenes/Level1.scene"); }
+						ImGui::EndMenu();
+					}
+
+					glm::vec2 spawnPos = { 0,0 };
+					if (ImGui::BeginMenu("Create")) {
+						if (ImGui::MenuItem("Create Obstacle")) {
+							auto o = std::make_unique<obstacle>();
+							o->pos = spawnPos;
+							editor_scene.entities.push_back(std::move(o));
+							selectedEntity = editor_scene.entities.back();
+						}
+						if (ImGui::MenuItem("Create Player")) {
+							auto p = std::make_unique<player>();
+							p->pos = spawnPos;
+							editor_scene.entities.push_back(std::move(p));
+							selectedEntity = editor_scene.entities.back();
+						}
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+				}
+
+				if (ImGui::ListBoxHeader("Entities", ImVec2(300.0f, ((work_size.y / 2) - (PAD * 6))))) {
+					for (auto const& entity : editor_scene.entities) {
+						const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
+
+						ImGui::PushID(entity->id);
+						if (ImGui::Selectable(entity->name, is_selected)) {
+							selectedEntity = entity;
+						}
+
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus();
+						}
+						ImGui::PopID();
+					}
+
+					ImGui::ListBoxFooter();
+				}
+
+				ImGui::End();
+			}
+		}
+	}
+	/* ----- TOOLBAR ----- */ {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImVec2 work_size = viewport->WorkSize;
+
+		// Set Windows Flags
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+		// Toolbar Window
+		ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, work_size.y - PAD), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
+
+		ImGui::SetNextWindowBgAlpha(0.9f);
+
+		if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
+			if(selectedEntity != nullptr)
+				selectedEntity->editor_draw();
+			ImGui::End();
+		}
+	}
+	ImGui::PopStyleVar();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	end = SDL_GetPerformanceCounter();
+
+	float elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+	FPS = 1.0f / elapsed;
+}
+
+void editor::clean() {
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+}
+
+#endif // _DEBUG

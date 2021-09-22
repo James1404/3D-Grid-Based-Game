@@ -6,32 +6,26 @@
 
 #include "Entity.h"
 
-struct Collider {
-    Collider();
-    ~Collider();
+struct collider {
+    collider();
+    ~collider();
 
-    void InitCollider(Entity* _owner);
+    void init_collider(entity* _owner);
 
-    Entity* owner;
+    entity* owner;
 
     glm::vec2 pos;
     glm::vec2 size;
 
-    bool ColliderVsCollider();
+    bool collider_vs_collider();
 };
 
-struct RayHit {
+struct ray_hit {
     glm::vec2 point;
     glm::vec2 normal;
-    float distance;
-    Collider* collider;
+    float dist;
+    collider* col;
 };
 
-bool RayVsCollider(Entity* owner, RayHit& hit, glm::vec2 origin, glm::vec2 direction);
-bool PointVsCollider(const glm::vec2& point);
-
-// TODO: Spatial Hashing
-class CollisionManager {
-public:
-    static std::vector<Collider*> colliders;
-};
+bool ray_vs_collider(entity* owner, ray_hit& hit, glm::vec2 origin, glm::vec2 direction);
+bool point_vs_collider(const glm::vec2& point);

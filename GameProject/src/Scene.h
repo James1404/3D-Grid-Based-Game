@@ -1,14 +1,12 @@
 #pragma once
-#include "Entity.h"
+#include "entity.h"
 
 #include <vector>
 #include <memory>
 
-class Scene {
-public:
-	std::vector<std::shared_ptr<Entity>> entities;
+struct scene {
+	std::vector<std::shared_ptr<entity>> entities;
 
-	void init();
 	void update(double dt);
-	void render();
+	void copy_scene_data(scene& _scene);
 };

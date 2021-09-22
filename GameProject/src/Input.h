@@ -2,13 +2,15 @@
 #include <string>
 #include <glm.hpp>
 
-void UpdateInput();
+namespace input {
+	void update();
 
-bool ButtonDown(std::string button);
-bool ButtonPressed(std::string button);
-bool ButtonReleased(std::string button);
+	bool button_down(std::string button);
+	bool button_pressed(std::string button);
+	bool button_released(std::string button);
 
-const glm::ivec2* GetMousePos();
+	const glm::ivec2* get_mouse_pos();
 
-void SaveInput();
-void LoadInput();
+	void save();
+	void load();
+}

@@ -4,37 +4,21 @@
 
 #include <json.hpp>
 
-enum class Layers {
-	Background = -10,
-	Foreground = 10,
-
-	StaticCollider = 2,
-
-	Player = 0,
-	Enemies = 0,
-	
-	Interactable = -2
-};
-
 // TODO: Implement UUID System.
+static int currentID = 0;
 
-class Entity {
-public:
+struct entity {
 	int id;
 	char name[128] = "name";
 
-	Layers layer;
+	entity() : id(currentID++) { printf("Entity %i Created\n", id); }
+	~entity() { printf("Entity %i Destroyed\n", id); }
 
-	Entity() : id(currentID++) { printf("Entity %i Created\n", id); }
-	~Entity() { printf("Entity %i Destroyed\n", id); }
-
-	virtual void init() {}
 	virtual void update(double dt) {}
-	virtual void render() {}
 
-	virtual void editmodeRender() {}
+#ifdef _DEBUG
+	virtual void editor_draw() {}
+#endif // _DEBUG
 
-	virtual void SerializeEntity(nlohmann::json& j) { }
-private:
-	static int currentID;
+	virtual void serialize_entity(nlohmann::json& j) { }
 };
