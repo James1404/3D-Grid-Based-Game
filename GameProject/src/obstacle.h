@@ -9,23 +9,22 @@
 struct obstacle : public entity {
 	glm::vec2 pos;
 	renderer::sprite* spr;
-	collider col;
+	collider* col;
 
 	obstacle() {
 		strcpy_s(name, "Obstacle");
 
 		spr = renderer::create_sprite("data/textures/face.png", &pos, -1);
-
-		col.init_collider(this);
-		col.size = { spr->width,spr->height };
+		col = create_collider(this, { spr->width,spr->height });
 	}
 
 	~obstacle() {
 		renderer::delete_sprite(spr);
+		delete_collider(col);
 	}
 
 	void update(double dt) override {
-		col.pos = pos;
+		col->pos = pos;
 	}
 
 #ifdef _DEBUG

@@ -19,12 +19,11 @@ namespace renderer {
 	extern const int screen_resolution_x, screen_resolution_y;
 
 	void init();
+	void clean();
 
 	void start_draw();
 	void draw_sprites();
 	void stop_draw();
-
-	void clean();
 
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering

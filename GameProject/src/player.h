@@ -11,20 +11,18 @@ struct player : public entity {
 	glm::vec2 pos;
 	glm::vec2 vel;
 	renderer::sprite* spr;
-	collider col;
+	collider* col;
 	float speed = 50;
 	player() {
 		strcpy_s(name, "Player");
 
 		spr = renderer::create_sprite("data/textures/player.png", &pos, 1);
-
-		col.init_collider(this);
-		col.pos = pos;
-		col.size = { spr->width,spr->height };
+		col = create_collider(this, { spr->width, spr->height });
 	}
 
 	~player() {
 		renderer::delete_sprite(spr);
+		delete_collider(col);
 	}
 
 	void update(double dt) {
@@ -34,7 +32,7 @@ struct player : public entity {
 			if (input::button_down("Shoot")) {
 				printf("Shoot\n");
 
-				ray_hit hit;
+				ray_data hit;
 				if (ray_vs_collider(this, hit, pos, { 20,0 })) {
 					printf("You Hit %s\n", hit.col->owner->name);
 				}
@@ -54,8 +52,8 @@ struct player : public entity {
 		moveVector /= movementSpeed;
 		moveVector *= dt;
 
-		col.pos = pos + moveVector;
-		if (col.collider_vs_collider()) {
+		col->pos = pos + moveVector;
+		if (collider_vs_collider(col)) {
 			return;
 		}
 

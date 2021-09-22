@@ -47,6 +47,12 @@ void renderer::init() {
 
 }
 
+void renderer::clean() {
+	SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
+
 void renderer::start_draw() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -75,15 +81,6 @@ void renderer::draw_sprites() {
 void renderer::stop_draw() {
 	// Swap buffer
 	SDL_GL_SwapWindow(window);
-}
-
-
-void renderer::clean() {
-	render_list.clear();
-
-	SDL_GL_DeleteContext(context);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
 }
 
 //
@@ -254,14 +251,14 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 	return pointer;
 }
 
-typedef std::multimap<int, std::unique_ptr<renderer::sprite>>::iterator iterator;
 void renderer::delete_sprite(renderer::sprite* _sprite) {
-	for (iterator iter = render_list.begin(); iter != render_list.end();) {
-		iterator erase_iter = iter++;
-
-		if (erase_iter->second.get() == _sprite) {
-			printf("	- deleting sprite located at %p\n", erase_iter->second.get());
-			render_list.erase(erase_iter);
+	for (auto it = render_list.begin(); it != render_list.end();) {
+		if (it->second.get() == _sprite) {
+			printf(" - deleting sprite located at %p\n", it->second.get());
+			it = render_list.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }
