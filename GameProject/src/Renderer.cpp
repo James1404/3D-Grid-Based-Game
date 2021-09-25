@@ -180,35 +180,57 @@ renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
 
 	stbi_image_free(data);
 
-	// Set position / texture coords and indices
+	// Generate and bind buffers
 	float vertices[] = {
-		// positions	// texture coords
-		 1.0f,  1.0f,	1.0f, 1.0f, // top right
-		 1.0f,  0.0f,	1.0f, 0.0f, // bottom right
-		 0.0f,  0.0f,	0.0f, 0.0f, // bottom left
-		 0.0f,  1.0f,	0.0f, 1.0f  // top left
+		// positions
+		 1.0f,  1.0f, // top right
+		 1.0f,  0.0f, // bottom right
+		 0.0f,  0.0f, // bottom left
+		 0.0f,  1.0f, // top left
 	};
+
+	float texcoords[] = {
+		// texture coords
+		1.0f, 1.0f, // top right
+		1.0f, 0.0f, // bottom right
+		0.0f, 0.0f, // bottom left
+		0.0f, 1.0f  // top left
+	};
+
+	// Generate and bind vao
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	// Generate and bind vbo
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texcoords), NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texcoords), &texcoords);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(vertices)));
+
+	int32_t bsize = 0;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bsize);
+	if (bsize == 0) {
+		printf("VERTEX BUFFER EMPTY\n");
+	}
 
 	unsigned int indices[] = {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
 
-	// Generate and bind buffers
-	unsigned int VBO, EBO;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+	unsigned int EBO;
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
 
 	// Set image attribute
 	glUniform1i(glGetUniformLocation(shader, "image"), 0);
@@ -236,9 +258,9 @@ void renderer::sprite::draw() {
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, false, glm::value_ptr(model));
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
-	glBindVertexArray(this->vao);
+	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -254,7 +276,7 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 void renderer::delete_sprite(renderer::sprite* _sprite) {
 	for (auto it = render_list.begin(); it != render_list.end();) {
 		if (it->second.get() == _sprite) {
-			printf(" - deleting sprite located at %p\n", it->second.get());
+			printf(" - deleted sprite at %p\n", it->second.get());
 			it = render_list.erase(it);
 		}
 		else {
