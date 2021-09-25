@@ -6,23 +6,26 @@
 
 #include "entity.h"
 
-struct collider {
-    entity* owner;
 
-    glm::vec2 pos;
-    glm::vec2 size;
-};
+namespace collision {
+    struct box_collider {
+        unsigned int id;
 
-collider* create_collider(entity* _owner, glm::vec2 size);
-void delete_collider(collider* _collider);
+        glm::vec2 pos;
+        glm::vec2 size;
+    };
 
-struct ray_data {
-    glm::vec2 point;
-    glm::vec2 normal;
-    float dist;
-    collider* col;
-};
+    box_collider* create_collider(glm::vec2 size);
+    void delete_collider(box_collider* _collider);
 
-bool collider_vs_collider(collider* _collider);
-bool ray_vs_collider(entity* _owner, ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
-bool point_vs_collider(const glm::vec2& _point);
+    struct ray_data {
+        glm::vec2 point;
+        glm::vec2 normal;
+        float dist;
+        box_collider* col;
+    };
+
+    bool collider_vs_collider(box_collider* _collider);
+    bool ray_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
+    bool point_vs_collider(const glm::vec2& _point);
+}
