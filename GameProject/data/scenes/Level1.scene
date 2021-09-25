@@ -1,31 +1,8 @@
 {
-    "Obstacle": [
-        {
-            "name": "Obs       tacle",
-            "position.x": 140.0,
-            "position.y": 138.0
-        },
-        {
-            "name": "Ob123   kjserww",
-            "position.x": 46.0,
-            "position.y": 76.0
-        },
-        {
-            "name": "Obst1235 acle6 ",
-            "position.x": 259.0,
-            "position.y": 108.0
-        },
-        {
-            "name": "--Obstacle--",
-            "position.x": 208.0,
-            "position.y": 39.0
-        }
-    ],
     "Player": [
         {
-            "name": "Pla 12378  yer",
-            "position.x": 138.5615692138672,
-            "position.y": 21.00023651123047
+            "position.x": 42,
+            "position.y": 0
         }
     ]
 }

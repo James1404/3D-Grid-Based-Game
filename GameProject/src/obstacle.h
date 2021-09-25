@@ -9,44 +9,23 @@
 struct obstacle : public entity {
 	glm::vec2 pos;
 	renderer::sprite* spr;
-	collider* col;
+	collision::box_collider* col;
 
 	obstacle() {
-		strcpy_s(name, "Obstacle");
-
 		spr = renderer::create_sprite("data/textures/face.png", &pos, -1);
-		col = create_collider(this, { spr->width,spr->height });
+		col = collision::create_collider({ spr->width,spr->height });
+
+		printf("OBSTACLE INITIALIZED\n");
 	}
 
 	~obstacle() {
 		renderer::delete_sprite(spr);
-		delete_collider(col);
+		collision::delete_collider(col);
+
+		printf("OBSTACLE CLEANED\n");
 	}
 
 	void update(double dt) override {
 		col->pos = pos;
 	}
-
-#ifdef _DEBUG
-	void editor_draw() override {
-		ImGui::PushID(id);
-		ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
-		ImGui::Text("ID: %i", id);
-
-		ImGui::Separator();
-
-		ImGui::DragFloat("Position.x", &pos.x);
-		ImGui::DragFloat("Position.y", &pos.y);
-		ImGui::PopID();
-	}
-#endif // _DEBUG
-
-	void serialize_entity(nlohmann::json& j) override {
-		j["Obstacle"] += {
-			{"name", name},
-			{ "position.x", pos.x },
-			{ "position.y", pos.y }
-		};
-	}
-
 };
