@@ -137,9 +137,11 @@ void input::save() {
 void input::load() {
 	MAPPED_INPUTS.clear();
 
+	printf("---------------------\n");
+	printf("RETRIEVING INPUT FILE\n");
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {
-		printf("LOADING INPUT:\n");
+		printf("PARSING INPUT FILE\n");
 
 		std::string line;
 		while (std::getline(ifs, line)) {
@@ -153,7 +155,7 @@ void input::load() {
 			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (INPUT_TYPE)type)));
 			printf(" - %s : %u\n", key.c_str(), value);
 		}
-		printf("FINISHED LOADING INPUT\n\n");
+		printf("FINISHED LOADING INPUT DATA\n");
 	}
 	else {
 		printf("CANNOT FIND INPUT FILE\n");

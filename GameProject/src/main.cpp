@@ -5,7 +5,6 @@
 #endif // _DEBUG
 
 #include "scene.h"
-#include "scene_serialization.h"
 
 #include "renderer.h"
 #include "input.h"
@@ -14,8 +13,9 @@
 #include "editor.h"
 #endif // _DEBUG
 
+#include "player.h"
+
 SDL_Event event;
-scene runtime_scene;
 
 bool isRunning = false;
 
@@ -33,9 +33,13 @@ int main(int argc, char* args[]) {
 		renderer::init();
 		input::load();
 
+		player::init();
+
+		level::init();
+
 #ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
-		load_scene(runtime_scene, "data/scenes/Level1.scene");
+		level::load();
 #endif // NDEBUG
 		
 #ifdef _DEBUG
@@ -78,17 +82,15 @@ int main(int argc, char* args[]) {
 
 #ifdef _DEBUG
 		if (input::button_down("Exit")) {
-			if (CurrentState == GAME_STATE::EDITOR) {
-				runtime_scene.copy_scene_data(editor::editor_scene);
-				CurrentState = GAME_STATE::GAMEPLAY;
-			}
-			else {
-				CurrentState = GAME_STATE::EDITOR;
-			}
+			CurrentState = (CurrentState == GAME_STATE::GAMEPLAY)
+										  ? GAME_STATE::EDITOR
+										  : GAME_STATE::GAMEPLAY;
 		}
 
-		if (CurrentState == GAME_STATE::GAMEPLAY)
-			runtime_scene.update(dt);
+		if (CurrentState == GAME_STATE::GAMEPLAY) {
+			player::update(dt);
+			level::update(dt);
+		}
 		else if (CurrentState == GAME_STATE::EDITOR)
 			editor::update(dt);
 #endif // _DEBUG
@@ -114,6 +116,8 @@ int main(int argc, char* args[]) {
 	}
 
 	/* ----- CLEAN GAME ----- */
+	player::clean();
+
 #ifdef _DEBUG
 	editor::clean();
 #endif // _DEBUG
