@@ -12,13 +12,10 @@
 #include "renderer.h"
 
 #include "scene.h"
-#include "scene_serialization.h"
 
 #include "entity.h"
 #include "player.h"
 #include "obstacle.h"
-
-static std::shared_ptr<entity> selectedEntity;
 
 void editor::init() {
 	IMGUI_CHECKVERSION();
@@ -53,6 +50,8 @@ void editor::update(double dt) {
 	renderer::view = glm::translate(renderer::view, glm::vec3(-moveVector, 0.0f));
 }
 
+// static std::shared_ptr<entity> selectedEntity;
+
 void editor::draw() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
@@ -80,16 +79,12 @@ void editor::draw() {
 
 			ImGui::Separator();
 			ImGui::Text("Screen Size: (%i, %i)", renderer::screen_width, renderer::screen_height);
-			ImGui::Text("No. of Entities: %i", editor_scene.entities.size());
 			ImGui::Text("%f FPS", FPS);
 
 			ImGui::End();
 		}
 	}
 	/* ----- INSPECTOR ----- */ {
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImVec2 work_size = viewport->WorkSize;
-
 		// Set Windows Flags
 		ImGuiWindowFlags window_flags = 0;
 		window_flags |= ImGuiWindowFlags_NoDecoration;
@@ -99,68 +94,62 @@ void editor::draw() {
 		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
 		window_flags |= ImGuiWindowFlags_MenuBar;
 
-		{
-			// Entites List Window
-			ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, PAD), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
-			ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
+		// Entites List Window
+		ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
+		ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, PAD), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
 
-			ImGui::SetNextWindowBgAlpha(0.9f);
+		ImGui::SetNextWindowBgAlpha(0.9f);
 
-			if (ImGui::Begin("Entities", &p_open, window_flags)) {
-				if (ImGui::BeginMenuBar()) {
-					// Custom save / load name
-					if (ImGui::BeginMenu("Scene")) {
-						if (ImGui::MenuItem("New")) { clear_scene(editor_scene); }
-						if (ImGui::MenuItem("Save")) { save_scene(editor_scene, "data/scenes/Level1.scene"); }
-						if (ImGui::MenuItem("Load")) { load_scene(editor_scene, "data/scenes/Level1.scene"); }
-						ImGui::EndMenu();
-					}
-
-					glm::vec2 spawnPos = { 0,0 };
-					if (ImGui::BeginMenu("Create")) {
-						if (ImGui::MenuItem("Create Obstacle")) {
-							auto o = std::make_unique<obstacle>();
-							o->pos = spawnPos;
-							editor_scene.entities.push_back(std::move(o));
-							selectedEntity = editor_scene.entities.back();
-						}
-						if (ImGui::MenuItem("Create Player")) {
-							auto p = std::make_unique<player>();
-							p->pos = spawnPos;
-							editor_scene.entities.push_back(std::move(p));
-							selectedEntity = editor_scene.entities.back();
-						}
-						ImGui::EndMenu();
-					}
-					ImGui::EndMenuBar();
+		if (ImGui::Begin("Entities", &p_open, window_flags)) {
+			if (ImGui::BeginMenuBar()) {
+				// Custom save / load name
+				if (ImGui::BeginMenu("Map")) {
+					if (ImGui::MenuItem("Save")) { level::save(); }
+					if (ImGui::MenuItem("Load")) { level::load(); }
+					ImGui::EndMenu();
 				}
 
-				if (ImGui::ListBoxHeader("Entities", ImVec2(300.0f, ((work_size.y / 2) - (PAD * 6))))) {
-					for (auto const& entity : editor_scene.entities) {
-						const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
-
-						ImGui::PushID(entity->id);
-						if (ImGui::Selectable(entity->name, is_selected)) {
-							selectedEntity = entity;
-						}
-
-						if (is_selected) {
-							ImGui::SetItemDefaultFocus();
-						}
-						ImGui::PopID();
+				/*
+				glm::vec2 spawnPos = { 0,0 };
+				if (ImGui::BeginMenu("Create")) {
+					if (ImGui::MenuItem("Create Obstacle")) {
+						auto o = std::make_unique<obstacle>();
+						o->pos = spawnPos;
+						level::data.obstacles.push_back(std::move(o));
+						selectedEntity = level::data.obstacles.back();
 					}
-
-					ImGui::ListBoxFooter();
+					ImGui::EndMenu();
 				}
-
-				ImGui::End();
+				*/
+				ImGui::EndMenuBar();
 			}
+
+			/*
+			if (ImGui::ListBoxHeader("Entities")) {
+				for (auto const& entity : level::current_level.obstacles) {
+					const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
+
+					ImGui::PushID(entity->id);
+					if (ImGui::Selectable(entity->name, is_selected)) {
+						selectedEntity = entity;
+					}
+
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
+					ImGui::PopID();
+				}
+
+				ImGui::ListBoxFooter();
+			}
+			*/
+			ImGui::End();
 		}
+
+		ImGui::PopStyleVar();
 	}
 	/* ----- TOOLBAR ----- */ {
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImVec2 work_size = viewport->WorkSize;
-
 		// Set Windows Flags
 		ImGuiWindowFlags window_flags = 0;
 		window_flags |= ImGuiWindowFlags_NoDecoration;
@@ -170,18 +159,20 @@ void editor::draw() {
 		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
 
 		// Toolbar Window
+		ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
 		ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, work_size.y - PAD), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
 		ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
 
 		ImGui::SetNextWindowBgAlpha(0.9f);
 
 		if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
+			/*
 			if(selectedEntity != nullptr)
 				selectedEntity->editor_draw();
+			*/
 			ImGui::End();
 		}
 	}
-	ImGui::PopStyleVar();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

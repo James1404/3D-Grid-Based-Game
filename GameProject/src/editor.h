@@ -3,8 +3,6 @@
 #include "scene.h"
 
 namespace editor {
-	static scene editor_scene;
-
 	void init();
 	void update(double dt);
 	void draw();
