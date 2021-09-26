@@ -77,7 +77,6 @@ int main(int argc, char* args[]) {
 		// calculate delta time;
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
-
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 #ifdef _DEBUG
@@ -96,7 +95,8 @@ int main(int argc, char* args[]) {
 #endif // _DEBUG
 
 #ifdef NDEBUG
-		runtime_scene.update(dt);
+		player::update(dt);
+		level::update(dt);
 #endif // NDEBUG
 
 		input::update();
@@ -107,7 +107,6 @@ int main(int argc, char* args[]) {
 		renderer::draw_sprites();
 
 #ifdef _DEBUG
-		// render editor
 		if (CurrentState == GAME_STATE::EDITOR)
 			editor::draw();
 #endif // _DEBUG
