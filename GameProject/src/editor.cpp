@@ -50,8 +50,6 @@ void editor::update(double dt) {
 	renderer::view = glm::translate(renderer::view, glm::vec3(-moveVector, 0.0f));
 }
 
-// static std::shared_ptr<entity> selectedEntity;
-
 void editor::draw() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
@@ -60,12 +58,11 @@ void editor::draw() {
 	const float PAD = 10.0f;
 	static bool p_open = true;
 
+	ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
+
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(PAD, PAD));
 	/* ----- OVERLAY ----- */ {
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImVec2 work_size = viewport->WorkSize;
-
-		ImGui::SetNextWindowPos(ImVec2(PAD, PAD), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
 
 		ImGuiWindowFlags window_flags = 0;
 		window_flags |= ImGuiWindowFlags_NoDecoration;
@@ -74,7 +71,7 @@ void editor::draw() {
 		window_flags |= ImGuiWindowFlags_NoNav;
 
 		ImGui::SetNextWindowBgAlpha(0.9f);
-		if (ImGui::Begin("Overlay", &p_open, window_flags)) {
+		if (ImGui::Begin("OVERLAY", &p_open, window_flags)) {
 			ImGui::Text("Game Stats");
 
 			ImGui::Separator();
@@ -95,84 +92,102 @@ void editor::draw() {
 		window_flags |= ImGuiWindowFlags_MenuBar;
 
 		// Entites List Window
-		ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
-		ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, PAD), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
-		ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(work_size.x, 0), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, work_size.y), ImGuiCond_Always);
 
 		ImGui::SetNextWindowBgAlpha(0.9f);
 
-		if (ImGui::Begin("Entities", &p_open, window_flags)) {
-			if (ImGui::BeginMenuBar()) {
-				// Custom save / load name
-				if (ImGui::BeginMenu("Map")) {
-					if (ImGui::MenuItem("Save")) { level::save(); }
-					if (ImGui::MenuItem("Load")) { level::load(); }
-					ImGui::EndMenu();
-				}
+		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
+			if (ImGui::BeginTabBar("TABS")) {
+				if (ImGui::BeginTabItem("MAP")) {
+					static char name[128] = "data/scenes/";
+					ImGui::InputText("", name, IM_ARRAYSIZE(name));
 
-				/*
-				glm::vec2 spawnPos = { 0,0 };
-				if (ImGui::BeginMenu("Create")) {
-					if (ImGui::MenuItem("Create Obstacle")) {
-						auto o = std::make_unique<obstacle>();
-						o->pos = spawnPos;
-						level::data.obstacles.push_back(std::move(o));
-						selectedEntity = level::data.obstacles.back();
+					ImGui::SameLine();
+					if (ImGui::Button("SAVE")) {
+						if (ImGui::MenuItem("SAVE")) { level::save(name); }
 					}
-					ImGui::EndMenu();
+
+					ImGui::SameLine();
+					if (ImGui::Button("LOAD")) {
+						if (ImGui::MenuItem("LOAD")) { level::load(name); }
+					}
+
+					ImGui::EndTabItem();
 				}
-				*/
-				ImGui::EndMenuBar();
+				if (ImGui::BeginTabItem("PATH")) {
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("OBSTACLES")) {
+					static std::shared_ptr<obstacle> current_obstacle = nullptr;
+
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto const& entity : level::data.obstacles) {
+							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle->id == entity->id);
+
+							std::string label = "Obstacle" + std::to_string(entity->id);
+
+							ImGui::PushID(entity->id);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_obstacle = entity;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						auto o = std::make_shared<obstacle>();
+						o->pos = { 0,0 };
+						level::data.obstacles.push_back(o);
+						current_obstacle = o;
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						level::data.obstacles.erase(
+							std::remove(level::data.obstacles.begin(),
+							level::data.obstacles.end(), current_obstacle),
+							level::data.obstacles.end());
+
+						if (!level::data.obstacles.empty())
+							current_obstacle = level::data.obstacles.back();
+						else
+							current_obstacle = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_obstacle != nullptr) {
+						ImGui::PushID(current_obstacle->id);
+
+						ImGui::DragFloat("Position.x", &current_obstacle->pos.x);
+						ImGui::DragFloat("Position.y", &current_obstacle->pos.y);
+
+						ImGui::PopID();
+					}
+
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("ENEMIES")) {
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("SPRITES")) {
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
 			}
 
-			/*
-			if (ImGui::ListBoxHeader("Entities")) {
-				for (auto const& entity : level::current_level.obstacles) {
-					const bool is_selected = (selectedEntity != nullptr) && (selectedEntity->id == entity->id);
-
-					ImGui::PushID(entity->id);
-					if (ImGui::Selectable(entity->name, is_selected)) {
-						selectedEntity = entity;
-					}
-
-					if (is_selected) {
-						ImGui::SetItemDefaultFocus();
-					}
-					ImGui::PopID();
-				}
-
-				ImGui::ListBoxFooter();
-			}
-			*/
-			ImGui::End();
-		}
-
-		ImGui::PopStyleVar();
-	}
-	/* ----- TOOLBAR ----- */ {
-		// Set Windows Flags
-		ImGuiWindowFlags window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoDecoration;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		window_flags |= ImGuiWindowFlags_NoNav;
-		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
-
-		// Toolbar Window
-		ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
-		ImGui::SetNextWindowPos(ImVec2(work_size.x - PAD, work_size.y - PAD), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
-		ImGui::SetNextWindowSize(ImVec2(300.0f, (work_size.y / 2) - (PAD * 1.5f)), ImGuiCond_Always);
-
-		ImGui::SetNextWindowBgAlpha(0.9f);
-
-		if (ImGui::Begin("Toolbar", &p_open, window_flags)) {
-			/*
-			if(selectedEntity != nullptr)
-				selectedEntity->editor_draw();
-			*/
 			ImGui::End();
 		}
 	}
+	ImGui::PopStyleVar();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
