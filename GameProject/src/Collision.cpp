@@ -14,7 +14,9 @@ collision::box_collider* collision::create_collider(glm::vec2 _size) {
     auto pointer = c.get();
 
     collider_list.push_back(std::move(c));
-    
+
+    printf(" - COLLIDER CREATED\n");
+
     return pointer;
 }
 
@@ -22,7 +24,7 @@ void collision::delete_collider(box_collider* _collider) {
     if (!collider_list.empty()) {
         for (auto it = collider_list.begin(); it != collider_list.end();) {
             if (it->get() == _collider) {
-                printf(" - deleted collider at %p\n", it->get());
+                printf(" - DELETED COLLIDER AT %p\n", it->get());
                 it = collider_list.erase(it);
             }
             else {

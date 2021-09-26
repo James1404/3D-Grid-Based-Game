@@ -25,6 +25,9 @@ const int renderer::screen_resolution_x = 320, renderer::screen_resolution_y = 2
 static std::multimap<int, std::unique_ptr<renderer::sprite>> render_list;
 
 void renderer::init() {
+	printf("--------------------------------\n");
+	printf("STARTING RENDERER INITIALIZATION\n");
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -45,6 +48,7 @@ void renderer::init() {
 
 	projection = glm::ortho(0.0f, (float)screen_resolution_x, 0.0f, (float)screen_resolution_y, -100.0f, 100.0f);
 
+	printf("SUCCESFULY COMPLETED RENDERER INITIALIZATION\n");
 }
 
 void renderer::clean() {
@@ -270,13 +274,15 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 	
 	render_list.insert({ s->layer, std::move(s) });
 
+	printf(" - SPRITE CREATED\n");
+
 	return pointer;
 }
 
 void renderer::delete_sprite(renderer::sprite* _sprite) {
 	for (auto it = render_list.begin(); it != render_list.end();) {
 		if (it->second.get() == _sprite) {
-			printf(" - deleted sprite at %p\n", it->second.get());
+			printf(" - DELETED SPRITE AT %p\n", it->second.get());
 			it = render_list.erase(it);
 		}
 		else {

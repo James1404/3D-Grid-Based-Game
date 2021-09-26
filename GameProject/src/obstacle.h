@@ -12,17 +12,19 @@ struct obstacle : public entity {
 	collision::box_collider* col;
 
 	obstacle() {
+		printf("-----------------------\n");
 		spr = renderer::create_sprite("data/textures/face.png", &pos, -1);
 		col = collision::create_collider({ spr->width,spr->height });
 
-		printf("OBSTACLE INITIALIZED\n");
+		printf("OBSTACLE %i INITIALIZED\n", id);
 	}
 
 	~obstacle() {
+		printf("-------------------\n");
 		renderer::delete_sprite(spr);
 		collision::delete_collider(col);
 
-		printf("OBSTACLE CLEANED\n");
+		printf("OBSTACLE %i CLEANED\n", id);
 	}
 
 	void update(double dt) override {
