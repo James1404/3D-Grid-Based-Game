@@ -1,8 +1,8 @@
 #include "scene.h"
+
 #include <json.hpp>
 #include <fstream>
 
-#include "obstacle.h"
 #include "player.h"
 
 level::level_data level::data;
@@ -22,7 +22,7 @@ void level::clean() {
 }
 
 std::string levelPath = "data/scenes/Level1.scene";
-void level::save() {
+void level::save(char* level_name) {
 	nlohmann::json j;
 
 	j["Player"] += {
@@ -37,7 +37,7 @@ void level::save() {
 		};
 	}
 
-	std::ofstream ofs(levelPath);
+	std::ofstream ofs(level_name);
 	if (ofs.is_open()) {
 		ofs << j.dump(4) << std::endl;
 	}
@@ -45,13 +45,13 @@ void level::save() {
 	ofs.close();
 }
 
-void level::load() {
+void level::load(char* level_name) {
 	clean();
 	printf("---------------------\n");
 	printf("RETRIEVING SCENE FILE\n");
 
 	nlohmann::json j;
-	std::ifstream ifs(levelPath);
+	std::ifstream ifs(level_name);
 	if (ifs.is_open()) {
 		j = nlohmann::json::parse(ifs);
 
@@ -80,8 +80,6 @@ void level::load() {
 			o->pos.y = obstacle_j["position.y"];
 
 			data.obstacles.push_back(o);
-
-			printf(" - LOADED OBSTACLE\n");
 		}
 	}
 

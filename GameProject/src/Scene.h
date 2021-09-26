@@ -17,6 +17,6 @@ namespace level {
 	void update(double dt);
 	void clean();
 
-	void save();
-	void load();
+	void save(char* level_name);
+	void load(char* level_name);
 }
