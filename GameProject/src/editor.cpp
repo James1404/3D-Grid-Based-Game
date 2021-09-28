@@ -4,9 +4,9 @@
 
 #include <SDL.h>
 
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_sdl.h>
+#include <imgui_impl_opengl3.h>
 
 #include "input.h"
 #include "renderer.h"
@@ -35,11 +35,13 @@ float speed = 2;
 void editor::update(double dt) {
 	start = SDL_GetPerformanceCounter();
 
-	if (input::button_pressed("MoveUp")) { velocity.y = 1; }
+	if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) { velocity.y = 0; }
+	else if (input::button_pressed("MoveUp")) { velocity.y = 1; }
 	else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
 	else { velocity.y = 0; }
 
-	if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
+	if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) { velocity.x = 0; }
+	else if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
 	else if (input::button_pressed("MoveRight")) { velocity.x = 1; }
 	else { velocity.x = 0; }
 
@@ -56,7 +58,7 @@ void editor::draw() {
 	ImGui::NewFrame();
 
 	const float PAD = 10.0f;
-	static bool p_open = true;
+	static bool p_open = false;
 
 	ImVec2 work_size = ImGui::GetMainViewport()->WorkSize;
 
@@ -81,6 +83,52 @@ void editor::draw() {
 			ImGui::End();
 		}
 	}
+
+	static bool save_menu_open = false;
+	static bool load_menu_open = false;
+	/* ----- SAVE / LOAD MENU ----- */ {
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+		if (save_menu_open) {
+			if (ImGui::Begin("Save", &p_open, window_flags)) {
+				static char name[128];
+				ImGui::InputText("", name, IM_ARRAYSIZE(name));
+
+				ImGui::SameLine();
+				if (ImGui::Button("SAVE")) {
+					level::save(name);
+					save_menu_open = false;
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("CLOSE")) { save_menu_open = false; }
+
+				ImGui::End();
+			}
+		}
+
+		if (load_menu_open) {
+			if (ImGui::Begin("Load", &p_open, window_flags)) {
+				static char name[128];
+				ImGui::InputText("", name, IM_ARRAYSIZE(name));
+
+				ImGui::SameLine();
+				if (ImGui::Button("LOAD")) {
+					level::load(name);
+					load_menu_open = false;
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("CLOSE")) { load_menu_open = false; }
+
+				ImGui::End();
+			}
+		}
+	}
 	/* ----- INSPECTOR ----- */ {
 		// Set Windows Flags
 		ImGuiWindowFlags window_flags = 0;
@@ -98,23 +146,16 @@ void editor::draw() {
 		ImGui::SetNextWindowBgAlpha(0.9f);
 
 		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
-			if (ImGui::BeginTabBar("TABS")) {
-				if (ImGui::BeginTabItem("MAP")) {
-					static char name[128] = "data/scenes/";
-					ImGui::InputText("", name, IM_ARRAYSIZE(name));
-
-					ImGui::SameLine();
-					if (ImGui::Button("SAVE")) {
-						if (ImGui::MenuItem("SAVE")) { level::save(name); }
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("LOAD")) {
-						if (ImGui::MenuItem("LOAD")) { level::load(name); }
-					}
-
-					ImGui::EndTabItem();
+			if (ImGui::BeginMenuBar()) {
+				if (ImGui::BeginMenu("File")) {
+					if (ImGui::MenuItem("New")) { level::clean(); }
+					if (ImGui::MenuItem("Save")) { save_menu_open = true; }
+					if (ImGui::MenuItem("Load")) { load_menu_open = true; }
+					ImGui::EndMenu();
 				}
+				ImGui::EndMenuBar();
+			}
+			if (ImGui::BeginTabBar("TABS")) {
 				if (ImGui::BeginTabItem("PATH")) {
 					ImGui::EndTabItem();
 				}

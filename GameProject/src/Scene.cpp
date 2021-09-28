@@ -19,10 +19,13 @@ void level::update(double dt) {
 
 void level::clean() {
 	data.obstacles.clear();
+
+	printf("LEVEL CLEANED UP\n");
 }
 
-std::string levelPath = "data/scenes/Level1.scene";
-void level::save(char* level_name) {
+void level::save(std::string level_name) {
+	std::string levelPath = "data/scenes/" + level_name;
+
 	nlohmann::json j;
 
 	j["Player"] += {
@@ -37,7 +40,7 @@ void level::save(char* level_name) {
 		};
 	}
 
-	std::ofstream ofs(level_name);
+	std::ofstream ofs(levelPath);
 	if (ofs.is_open()) {
 		ofs << j.dump(4) << std::endl;
 	}
@@ -45,13 +48,15 @@ void level::save(char* level_name) {
 	ofs.close();
 }
 
-void level::load(char* level_name) {
+void level::load(std::string level_name) {
 	clean();
 	printf("---------------------\n");
 	printf("RETRIEVING SCENE FILE\n");
 
+	std::string levelPath = "data/scenes/" + level_name;
+
 	nlohmann::json j;
-	std::ifstream ifs(level_name);
+	std::ifstream ifs(levelPath);
 	if (ifs.is_open()) {
 		j = nlohmann::json::parse(ifs);
 
