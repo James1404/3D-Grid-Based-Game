@@ -250,7 +250,6 @@ renderer::sprite::~sprite() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-// TODO: fix transparency problem
 void renderer::sprite::draw() {
 	glUseProgram(shader);
 

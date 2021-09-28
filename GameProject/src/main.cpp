@@ -1,7 +1,7 @@
 #include <SDL.h>
 
 #ifdef _DEBUG
-#include "imgui_impl_sdl.h"
+#include <imgui_impl_sdl.h>
 #endif // _DEBUG
 
 #include "scene.h"
@@ -31,6 +31,8 @@ int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		renderer::init();
+
+		input::init();
 		input::load();
 
 		player::init();
@@ -39,7 +41,7 @@ int main(int argc, char* args[]) {
 
 #ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
-		level::load();
+		level::load("data/scenes/Level1.scene");
 #endif // NDEBUG
 		
 #ifdef _DEBUG
@@ -115,13 +117,20 @@ int main(int argc, char* args[]) {
 	}
 
 	/* ----- CLEAN GAME ----- */
+	printf("----------------\n");
+	printf("STARTING CLEANUP\n");
+
 	player::clean();
+
+	level::clean();
 
 #ifdef _DEBUG
 	editor::clean();
 #endif // _DEBUG
 
 	renderer::clean();
+
+	printf("CLEANUP FINISHED\n");
 
 	return 0;
 }
