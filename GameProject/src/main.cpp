@@ -41,7 +41,7 @@ int main(int argc, char* args[]) {
 
 #ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
-		level::load("data/scenes/Level1.scene");
+		level::load("Level1.scene");
 #endif // NDEBUG
 		
 #ifdef _DEBUG
@@ -120,13 +120,13 @@ int main(int argc, char* args[]) {
 	printf("----------------\n");
 	printf("STARTING CLEANUP\n");
 
-	player::clean();
-
-	level::clean();
-
 #ifdef _DEBUG
 	editor::clean();
 #endif // _DEBUG
+
+	player::clean();
+
+	level::clean();
 
 	renderer::clean();
 
