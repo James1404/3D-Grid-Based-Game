@@ -52,6 +52,9 @@ void editor::update(double dt) {
 	renderer::view = glm::translate(renderer::view, glm::vec3(-moveVector, 0.0f));
 }
 
+static std::shared_ptr<obstacle> current_obstacle = nullptr;
+static glm::vec2* current_path_node = nullptr;
+
 void editor::draw() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
@@ -129,7 +132,7 @@ void editor::draw() {
 			}
 		}
 	}
-	/* ----- INSPECTOR ----- */ {
+	/* ----- LEVEL DATA ----- */ {
 		// Set Windows Flags
 		ImGuiWindowFlags window_flags = 0;
 		window_flags |= ImGuiWindowFlags_NoDecoration;
@@ -148,20 +151,77 @@ void editor::draw() {
 		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
 			if (ImGui::BeginMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
-					if (ImGui::MenuItem("New")) { level::clean(); }
-					if (ImGui::MenuItem("Save")) { save_menu_open = true; }
-					if (ImGui::MenuItem("Load")) { load_menu_open = true; }
+					if (ImGui::MenuItem("New")) {
+						level::clean(); current_obstacle = nullptr;
+					}
+
+					if (ImGui::MenuItem("Save")) {
+						save_menu_open = true;
+					}
+
+					if (ImGui::MenuItem("Load")) {
+						load_menu_open = true;
+						current_obstacle = nullptr;
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
 			}
 			if (ImGui::BeginTabBar("TABS")) {
 				if (ImGui::BeginTabItem("PATH")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& node : player::player_path.nodes) {
+							const bool is_selected = (current_path_node != nullptr) && (current_path_node == &node);
+
+							std::string label = "Node";
+
+							ImGui::PushID(&node);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_path_node = &node;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						glm::vec2 n = { 0,0 };
+						player::player_path.nodes.push_back(n);
+						current_path_node = &player::player_path.nodes.back();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						player::player_path.nodes.erase(
+							std::remove(player::player_path.nodes.begin(),
+							player::player_path.nodes.end(), *current_path_node),
+							player::player_path.nodes.end());
+
+						if (!player::player_path.nodes.empty())
+							current_path_node = &player::player_path.nodes.back();
+						else
+							current_path_node = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_path_node != nullptr) {
+						ImGui::PushID(current_path_node);
+
+						ImGui::DragFloat("Position.x", &current_path_node->x);
+						ImGui::DragFloat("Position.y", &current_path_node->y);
+
+						ImGui::PopID();
+					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("OBSTACLES")) {
-					static std::shared_ptr<obstacle> current_obstacle = nullptr;
-
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto const& entity : level::data.obstacles) {
 							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle->id == entity->id);
@@ -240,9 +300,15 @@ void editor::draw() {
 }
 
 void editor::clean() {
+	current_obstacle = nullptr;
+	current_path_node = nullptr;
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+
+	printf("-----------------\n");
+	printf("EDITOR CLEANED UP\n");
 }
 
 #endif // _DEBUG

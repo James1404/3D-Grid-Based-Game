@@ -5,7 +5,7 @@
 
 namespace player {
 	struct path {
-		std::vector<glm::vec2> nodes = { {0,0}, {200, 50}, {80, 100} };
+		std::vector<glm::vec2> nodes = { {0,0}, {0, 100}, {80, 10} };
 	};
 
 	extern path player_path;
@@ -16,8 +16,6 @@ namespace player {
 		renderer::sprite* spr = nullptr;
 		collision::box_collider* col = nullptr;
 		float speed = 50;
-
-		unsigned int current_node = 0;
 	};
 
 	extern player_data data;

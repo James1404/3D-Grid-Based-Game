@@ -5,15 +5,15 @@
 #include <imgui.h>
 #include <json.hpp>
 
+#include <cmath>
+
 player::player_data player::data;
 player::path player::player_path;
 
-float lerpTime = 1.0f;
-float currentLerpTime;
-
-glm::vec2 lerp(const glm::vec2& A, const glm::vec2& B, float t) {
-	// return A * t + B * (1.f - t);
-	return A + (B - A) * t;
+float distance(const glm::vec2 a, const glm::vec2 b) {
+	float x_diff = a.x - b.x;
+	float y_diff = a.y - b.y;
+	return std::sqrt(x_diff * x_diff + y_diff * y_diff);
 }
 
 void player::init() {
@@ -24,9 +24,8 @@ void player::init() {
 	printf("PLAYER INITIALIZED\n");
 }
 
+int current_node = 0;
 void player::update(double dt) {
-	data.pos.y = 0;
-
 	if (input::button_pressed("Aim")) {
 		if (input::button_down("Shoot")) {
 			printf("Shoot\n");
@@ -44,34 +43,51 @@ void player::update(double dt) {
 	else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
 	else { data.vel.x = 0; }
 
-	currentLerpTime += dt;
-	if (currentLerpTime > lerpTime)
-		currentLerpTime = lerpTime;
+	float movementSpeed = .1f;
+	if (input::button_pressed("Run")) { movementSpeed = .5f; }
 
-	float perc = currentLerpTime / lerpTime;
+	if (data.vel.x > 0) {
+		if (current_node != player_path.nodes.size() - 1) {
+			if (distance(data.pos, player_path.nodes[current_node + 1]) > 0.01) {
+				glm::vec2 dir = glm::normalize(player_path.nodes[current_node + 1] - data.pos);
+				glm::vec2 move_vector = dir * data.vel.x;
 
-	if (perc > 1) {
-		data.current_node += 1;
-		currentLerpTime = 0;
+				move_vector *= dt;
+				move_vector *= movementSpeed;
+
+				data.col->pos = data.pos + move_vector;
+				if (collider_vs_collider(data.col)) {
+					return;
+				}
+
+				data.pos += move_vector;
+			}
+			else {
+				current_node++;
+			}
+		}
 	}
+	else {
+		if (current_node >= 0) {
+			if (distance(data.pos, player_path.nodes[current_node]) > 0.01) {
+				glm::vec2 dir = glm::normalize(player_path.nodes[current_node] - data.pos);
+				glm::vec2 move_vector = dir * data.vel.x;
 
-	data.pos = lerp(data.pos, player_path.nodes[data.current_node + 1], perc);
+				move_vector *= dt;
+				move_vector *= movementSpeed;
 
-	/*
-	float movementSpeed = data.speed;
-	if (input::button_pressed("Run")) { movementSpeed *= .5f; }
+				data.col->pos = data.pos - move_vector;
+				if (collider_vs_collider(data.col)) {
+					return;
+				}
 
-	glm::vec2 moveVector = glm::vec2(std::floor(data.vel.x), std::floor(data.vel.y));
-	moveVector /= movementSpeed;
-	moveVector *= dt;
-
-	data.col->pos = data.pos + moveVector;
-	if (collider_vs_collider(data.col)) {
-		return;
+				data.pos -= move_vector;
+			}
+			else {
+				current_node--;
+			}
+		}
 	}
-
-	data.pos += moveVector;
-	*/
 }
 
 void player::clean() {
