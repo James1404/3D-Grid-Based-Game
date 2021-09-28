@@ -7,45 +7,47 @@
 
 #include <SDL.h>
 
+const Uint8* keyboard_state;
+Uint8* previous_keyboard_state;
+int keyboard_state_size;
+
+Uint32 mouse_state;
+Uint32 previous_mouse_state;
+glm::ivec2 mouse_position;
+glm::ivec2 previous_mouse_position;
+
+void input::init() {
+	keyboard_state = SDL_GetKeyboardState(&keyboard_state_size);
+	previous_keyboard_state = new Uint8[keyboard_state_size];
+	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
+
+	printf("-----------------\n");
+	printf("INITIALIZED INPUT\n");
+}
+
+void input::clean() {
+	delete[] previous_keyboard_state;
+	previous_keyboard_state = NULL;
+}
+
 // TODO: Add Controller Support
-struct input_data {
-	const Uint8* KEYBOARD;
-	Uint8* P_KEYBOARD;
-	int KEYBOARD_SIZE;
+enum input_type { KEYBOARD = 0, MOUSE };
+enum mouse_button { LEFT = 0, RIGHT, MIDDLE, BACK, FORWARD };
 
-	Uint32 MOUSE;
-	Uint32 P_MOUSE;
-	glm::ivec2 MOUSE_POS;
-
-	input_data() {
-		KEYBOARD = SDL_GetKeyboardState(&KEYBOARD_SIZE);
-		P_KEYBOARD = new Uint8[KEYBOARD_SIZE];
-		memcpy(P_KEYBOARD, KEYBOARD, KEYBOARD_SIZE);
-	}
-
-	~input_data() {
-		delete[] P_KEYBOARD;
-		P_KEYBOARD = NULL;
-	}
-} static INPUT_DATA;
-
-enum MOUSE_BUTTON { LEFT = 0, RIGHT, MIDDLE, BACK, FORWARD };
-
-enum INPUT_TYPE { KEYBOARD = 0, MOUSE };
 struct INPUT {
-	unsigned int input;
-	INPUT_TYPE type;
+	unsigned int input_index;
+	input_type type;
 
-	INPUT(Uint8 _input, INPUT_TYPE _type) : input(_input), type(_type) {}
+	INPUT(Uint8 _input, input_type _type) : input_index(_input), type(_type) {}
 	~INPUT() {}
 
 	virtual bool State() {
 		if (type == KEYBOARD) {
-			return INPUT_DATA.KEYBOARD[input];
+			return keyboard_state[input_index];
 		} else if (type == MOUSE) {
 			Uint32 mask = 0;
 
-			switch (input) {
+			switch (input_index) {
 			case LEFT: mask = SDL_BUTTON_LMASK; break;
 			case RIGHT: mask = SDL_BUTTON_RMASK; break;
 			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
@@ -53,18 +55,18 @@ struct INPUT {
 			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
-			return (INPUT_DATA.MOUSE & mask);
+			return (mouse_state & mask);
 		}
 
 		return false;
 	}
 	virtual bool P_State() {
 		if (type == KEYBOARD) {
-			return INPUT_DATA.P_KEYBOARD[input];
+			return previous_keyboard_state[input_index];
 		} else if (type == MOUSE) {
 			Uint32 mask = 0;
 
-			switch (input) {
+			switch (input_index) {
 			case LEFT: mask = SDL_BUTTON_LMASK; break;
 			case RIGHT: mask = SDL_BUTTON_RMASK; break;
 			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
@@ -72,7 +74,7 @@ struct INPUT {
 			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
-			return (INPUT_DATA.P_MOUSE & mask);
+			return (previous_mouse_state & mask);
 		}
 	}
 };
@@ -80,9 +82,10 @@ struct INPUT {
 static std::multimap<std::string, INPUT> MAPPED_INPUTS;
 
 void input::update() {
-	INPUT_DATA.P_MOUSE = INPUT_DATA.MOUSE;
-	INPUT_DATA.MOUSE = SDL_GetMouseState(&INPUT_DATA.MOUSE_POS.x, &INPUT_DATA.MOUSE_POS.y);
-	memcpy(INPUT_DATA.P_KEYBOARD, INPUT_DATA.KEYBOARD, INPUT_DATA.KEYBOARD_SIZE);
+	previous_mouse_state = mouse_state;
+	previous_mouse_position = mouse_position;
+	mouse_state = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 }
 
 bool input::button_down(std::string button) {
@@ -119,14 +122,14 @@ bool input::button_released(std::string button) {
 }
 
 const glm::ivec2* input::get_mouse_pos() {
-	return &INPUT_DATA.MOUSE_POS;
+	return &mouse_position;
 }
 
 void input::save() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {
 		for (auto KEY : MAPPED_INPUTS) {
-			ofs << KEY.first << " " << KEY.second.type << " " << KEY.second.input << std::endl;
+			ofs << KEY.first << " " << KEY.second.type << " " << KEY.second.input_index << std::endl;
 		}
 	}
 
@@ -152,7 +155,7 @@ void input::load() {
 			std::istringstream iss(line);
 			if (!(iss >> key >> type >> value)) { break; }
 
-			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (INPUT_TYPE)type)));
+			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (input_type)type)));
 			printf(" - %s : %u\n", key.c_str(), value);
 		}
 		printf("FINISHED LOADING INPUT DATA\n");

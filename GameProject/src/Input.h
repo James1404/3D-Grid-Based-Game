@@ -3,6 +3,9 @@
 #include <glm.hpp>
 
 namespace input {
+	void init();
+	void clean();
+
 	void update();
 
 	bool button_down(std::string button);
