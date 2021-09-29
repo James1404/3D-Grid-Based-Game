@@ -32,9 +32,11 @@ float FPS;
 
 glm::vec2 velocity;
 float speed = 2;
+
 void editor::update(double dt) {
 	start = SDL_GetPerformanceCounter();
 
+	/*
 	if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) { velocity.y = 0; }
 	else if (input::button_pressed("MoveUp")) { velocity.y = 1; }
 	else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
@@ -48,12 +50,40 @@ void editor::update(double dt) {
 	glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
 	moveVector /= speed;
 	moveVector *= dt;
+	*/
 
-	renderer::view = glm::translate(renderer::view, glm::vec3(-moveVector, 0.0f));
+	if (input::mouse_button_pressed(input::mouse_button::RIGHT)) {
+		glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
+
+		renderer::view = glm::translate(renderer::view,
+			{ mouseDelta, 0.0f });
+	}
+
+	/*
+	float zoom = 1;
+	if (input::button_down("Shoot")) {
+		zoom += .1f;
+	}
+	else if (input::button_down("Aim")) {
+		zoom -= .1f;
+	}
+
+	renderer::view = glm::scale(renderer::view, { zoom, zoom, 0 });
+	*/
+
+	/*
+	if (input::button_down("Shoot")) {
+		renderer::view = glm::scale(renderer::view, { 0.9f, 0.9f, 0 });
+	}
+	else if (input::button_down("Aim")) {
+		renderer::view = glm::scale(renderer::view, { 1.1f, 1.1f, 0 });
+	}
+	*/
 }
 
 static std::shared_ptr<obstacle> current_obstacle = nullptr;
 static glm::vec2* current_path_node = nullptr;
+static renderer::sprite* current_sprite = nullptr;
 
 void editor::draw() {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -280,6 +310,56 @@ void editor::draw() {
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("SPRITES")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& sprite : level::data.sprites) {
+							const bool is_selected = (current_sprite != nullptr) && (current_sprite == sprite);
+
+							std::string label = "Sprite";
+
+							ImGui::PushID(&sprite);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_sprite = sprite;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						glm::vec2 pos = { 0,0 };
+						renderer::sprite* s = renderer::create_sprite("data/textures/face.png", &pos, 0);
+						level::data.sprites.push_back(s);
+						current_sprite = level::data.sprites.back();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						
+						level::data.sprites.erase(
+							std::remove(level::data.sprites.begin(),
+							level::data.sprites.end(), current_sprite),
+							level::data.sprites.end());
+
+						renderer::delete_sprite(current_sprite);
+						if (!level::data.sprites.empty())
+							current_sprite = level::data.sprites.back();
+						else
+							current_sprite = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_path_node != nullptr) {
+						ImGui::PushID(current_sprite);
+
+						ImGui::PopID();
+					}
 					ImGui::EndTabItem();
 				}
 				ImGui::EndTabBar();
