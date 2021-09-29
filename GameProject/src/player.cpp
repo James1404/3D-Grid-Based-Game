@@ -48,7 +48,7 @@ void player::update(double dt) {
 
 	if (data.vel.x > 0) {
 		if (current_node != player_path.nodes.size() - 1) {
-			if (distance(data.pos, player_path.nodes[current_node + 1]) > 0.01) {
+			if (distance(data.pos, player_path.nodes[current_node + 1]) > 0.1) {
 				glm::vec2 dir = glm::normalize(player_path.nodes[current_node + 1] - data.pos);
 				glm::vec2 move_vector = dir * data.vel.x;
 

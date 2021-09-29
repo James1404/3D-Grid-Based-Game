@@ -20,6 +20,10 @@ void level::update(double dt) {
 void level::clean() {
 	data.obstacles.clear();
 
+	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
+
+	data.sprites.clear();
+
 	printf("LEVEL CLEANED UP\n");
 }
 
