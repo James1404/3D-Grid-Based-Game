@@ -220,12 +220,6 @@ renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(vertices)));
 
-	int32_t bsize = 0;
-	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bsize);
-	if (bsize == 0) {
-		printf("VERTEX BUFFER EMPTY\n");
-	}
-
 	unsigned int indices[] = {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
@@ -289,3 +283,53 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 		}
 	}
 }
+
+#ifdef _DEBUG
+//
+// ----- DEBUG RENDERER -----
+//
+
+void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size) {
+	// SETUP STUFF
+	unsigned int square_shader;
+	square_shader = create_shader("data/shaders/square.vs", "data/shaders/square.fs");
+
+	unsigned int square_vao, square_vbo, square_ebo;
+
+	float vertices[] = {
+		// positions
+		 size.x,	 size.y,		// top right
+		 size.x,	 position.y,	// bottom right
+		 position.x, position.y,	// bottom left
+		 position.x, size.y,        // top left
+	};
+	
+	unsigned int indices[] = {
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+	};
+
+	glGenVertexArrays(1, &square_vao);
+	glBindVertexArray(square_vao);
+
+	glGenBuffers(1, &square_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+
+	glGenBuffers(1, &square_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	// DRAW STUFF
+	glUseProgram(square_shader);
+
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "view"), 1, false, glm::value_ptr(view));
+
+	glBindVertexArray(square_vao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+#endif // _DEBUG

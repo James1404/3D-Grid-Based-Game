@@ -45,4 +45,10 @@ namespace renderer {
 
 	sprite* create_sprite(const char* _path, glm::vec2* _position, int _layer);
 	void delete_sprite(sprite* _sprite);
+
+#ifdef _DEBUG
+	namespace debug {
+		void draw_square(const glm::vec2 position, const glm::vec2 size);
+	}
+#endif // _DEBUG
 }
