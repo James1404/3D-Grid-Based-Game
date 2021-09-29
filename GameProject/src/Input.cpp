@@ -5,8 +5,6 @@
 #include <map>
 #include <memory>
 
-#include <SDL.h>
-
 const Uint8* keyboard_state;
 Uint8* previous_keyboard_state;
 int keyboard_state_size;
@@ -32,7 +30,6 @@ void input::clean() {
 
 // TODO: Add Controller Support
 enum input_type { KEYBOARD = 0, MOUSE };
-enum mouse_button { LEFT = 0, RIGHT, MIDDLE, BACK, FORWARD };
 
 struct INPUT {
 	unsigned int input_index;
@@ -48,11 +45,11 @@ struct INPUT {
 			Uint32 mask = 0;
 
 			switch (input_index) {
-			case LEFT: mask = SDL_BUTTON_LMASK; break;
-			case RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case BACK: mask = SDL_BUTTON_X1MASK; break;
-			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			case input::LEFT: mask = SDL_BUTTON_LMASK; break;
+			case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case input::BACK: mask = SDL_BUTTON_X1MASK; break;
+			case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
 			return (mouse_state & mask);
@@ -67,11 +64,11 @@ struct INPUT {
 			Uint32 mask = 0;
 
 			switch (input_index) {
-			case LEFT: mask = SDL_BUTTON_LMASK; break;
-			case RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case BACK: mask = SDL_BUTTON_X1MASK; break;
-			case FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			case input::LEFT: mask = SDL_BUTTON_LMASK; break;
+			case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case input::BACK: mask = SDL_BUTTON_X1MASK; break;
+			case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
 			return (previous_mouse_state & mask);
@@ -121,8 +118,70 @@ bool input::button_released(std::string button) {
 	return false;
 }
 
+bool input::key_down(SDL_Scancode key) {
+	return keyboard_state[key] && !previous_keyboard_state[key];
+}
+
+bool input::key_pressed(SDL_Scancode key) {
+	return keyboard_state[key];
+}
+
+bool input::key_released(SDL_Scancode key) {
+	return !keyboard_state[key] && previous_keyboard_state[key];
+}
+
+bool input::mouse_button_down(mouse_button button) {
+	Uint32 mask = 0;
+
+	switch (button) {
+	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	}
+
+	return (mouse_state & mask) && (!previous_mouse_state & mask);
+}
+
+bool input::mouse_button_pressed(mouse_button button) {
+	Uint32 mask = 0;
+
+	switch (button) {
+	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	}
+
+	return (mouse_state & mask);
+}
+
+bool input::mouse_button_released(mouse_button button) {
+	Uint32 mask = 0;
+
+	switch (button) {
+	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	}
+
+	return (!mouse_state & mask) && (previous_mouse_state & mask);
+}
+
 const glm::ivec2* input::get_mouse_pos() {
 	return &mouse_position;
+}
+
+const glm::ivec2* input::get_previous_mouse_pos() {
+	return &previous_mouse_position;
+}
+
+const glm::ivec2 input::get_mouse_delta() {
+	return previous_mouse_position - mouse_position;
 }
 
 void input::save() {
