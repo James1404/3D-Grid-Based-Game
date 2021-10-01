@@ -45,11 +45,11 @@ struct INPUT {
 			Uint32 mask = 0;
 
 			switch (input_index) {
-			case input::LEFT: mask = SDL_BUTTON_LMASK; break;
-			case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case input::BACK: mask = SDL_BUTTON_X1MASK; break;
-			case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+			case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+			case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
 			return (mouse_state & mask);
@@ -64,11 +64,11 @@ struct INPUT {
 			Uint32 mask = 0;
 
 			switch (input_index) {
-			case input::LEFT: mask = SDL_BUTTON_LMASK; break;
-			case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case input::BACK: mask = SDL_BUTTON_X1MASK; break;
-			case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+			case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+			case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+			case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+			case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+			case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 			}
 
 			return (previous_mouse_state & mask);
@@ -134,25 +134,25 @@ bool input::mouse_button_down(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
-	return (mouse_state & mask) && (!previous_mouse_state & mask);
+	return (mouse_state & mask) && !(previous_mouse_state & mask);
 }
 
 bool input::mouse_button_pressed(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
 	return (mouse_state & mask);
@@ -162,14 +162,14 @@ bool input::mouse_button_released(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
-	return (!mouse_state & mask) && (previous_mouse_state & mask);
+	return !(mouse_state & mask) && (previous_mouse_state & mask);
 }
 
 const glm::ivec2* input::get_mouse_pos() {
@@ -238,10 +238,10 @@ void input::load() {
 		//
 
 		MAPPED_INPUTS.insert({ "Aim", INPUT(SDL_SCANCODE_LCTRL, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "Aim", INPUT(RIGHT, MOUSE) });
+		MAPPED_INPUTS.insert({ "Aim", INPUT(MOUSE_RIGHT, MOUSE) });
 
 		MAPPED_INPUTS.insert({"Shoot", INPUT(SDL_SCANCODE_SPACE, KEYBOARD)});
-		MAPPED_INPUTS.insert({"Shoot", INPUT(LEFT, MOUSE)});
+		MAPPED_INPUTS.insert({"Shoot", INPUT(MOUSE_LEFT, MOUSE)});
 
 		//
 		// -- MISC INPUT --
