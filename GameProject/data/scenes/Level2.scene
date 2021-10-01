@@ -1,0 +1,9 @@
+FILE_VERSION : 1
+
+PLAYER : Position (40, 0);
+
+OBSTACLE : Position (188, 29);
+OBSTACLE : Position (182, 106);
+OBSTACLE : Position (42, 146);
+OBSTACLE : Position (110, 78);
+
