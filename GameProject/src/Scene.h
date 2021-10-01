@@ -11,6 +11,7 @@ namespace level {
 	struct level_data {
 		std::vector<std::shared_ptr<obstacle>> obstacles;
 		std::vector<renderer::sprite*> sprites;
+		std::vector<glm::vec2> path_nodes;
 	};
 	extern level_data data;
 
