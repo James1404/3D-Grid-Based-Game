@@ -52,7 +52,7 @@ void editor::update(double dt) {
 	moveVector *= dt;
 	*/
 
-	if (input::mouse_button_pressed(input::mouse_button::RIGHT)) {
+	if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
 		glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
 
 		renderer::view = glm::translate(renderer::view,
@@ -126,10 +126,18 @@ void editor::draw() {
 		window_flags |= ImGuiWindowFlags_NoCollapse;
 		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
+		ImGuiInputTextFlags input_text_flags = 0;
+		input_text_flags |= ImGuiInputTextFlags_EnterReturnsTrue;
+
 		if (save_menu_open) {
 			if (ImGui::Begin("Save", &p_open, window_flags)) {
 				static char name[128];
-				ImGui::InputText("", name, IM_ARRAYSIZE(name));
+
+				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), input_text_flags)) {
+					level::save(name);
+					save_menu_open = false;
+				}
+
 
 				ImGui::SameLine();
 				if (ImGui::Button("SAVE")) {
@@ -147,7 +155,10 @@ void editor::draw() {
 		if (load_menu_open) {
 			if (ImGui::Begin("Load", &p_open, window_flags)) {
 				static char name[128];
-				ImGui::InputText("", name, IM_ARRAYSIZE(name));
+				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), input_text_flags)) {
+					level::load(name);
+					load_menu_open = false;
+				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("LOAD")) {
@@ -200,7 +211,7 @@ void editor::draw() {
 			if (ImGui::BeginTabBar("TABS")) {
 				if (ImGui::BeginTabItem("PATH")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& node : player::player_path.nodes) {
+						for (auto& node : level::data.path_nodes) {
 							const bool is_selected = (current_path_node != nullptr) && (current_path_node == &node);
 
 							std::string label = "Node";
@@ -222,19 +233,19 @@ void editor::draw() {
 
 					if (ImGui::Button("+")) {
 						glm::vec2 n = { 0,0 };
-						player::player_path.nodes.push_back(n);
-						current_path_node = &player::player_path.nodes.back();
+						level::data.path_nodes.push_back(n);
+						current_path_node = &level::data.path_nodes.back();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						player::player_path.nodes.erase(
-							std::remove(player::player_path.nodes.begin(),
-							player::player_path.nodes.end(), *current_path_node),
-							player::player_path.nodes.end());
+						level::data.path_nodes.erase(
+							std::remove(level::data.path_nodes.begin(),
+							level::data.path_nodes.end(), *current_path_node),
+							level::data.path_nodes.end());
 
-						if (!player::player_path.nodes.empty())
-							current_path_node = &player::player_path.nodes.back();
+						if (!level::data.path_nodes.empty())
+							current_path_node = &level::data.path_nodes.back();
 						else
 							current_path_node = nullptr;
 					}
