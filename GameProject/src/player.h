@@ -4,12 +4,6 @@
 #include "collision.h"
 
 namespace player {
-	struct path {
-		std::vector<glm::vec2> nodes = { {0,0}, {0, 100}, {80, 10} };
-	};
-
-	extern path player_path;
-
 	struct player_data {
 		glm::vec2 pos = { 0,0 };
 		glm::vec2 vel = { 0,0 };
