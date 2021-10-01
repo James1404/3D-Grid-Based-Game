@@ -38,7 +38,6 @@ namespace renderer {
 		int layer;
 		int width, height;
 
-		unsigned int shader;
 		unsigned int vao;
 		unsigned int texture;
 	};
@@ -48,7 +47,7 @@ namespace renderer {
 
 #ifdef _DEBUG
 	namespace debug {
-		void draw_square(const glm::vec2 position, const glm::vec2 size);
+		void draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour);
 	}
 #endif // _DEBUG
 }

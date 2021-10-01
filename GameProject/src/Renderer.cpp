@@ -10,84 +10,6 @@
 #include "stb_image.h"
 
 //
-// ----- RENDERER -----
-//
-
-SDL_Window* renderer::window;
-SDL_GLContext renderer::context;
-
-glm::mat4 renderer::projection;
-glm::mat4 renderer::view = glm::mat4(1.0f);
-
-int renderer::screen_width = 1280, renderer::screen_height = 720;
-const int renderer::screen_resolution_x = 320, renderer::screen_resolution_y = 200;
-
-static std::multimap<int, std::unique_ptr<renderer::sprite>> render_list;
-
-void renderer::init() {
-	printf("--------------------------------\n");
-	printf("STARTING RENDERER INITIALIZATION\n");
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-	window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-	context = SDL_GL_CreateContext(window);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	if (context != NULL) {
-		glewExperimental = GL_TRUE;
-		GLenum glewError = glewInit();
-		if (glewError != GLEW_OK) {
-			printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
-		}
-	}
-
-	projection = glm::ortho(0.0f, (float)screen_resolution_x, 0.0f, (float)screen_resolution_y, -100.0f, 100.0f);
-
-	printf("SUCCESFULY COMPLETED RENDERER INITIALIZATION\n");
-}
-
-void renderer::clean() {
-	SDL_GL_DeleteContext(context);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-}
-
-void renderer::start_draw() {
-	// Clear screen
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// Set aspect ratio
-	float x = screen_width / (float)screen_resolution_x;
-	float y = screen_height / (float)screen_resolution_y;
-	float aspect = std::min(x, y);
-
-	int viewWidth = screen_resolution_x * aspect;
-	int viewHeight = screen_resolution_y * aspect;
-
-	int viewX = (screen_width - screen_resolution_x * aspect) / 2;
-	int viewY = (screen_height - screen_resolution_y * aspect) / 2;
-
-	glViewport(viewX, viewY, viewWidth, viewHeight);
-}
-
-void renderer::draw_sprites() {
-	for (auto& i : render_list) {
-		i.second->draw();
-	}
-}
-
-void renderer::stop_draw() {
-	// Swap buffer
-	SDL_GL_SwapWindow(window);
-}
-
-//
 // ----- SHADERS -----
 //
 
@@ -157,15 +79,96 @@ unsigned int create_shader(const char* vertexSource, const char* fragmentSource)
 }
 
 //
+// ----- RENDERER -----
+//
+
+SDL_Window* renderer::window;
+SDL_GLContext renderer::context;
+
+glm::mat4 renderer::projection;
+glm::mat4 renderer::view = glm::mat4(1.0f);
+
+int renderer::screen_width = 1280, renderer::screen_height = 720;
+const int renderer::screen_resolution_x = 320, renderer::screen_resolution_y = 200;
+
+static std::multimap<int, std::unique_ptr<renderer::sprite>> render_list;
+
+unsigned int sprite_shader;
+
+void renderer::init() {
+	printf("--------------------------------\n");
+	printf("STARTING RENDERER INITIALIZATION\n");
+	
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	context = SDL_GL_CreateContext(window);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	if (context != NULL) {
+		glewExperimental = GL_TRUE;
+		GLenum glewError = glewInit();
+		if (glewError != GLEW_OK) {
+			printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+		}
+	}
+
+	projection = glm::ortho(0.0f, (float)screen_resolution_x, 0.0f, (float)screen_resolution_y, -100.0f, 100.0f);
+
+	sprite_shader = create_shader("data/shaders/core.vs", "data/shaders/core.fs");
+
+	printf("SUCCESFULY COMPLETED RENDERER INITIALIZATION\n");
+}
+
+void renderer::clean() {
+	glDeleteProgram(sprite_shader);
+
+	SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
+
+void renderer::start_draw() {
+	// Clear screen
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Set aspect ratio
+	float x = screen_width / (float)screen_resolution_x;
+	float y = screen_height / (float)screen_resolution_y;
+	float aspect = std::min(x, y);
+
+	int viewWidth = screen_resolution_x * aspect;
+	int viewHeight = screen_resolution_y * aspect;
+
+	int viewX = (screen_width - screen_resolution_x * aspect) / 2;
+	int viewY = (screen_height - screen_resolution_y * aspect) / 2;
+
+	glViewport(viewX, viewY, viewWidth, viewHeight);
+}
+
+void renderer::draw_sprites() {
+	for (auto& i : render_list) {
+		i.second->draw();
+	}
+}
+
+void renderer::stop_draw() {
+	// Swap buffer
+	SDL_GL_SwapWindow(window);
+}
+
+//
 // ----- SPRITES -----
 //
 
 renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
 	this->position = _position;
 	this->layer = _layer;
-
-	// Load and compile shaders
-	shader = create_shader("data/shaders/core.vs", "data/shaders/core.fs");
 
 	// Load and Generate Textures
 	glGenTextures(1, &texture);
@@ -231,28 +234,27 @@ renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set image attribute
-	glUniform1i(glGetUniformLocation(shader, "image"), 0);
+	glUniform1i(glGetUniformLocation(sprite_shader, "image"), 0);
 
 	// Set projection matrix attribute
-	glUseProgram(shader);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, false, glm::value_ptr(projection));
+	glUseProgram(sprite_shader);
+	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "projection"), 1, false, glm::value_ptr(projection));
 }
 
 renderer::sprite::~sprite() {
-	glDeleteProgram(shader);
 	glDeleteTextures(1, &texture);
 	glDeleteVertexArrays(1, &vao);
 }
 
 void renderer::sprite::draw() {
-	glUseProgram(shader);
+	glUseProgram(sprite_shader);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3((glm::ivec2)*position, layer));
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));
 
-	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, false, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, false, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "view"), 1, false, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "model"), 1, false, glm::value_ptr(model));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -289,7 +291,7 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 // ----- DEBUG RENDERER -----
 //
 
-void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size) {
+void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour) {
 	// SETUP STUFF
 	unsigned int square_shader;
 	square_shader = create_shader("data/shaders/square.vs", "data/shaders/square.fs");
