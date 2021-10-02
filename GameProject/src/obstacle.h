@@ -12,15 +12,13 @@ struct obstacle : public entity {
 	collision::box_collider* col;
 
 	obstacle() {
-		printf("-----------------------\n");
 		spr = renderer::create_sprite("data/textures/face.png", &pos, -1);
-		col = collision::create_collider({ spr->width,spr->height });
+		col = collision::create_collider(spr->size);
 
 		printf("OBSTACLE %i INITIALIZED\n", id);
 	}
 
 	~obstacle() {
-		printf("-------------------\n");
 		renderer::delete_sprite(spr);
 		collision::delete_collider(col);
 

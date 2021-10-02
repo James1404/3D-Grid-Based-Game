@@ -15,6 +15,8 @@
 
 #include "player.h"
 
+// TODO: implement centrilaised log system
+
 SDL_Event event;
 
 bool isRunning = false;

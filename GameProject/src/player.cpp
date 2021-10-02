@@ -8,7 +8,7 @@ player::player_data player::data;
 void player::init() {
 	printf("------------------\n");
 	data.spr = renderer::create_sprite("data/textures/player.png", &data.pos, 1);
-	data.col = collision::create_collider({ data.spr->width, data.spr->height });
+	data.col = collision::create_collider(data.spr->size);
 
 	printf("PLAYER INITIALIZED\n");
 }

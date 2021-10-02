@@ -24,7 +24,7 @@ void collision::delete_collider(box_collider* _collider) {
     if (!collider_list.empty()) {
         for (auto it = collider_list.begin(); it != collider_list.end();) {
             if (it->get() == _collider) {
-                printf(" - DELETED COLLIDER AT %p\n", it->get());
+                printf(" - DELETED COLLIDER LOC: %p\n", it->get());
                 it = collider_list.erase(it);
             }
             else {

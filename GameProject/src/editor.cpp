@@ -321,6 +321,7 @@ void editor::draw() {
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("SPRITES")) {
+					// TODO: finally implement sprite creation
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto& sprite : level::data.sprites) {
 							const bool is_selected = (current_sprite != nullptr) && (current_sprite == sprite);
