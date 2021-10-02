@@ -182,8 +182,8 @@ renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
 	stbi_set_flip_vertically_on_load(true);
 
 	int nrChannels;
-	unsigned char* data = stbi_load(_path, &width, &height, &nrChannels, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	unsigned char* data = stbi_load(_path, &size.x, &size.y, &nrChannels, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);
 
@@ -251,7 +251,7 @@ void renderer::sprite::draw() {
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3((glm::ivec2)*position, layer));
-	model = glm::scale(model, glm::vec3(width, height, 1.0f));
+	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 
 	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "view"), 1, false, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "model"), 1, false, glm::value_ptr(model));
@@ -266,7 +266,8 @@ void renderer::sprite::draw() {
 renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _position, int _layer) {
 	auto s = std::make_unique<sprite>(_path, _position, _layer);
 	auto pointer = s.get();
-	
+
+	// TODO: allow dynamic layer changing
 	render_list.insert({ s->layer, std::move(s) });
 
 	printf(" - SPRITE CREATED\n");
@@ -277,7 +278,7 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 void renderer::delete_sprite(renderer::sprite* _sprite) {
 	for (auto it = render_list.begin(); it != render_list.end();) {
 		if (it->second.get() == _sprite) {
-			printf(" - DELETED SPRITE AT %p\n", it->second.get());
+			printf(" - DELETED SPRITE LOC: %p\n", it->second.get());
 			it = render_list.erase(it);
 		}
 		else {
@@ -291,6 +292,7 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 // ----- DEBUG RENDERER -----
 //
 
+// TODO: use color in shader code.
 void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour) {
 	// SETUP STUFF
 	unsigned int square_shader;
@@ -299,11 +301,10 @@ void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size
 	unsigned int square_vao, square_vbo, square_ebo;
 
 	float vertices[] = {
-		// positions
-		 size.x,	 size.y,		// top right
-		 size.x,	 position.y,	// bottom right
-		 position.x, position.y,	// bottom left
-		 position.x, size.y,        // top left
+		position.x + size.x, position.y + size.y,	// top right
+		position.x + size.x, position.y,			// bottom right
+		position.x,		     position.y,			// bottom left
+		position.x,		     position.y + size.y,	// top left
 	};
 	
 	unsigned int indices[] = {
@@ -328,8 +329,10 @@ void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size
 	// DRAW STUFF
 	glUseProgram(square_shader);
 
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "view"), 1, false, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
+
+	glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(colour));
 
 	glBindVertexArray(square_vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

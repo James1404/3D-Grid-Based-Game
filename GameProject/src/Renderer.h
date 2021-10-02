@@ -34,9 +34,10 @@ namespace renderer {
 
 		void draw();
 
+		// TODO: make sprite store its own position not a pointer
 		glm::vec2* position;
+		glm::ivec2 size;
 		int layer;
-		int width, height;
 
 		unsigned int vao;
 		unsigned int texture;
