@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 #include "stb_image.h"
 
@@ -91,7 +92,7 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 int renderer::screen_width = 1280, renderer::screen_height = 720;
 const int renderer::screen_resolution_x = 320, renderer::screen_resolution_y = 200;
 
-static std::multimap<int, std::unique_ptr<renderer::sprite>> render_list;
+std::vector<std::unique_ptr<renderer::sprite>> render_list;
 
 unsigned int sprite_shader;
 
@@ -152,7 +153,12 @@ void renderer::start_draw() {
 }
 
 void renderer::draw_sprites() {
+	std::multimap <int, sprite*> render_order;
 	for (auto& i : render_list) {
+		render_order.insert({ i->layer, i.get() });
+	}
+
+	for (auto& i : render_order) {
 		i.second->draw();
 	}
 }
@@ -268,7 +274,7 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 	auto pointer = s.get();
 
 	// TODO: allow dynamic layer changing
-	render_list.insert({ s->layer, std::move(s) });
+	render_list.push_back(std::move(s));
 
 	printf(" - SPRITE CREATED\n");
 
@@ -276,9 +282,13 @@ renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _positio
 }
 
 void renderer::delete_sprite(renderer::sprite* _sprite) {
+	// TODO: replace delete sprite code with cleaner code
+	//printf(" - DELETED SPRITE LOC: %p\n", _sprite);
+	//render_list.erase(std::remove(render_list.begin(), render_list.end(), _sprite), render_list.end());
+
 	for (auto it = render_list.begin(); it != render_list.end();) {
-		if (it->second.get() == _sprite) {
-			printf(" - DELETED SPRITE LOC: %p\n", it->second.get());
+		if (it->get() == _sprite) {
+			printf(" - DELETED SPRITE LOC: %p\n", it->get());
 			it = render_list.erase(it);
 		}
 		else {
@@ -292,7 +302,6 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 // ----- DEBUG RENDERER -----
 //
 
-// TODO: use color in shader code.
 void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour) {
 	// SETUP STUFF
 	unsigned int square_shader;
