@@ -254,9 +254,10 @@ void editor::draw() {
 
 					if (current_path_node != nullptr) {
 						ImGui::PushID(current_path_node);
+						ImGui::Text("Position");
 
-						ImGui::DragFloat("Position.x", &current_path_node->x);
-						ImGui::DragFloat("Position.y", &current_path_node->y);
+						ImGui::DragFloat("X", &current_path_node->x);
+						ImGui::DragFloat("Y", &current_path_node->y);
 
 						ImGui::PopID();
 					}
@@ -308,9 +309,10 @@ void editor::draw() {
 
 					if (current_obstacle != nullptr) {
 						ImGui::PushID(current_obstacle->id);
+						ImGui::Text("Position");
 
-						ImGui::DragFloat("Position.x", &current_obstacle->pos.x);
-						ImGui::DragFloat("Position.y", &current_obstacle->pos.y);
+						ImGui::DragFloat("X", &current_obstacle->pos.x);
+						ImGui::DragFloat("Y", &current_obstacle->pos.y);
 
 						ImGui::PopID();
 					}
