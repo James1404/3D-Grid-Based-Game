@@ -4,7 +4,6 @@
 #include "collision.h"
 
 #include <imgui.h>
-#include <json.hpp>
 
 struct obstacle : public entity {
 	glm::vec2 pos;

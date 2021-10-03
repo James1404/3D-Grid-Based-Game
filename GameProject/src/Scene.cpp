@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <json.hpp>
 
 #include "player.h"
 
@@ -81,7 +80,6 @@ void level::load(std::string level_name) {
 			std::stringstream ss(line);
 			std::string type;
 			
-			// TODO: Remove white spaces.
 			std::getline(ss, type, ' ');
 
 			if (type == "FILE_VERSION") {
@@ -89,7 +87,7 @@ void level::load(std::string level_name) {
 				ss >> file_version;
 
 				if (file_version != fileVersion) {
-					printf("OUTDATED SAVE FILE\n");
+					printf("OUTDATED LEVEL FILE\n");
 					return;
 				}
 			}
