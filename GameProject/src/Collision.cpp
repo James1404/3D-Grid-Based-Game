@@ -5,7 +5,7 @@
 // TODO: Spatial Hashing
 std::vector<std::unique_ptr<collision::box_collider>> collider_list;
 
-static unsigned int current_id = 0;
+static uint32_t current_id = 0;
 collision::box_collider* collision::create_collider(glm::vec2 _size) {
     auto c = std::make_unique<box_collider>();
     c->id = current_id++;

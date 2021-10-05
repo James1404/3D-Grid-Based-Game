@@ -4,12 +4,9 @@
 #include <map>
 #include <string>
 
-#include "entity.h"
-
-
 namespace collision {
     struct box_collider {
-        unsigned int id;
+        uint32_t id;
 
         glm::vec2 pos;
         glm::vec2 size;
