@@ -10,3 +10,7 @@ PATH_NODE 20 45
 PATH_NODE 100 45
 PATH_NODE 200 80
 
+ENEMY 56 55
+
+SPRITE 0 0 -5 data/textures/background.png
+
