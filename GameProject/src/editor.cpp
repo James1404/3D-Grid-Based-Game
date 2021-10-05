@@ -1,21 +1,16 @@
-#ifdef _DEBUG
-
 #include "editor.h"
 
+#ifdef _DEBUG
 #include <SDL.h>
-
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
 #include <imgui_impl_opengl3.h>
 
 #include "input.h"
 #include "renderer.h"
-
 #include "scene.h"
-
 #include "entity.h"
 #include "player.h"
-#include "obstacle.h"
 
 void editor::init() {
 	IMGUI_CHECKVERSION();
@@ -81,9 +76,17 @@ void editor::update(double dt) {
 	*/
 }
 
-static std::shared_ptr<obstacle> current_obstacle = nullptr;
+static std::shared_ptr<obstacle_entity> current_obstacle = nullptr;
 static glm::vec2* current_path_node = nullptr;
-static renderer::sprite* current_sprite = nullptr;
+static std::shared_ptr<sprite_entity> current_sprite = nullptr;
+static std::shared_ptr<enemy_entity> current_enemy = nullptr;
+
+void clear_selected() {
+	current_obstacle = nullptr;
+	current_path_node = nullptr;
+	current_sprite = nullptr;
+	current_enemy = nullptr;
+}
 
 void editor::draw() {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -138,14 +141,15 @@ void editor::draw() {
 					save_menu_open = false;
 				}
 
-
 				ImGui::SameLine();
+
 				if (ImGui::Button("SAVE")) {
 					level::save(name);
 					save_menu_open = false;
 				}
 
 				ImGui::SameLine();
+
 				if (ImGui::Button("CLOSE")) { save_menu_open = false; }
 
 				ImGui::End();
@@ -156,12 +160,16 @@ void editor::draw() {
 			if (ImGui::Begin("Load", &p_open, window_flags)) {
 				static char name[128];
 				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), input_text_flags)) {
+					clear_selected();
+
 					level::load(name);
 					load_menu_open = false;
 				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("LOAD")) {
+					clear_selected();
+
 					level::load(name);
 					load_menu_open = false;
 				}
@@ -193,7 +201,8 @@ void editor::draw() {
 			if (ImGui::BeginMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
 					if (ImGui::MenuItem("New")) {
-						level::clean(); current_obstacle = nullptr;
+						clear_selected();
+						level::clean();
 					}
 
 					if (ImGui::MenuItem("Save")) {
@@ -202,7 +211,6 @@ void editor::draw() {
 
 					if (ImGui::MenuItem("Load")) {
 						load_menu_open = true;
-						current_obstacle = nullptr;
 					}
 					ImGui::EndMenu();
 				}
@@ -265,14 +273,14 @@ void editor::draw() {
 				}
 				if (ImGui::BeginTabItem("OBSTACLES")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto const& entity : level::data.obstacles) {
-							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle->id == entity->id);
+						for (auto& obstacle : level::data.obstacles) {
+							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
 
-							std::string label = "Obstacle" + std::to_string(entity->id);
+							std::string label = "Obstacle";
 
-							ImGui::PushID(entity->id);
+							ImGui::PushID(&obstacle);
 							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_obstacle = entity;
+								current_obstacle = obstacle;
 							}
 
 							if (is_selected) {
@@ -286,7 +294,7 @@ void editor::draw() {
 					}
 
 					if (ImGui::Button("+")) {
-						auto o = std::make_shared<obstacle>();
+						auto o = std::make_shared<obstacle_entity>();
 						o->pos = { 0,0 };
 						level::data.obstacles.push_back(o);
 						current_obstacle = o;
@@ -308,7 +316,7 @@ void editor::draw() {
 					ImGui::Separator();
 
 					if (current_obstacle != nullptr) {
-						ImGui::PushID(current_obstacle->id);
+						ImGui::PushID(current_obstacle.get());
 						ImGui::Text("Position");
 
 						ImGui::DragFloat("X", &current_obstacle->pos.x);
@@ -320,6 +328,58 @@ void editor::draw() {
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("ENEMIES")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& enemy : level::data.enemies) {
+							const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
+
+							std::string label = "Enemy";
+
+							ImGui::PushID(&enemy);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_enemy = enemy;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						auto e = std::make_shared<enemy_entity>();
+						e->pos = { 0,0 };
+						level::data.enemies.push_back(e);
+						current_enemy = e;
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						level::data.enemies.erase(
+							std::remove(level::data.enemies.begin(),
+							level::data.enemies.end(), current_enemy),
+							level::data.enemies.end());
+
+						if (!level::data.enemies.empty())
+							current_enemy = level::data.enemies.back();
+						else
+							current_enemy = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_enemy != nullptr) {
+						ImGui::PushID(current_enemy.get());
+						ImGui::Text("Position");
+
+						ImGui::DragFloat("X", &current_enemy->pos.x);
+						ImGui::DragFloat("Y", &current_enemy->pos.y);
+
+						ImGui::PopID();
+					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("SPRITES")) {
@@ -346,21 +406,19 @@ void editor::draw() {
 					}
 
 					if (ImGui::Button("+")) {
-						glm::vec2 pos = { 0,0 };
-						renderer::sprite* s = renderer::create_sprite("data/textures/face.png", &pos, 0);
+						auto s = std::make_shared<sprite_entity>();
+
 						level::data.sprites.push_back(s);
 						current_sprite = level::data.sprites.back();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						
 						level::data.sprites.erase(
 							std::remove(level::data.sprites.begin(),
 							level::data.sprites.end(), current_sprite),
 							level::data.sprites.end());
 
-						renderer::delete_sprite(current_sprite);
 						if (!level::data.sprites.empty())
 							current_sprite = level::data.sprites.back();
 						else
@@ -369,8 +427,24 @@ void editor::draw() {
 
 					ImGui::Separator();
 
-					if (current_path_node != nullptr) {
-						ImGui::PushID(current_sprite);
+					if (current_sprite != nullptr) {
+						ImGui::PushID(current_sprite.get());
+
+						ImGui::Text("Position");
+
+						ImGui::DragFloat("X", &current_sprite->pos.x);
+						ImGui::DragFloat("Y", &current_sprite->pos.y);
+
+						ImGui::DragInt("Layer", &current_sprite->spr->layer);
+
+						static char name[128];
+
+						ImGui::InputText("Path", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_EnterReturnsTrue);
+
+						if (ImGui::Button("Set Path")) {
+							current_sprite->sprite_path = name;
+							current_sprite->spr->set_sprite_path(name);
+						}
 
 						ImGui::PopID();
 					}
