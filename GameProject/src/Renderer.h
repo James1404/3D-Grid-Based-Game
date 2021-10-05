@@ -29,11 +29,12 @@ namespace renderer {
 	// TODO: Batch Rendering
 
 	struct sprite {
-		sprite(const char* _path, glm::vec2* _position, int _layer);
+		sprite();
 		~sprite();
 
 		void draw();
-
+		void set_sprite_path(const char* _path);
+	
 		// TODO: make sprite store its own position not a pointer
 		glm::vec2* position;
 		glm::ivec2 size;
@@ -43,7 +44,7 @@ namespace renderer {
 		unsigned int texture;
 	};
 
-	sprite* create_sprite(const char* _path, glm::vec2* _position, int _layer);
+	sprite* create_sprite();
 	void delete_sprite(sprite* _sprite);
 
 #ifdef _DEBUG

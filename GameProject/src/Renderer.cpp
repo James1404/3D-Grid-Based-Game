@@ -172,27 +172,7 @@ void renderer::stop_draw() {
 // ----- SPRITES -----
 //
 
-renderer::sprite::sprite(const char* _path, glm::vec2* _position, int _layer) {
-	this->position = _position;
-	this->layer = _layer;
-
-	// Load and Generate Textures
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	stbi_set_flip_vertically_on_load(true);
-
-	int nrChannels;
-	unsigned char* data = stbi_load(_path, &size.x, &size.y, &nrChannels, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	stbi_image_free(data);
-
+renderer::sprite::sprite() {
 	// Generate and bind buffers
 	float vertices[] = {
 		// positions
@@ -269,8 +249,27 @@ void renderer::sprite::draw() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-renderer::sprite* renderer::create_sprite(const char* _path, glm::vec2* _position, int _layer) {
-	auto s = std::make_unique<sprite>(_path, _position, _layer);
+void renderer::sprite::set_sprite_path(const char* _path) {
+	// Load and Generate Textures
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	stbi_set_flip_vertically_on_load(true);
+
+	int nrChannels;
+	unsigned char* data = stbi_load(_path, &size.x, &size.y, &nrChannels, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	stbi_image_free(data);
+}
+
+renderer::sprite* renderer::create_sprite() {
+	auto s = std::make_unique<sprite>();
 	auto pointer = s.get();
 
 	// TODO: allow dynamic layer changing

@@ -7,7 +7,12 @@ player::player_data player::data;
 
 void player::init() {
 	printf("------------------\n");
-	data.spr = renderer::create_sprite("data/textures/player.png", &data.pos, 1);
+
+	data.spr = renderer::create_sprite();
+	data.spr->set_sprite_path("data/textures/player.png");
+	data.spr->position = &data.pos;
+	data.spr->layer = 1;
+
 	data.col = collision::create_collider(data.spr->size);
 
 	printf("PLAYER INITIALIZED\n");
