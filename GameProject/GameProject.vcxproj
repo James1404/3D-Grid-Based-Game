@@ -186,7 +186,6 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClInclude Include="src\editor.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\collision.h" />
-    <ClInclude Include="src\obstacle.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\stb_image.h" />

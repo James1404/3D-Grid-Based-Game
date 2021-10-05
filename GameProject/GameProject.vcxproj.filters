@@ -104,9 +104,6 @@
     <ClInclude Include="src\collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obstacle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
