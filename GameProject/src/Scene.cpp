@@ -3,71 +3,73 @@
 #include <fstream>
 #include <sstream>
 
-level::level_data level::data;
+level runtime_level;
 
 void level::init() {
 
 }
 
 void level::update(double dt) {
-	for (auto& _obstacle : data.obstacles) {
+	for (auto& _obstacle : obstacles) {
 		_obstacle->update(dt);
 	}
 
-	for (auto& _enemy : data.enemies) {
+	for (auto& _enemy : enemies) {
 		_enemy->update(dt);
 	}
 
-	for (auto& _sprite : data.sprites) {
+	for (auto& _sprite : sprites) {
 		_sprite->update(dt);
 	}
 }
 
 void level::clean() {
-	data.obstacles.clear();
-	data.enemies.clear();
+	obstacles.clear();
+	enemies.clear();
 
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 
-	data.sprites.clear();
+	sprites.clear();
 
 	printf("CLEANED LEVEL DATA\n");
 }
 
-unsigned int fileVersion = 1;
-void level::save(std::string level_name) {
-	std::string levelPath = "data/scenes/" + level_name;
+uint32_t fileVersion = 1;
+void level::save() {
+	std::string levelPath = "data/scenes/";
+	levelPath.append(name);
+	levelPath.append(".scene");
 
 	std::ofstream ofs(levelPath, std::ofstream::trunc);
 	if (ofs.is_open()) {
 		ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
 
-		if (!data.obstacles.empty()) {
-			for (auto& _obstacle : data.obstacles) {
+		if (!obstacles.empty()) {
+			for (auto& _obstacle : obstacles) {
 				ofs << "OBSTACLE" << " " << (int)_obstacle->pos.x << " " << (int)_obstacle->pos.y << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.path_nodes.empty()) {
-			for (auto& _node : data.path_nodes) {
+		if (!path_nodes.empty()) {
+			for (auto& _node : path_nodes) {
 				ofs << "PATH_NODE" << " " << (int)_node.x << " " << (int)_node.y << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.enemies.empty()) {
-			for (auto& _enemy : data.enemies) {
+		if (!enemies.empty()) {
+			for (auto& _enemy : enemies) {
 				ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.sprites.empty()) {
-			for (auto& _sprite : data.sprites) {
+		if (!sprites.empty()) {
+			for (auto& _sprite : sprites) {
 				ofs << "SPRITE" << " " << (int)_sprite->pos.x << " " << (int)_sprite->pos.y << " " << (int)_sprite->spr->layer << " " << _sprite->sprite_path << std::endl;
 			}
 
@@ -84,7 +86,9 @@ void level::load(std::string level_name) {
 
 	clean();
 
-	std::string levelPath = "data/scenes/" + level_name;
+	std::string levelPath = "data/scenes/";
+	levelPath.append(level_name);
+	levelPath.append(".scene");
 
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open()) {
@@ -98,7 +102,7 @@ void level::load(std::string level_name) {
 			std::getline(ss, type, ' ');
 
 			if (type == "FILE_VERSION") {
-				int file_version;
+				uint32_t file_version;
 				ss >> file_version;
 
 				if (file_version != fileVersion) {
@@ -114,12 +118,12 @@ void level::load(std::string level_name) {
 				auto o = std::make_shared<obstacle_entity>();
 				o->pos = position;
 
-				data.obstacles.push_back(o);
+				obstacles.push_back(o);
 			}
 			else if (type == "PATH_NODE") {
 				glm::vec2 node;
 				ss >> node.x >> node.y;
-				data.path_nodes.push_back(node);
+				path_nodes.push_back(node);
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
@@ -128,7 +132,7 @@ void level::load(std::string level_name) {
 				auto e = std::make_shared<enemy_entity>();
 				e->pos = position;
 
-				data.enemies.push_back(e);
+				enemies.push_back(e);
 			}
 			else if (type == "SPRITE") {
 				glm::ivec2 position;
@@ -143,7 +147,7 @@ void level::load(std::string level_name) {
 				s->sprite_path = path;
 				s->spr->set_sprite_path(s->sprite_path.c_str());
 
-				data.sprites.push_back(s);
+				sprites.push_back(s);
 			}
 		}
 

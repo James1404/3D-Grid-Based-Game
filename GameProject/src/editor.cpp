@@ -12,6 +12,8 @@
 #include "entity.h"
 #include "player.h"
 
+level editor::editor_level;
+
 void editor::init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -20,6 +22,8 @@ void editor::init() {
 
 	ImGui_ImplSDL2_InitForOpenGL(renderer::window, renderer::context);
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+	editor_level.init();
 }
 
 Uint64 start, end;
@@ -137,14 +141,14 @@ void editor::draw() {
 				static char name[128];
 
 				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), input_text_flags)) {
-					level::save(name);
+					editor_level.save();
 					save_menu_open = false;
 				}
 
 				ImGui::SameLine();
 
 				if (ImGui::Button("SAVE")) {
-					level::save(name);
+					editor_level.save();
 					save_menu_open = false;
 				}
 
@@ -162,7 +166,7 @@ void editor::draw() {
 				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), input_text_flags)) {
 					clear_selected();
 
-					level::load(name);
+					editor_level.load(name);
 					load_menu_open = false;
 				}
 
@@ -170,7 +174,7 @@ void editor::draw() {
 				if (ImGui::Button("LOAD")) {
 					clear_selected();
 
-					level::load(name);
+					editor_level.load(name);
 					load_menu_open = false;
 				}
 
@@ -202,7 +206,7 @@ void editor::draw() {
 				if (ImGui::BeginMenu("File")) {
 					if (ImGui::MenuItem("New")) {
 						clear_selected();
-						level::clean();
+						editor_level.clean();
 					}
 
 					if (ImGui::MenuItem("Save")) {
@@ -216,10 +220,26 @@ void editor::draw() {
 				}
 				ImGui::EndMenuBar();
 			}
+
+			static char name[256];
+			ImGui::InputText("Level Name", name, IM_ARRAYSIZE(name));
+			editor_level.name = name;
+
+			if (ImGui::Button("Save")) {
+				if (strlen(name) != 0) {
+					editor_level.save();
+				}
+				else {
+					printf("Name Empty\n");
+				}
+			}
+
+			ImGui::Separator();
+
 			if (ImGui::BeginTabBar("TABS")) {
 				if (ImGui::BeginTabItem("PATH")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& node : level::data.path_nodes) {
+						for (auto& node : editor_level.path_nodes) {
 							const bool is_selected = (current_path_node != nullptr) && (current_path_node == &node);
 
 							std::string label = "Node";
@@ -241,19 +261,19 @@ void editor::draw() {
 
 					if (ImGui::Button("+")) {
 						glm::vec2 n = { 0,0 };
-						level::data.path_nodes.push_back(n);
-						current_path_node = &level::data.path_nodes.back();
+						editor_level.path_nodes.push_back(n);
+						current_path_node = &editor_level.path_nodes.back();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						level::data.path_nodes.erase(
-							std::remove(level::data.path_nodes.begin(),
-							level::data.path_nodes.end(), *current_path_node),
-							level::data.path_nodes.end());
+						editor_level.path_nodes.erase(
+							std::remove(editor_level.path_nodes.begin(),
+							editor_level.path_nodes.end(), *current_path_node),
+							editor_level.path_nodes.end());
 
-						if (!level::data.path_nodes.empty())
-							current_path_node = &level::data.path_nodes.back();
+						if (!editor_level.path_nodes.empty())
+							current_path_node = &editor_level.path_nodes.back();
 						else
 							current_path_node = nullptr;
 					}
@@ -273,7 +293,7 @@ void editor::draw() {
 				}
 				if (ImGui::BeginTabItem("OBSTACLES")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& obstacle : level::data.obstacles) {
+						for (auto& obstacle : editor_level.obstacles) {
 							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
 
 							std::string label = "Obstacle";
@@ -296,19 +316,19 @@ void editor::draw() {
 					if (ImGui::Button("+")) {
 						auto o = std::make_shared<obstacle_entity>();
 						o->pos = { 0,0 };
-						level::data.obstacles.push_back(o);
+						editor_level.obstacles.push_back(o);
 						current_obstacle = o;
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						level::data.obstacles.erase(
-							std::remove(level::data.obstacles.begin(),
-							level::data.obstacles.end(), current_obstacle),
-							level::data.obstacles.end());
+						editor_level.obstacles.erase(
+							std::remove(editor_level.obstacles.begin(),
+							editor_level.obstacles.end(), current_obstacle),
+							editor_level.obstacles.end());
 
-						if (!level::data.obstacles.empty())
-							current_obstacle = level::data.obstacles.back();
+						if (!editor_level.obstacles.empty())
+							current_obstacle = editor_level.obstacles.back();
 						else
 							current_obstacle = nullptr;
 					}
@@ -329,7 +349,7 @@ void editor::draw() {
 				}
 				if (ImGui::BeginTabItem("ENEMIES")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& enemy : level::data.enemies) {
+						for (auto& enemy : editor_level.enemies) {
 							const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
 
 							std::string label = "Enemy";
@@ -352,19 +372,19 @@ void editor::draw() {
 					if (ImGui::Button("+")) {
 						auto e = std::make_shared<enemy_entity>();
 						e->pos = { 0,0 };
-						level::data.enemies.push_back(e);
+						editor_level.enemies.push_back(e);
 						current_enemy = e;
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						level::data.enemies.erase(
-							std::remove(level::data.enemies.begin(),
-							level::data.enemies.end(), current_enemy),
-							level::data.enemies.end());
+						editor_level.enemies.erase(
+							std::remove(editor_level.enemies.begin(),
+							editor_level.enemies.end(), current_enemy),
+							editor_level.enemies.end());
 
-						if (!level::data.enemies.empty())
-							current_enemy = level::data.enemies.back();
+						if (!editor_level.enemies.empty())
+							current_enemy = editor_level.enemies.back();
 						else
 							current_enemy = nullptr;
 					}
@@ -385,7 +405,7 @@ void editor::draw() {
 				if (ImGui::BeginTabItem("SPRITES")) {
 					// TODO: finally implement sprite creation
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& sprite : level::data.sprites) {
+						for (auto& sprite : editor_level.sprites) {
 							const bool is_selected = (current_sprite != nullptr) && (current_sprite == sprite);
 
 							std::string label = "Sprite";
@@ -408,19 +428,19 @@ void editor::draw() {
 					if (ImGui::Button("+")) {
 						auto s = std::make_shared<sprite_entity>();
 
-						level::data.sprites.push_back(s);
-						current_sprite = level::data.sprites.back();
+						editor_level.sprites.push_back(s);
+						current_sprite = editor_level.sprites.back();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
-						level::data.sprites.erase(
-							std::remove(level::data.sprites.begin(),
-							level::data.sprites.end(), current_sprite),
-							level::data.sprites.end());
+						editor_level.sprites.erase(
+							std::remove(editor_level.sprites.begin(),
+							editor_level.sprites.end(), current_sprite),
+							editor_level.sprites.end());
 
-						if (!level::data.sprites.empty())
-							current_sprite = level::data.sprites.back();
+						if (!editor_level.sprites.empty())
+							current_sprite = editor_level.sprites.back();
 						else
 							current_sprite = nullptr;
 					}
@@ -468,8 +488,9 @@ void editor::draw() {
 }
 
 void editor::clean() {
-	current_obstacle = nullptr;
-	current_path_node = nullptr;
+	clear_selected();
+
+	editor_level.clean();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();

@@ -39,7 +39,7 @@ int main(int argc, char* args[]) {
 
 		player::init();
 
-		level::init();
+		runtime_level.init();
 
 #ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
@@ -85,14 +85,18 @@ int main(int argc, char* args[]) {
 
 #ifdef _DEBUG
 		if (input::button_down("Exit")) {
-			CurrentState = (CurrentState == GAME_STATE::GAMEPLAY)
-										  ? GAME_STATE::EDITOR
-										  : GAME_STATE::GAMEPLAY;
+			if (CurrentState == GAME_STATE::EDITOR) {
+				runtime_level.load(editor::editor_level.name);
+				CurrentState = GAME_STATE::GAMEPLAY;
+			}
+			else if (CurrentState == GAME_STATE::GAMEPLAY) {
+				CurrentState = GAME_STATE::EDITOR;
+			}
 		}
 
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
 			player::update(dt);
-			level::update(dt);
+			runtime_level.update(dt);
 		}
 		else if (CurrentState == GAME_STATE::EDITOR)
 			editor::update(dt);
@@ -128,7 +132,7 @@ int main(int argc, char* args[]) {
 
 	player::clean();
 
-	level::clean();
+	runtime_level.clean();
 
 	renderer::clean();
 
