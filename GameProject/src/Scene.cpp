@@ -26,9 +26,9 @@ void level::update(double dt) {
 void level::clean() {
 	obstacles.clear();
 	enemies.clear();
+	path_nodes.clear();
 
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
-
 	sprites.clear();
 
 	printf("CLEANED LEVEL DATA\n");
@@ -150,6 +150,8 @@ void level::load(std::string level_name) {
 				sprites.push_back(s);
 			}
 		}
+
+		name = level_name;
 
 		printf("FINISHED LOADING SCENE DATA\n");
 		printf("---------------------------\n");
