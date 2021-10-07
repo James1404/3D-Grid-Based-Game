@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
 #include <imgui_impl_opengl3.h>
+#include <imgui_stdlib.h>
 
 #include "input.h"
 #include "renderer.h"
@@ -221,12 +222,10 @@ void editor::draw() {
 				ImGui::EndMenuBar();
 			}
 
-			static char name[256];
-			ImGui::InputText("Level Name", name, IM_ARRAYSIZE(name));
-			editor_level.name = name;
+			ImGui::InputText("Level Name", &editor_level.name);
 
 			if (ImGui::Button("Save")) {
-				if (strlen(name) != 0) {
+				if (!editor_level.name.empty()) {
 					editor_level.save();
 				}
 				else {
@@ -457,13 +456,13 @@ void editor::draw() {
 
 						ImGui::DragInt("Layer", &current_sprite->spr->layer);
 
-						static char name[128];
+						std::string name;
 
-						ImGui::InputText("Path", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_EnterReturnsTrue);
+						ImGui::InputText("Path", &name, ImGuiInputTextFlags_EnterReturnsTrue);
 
 						if (ImGui::Button("Set Path")) {
 							current_sprite->sprite_path = name;
-							current_sprite->spr->set_sprite_path(name);
+							current_sprite->spr->set_sprite_path(name.c_str());
 						}
 
 						ImGui::PopID();

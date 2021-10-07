@@ -1,15 +1,12 @@
 #include <SDL.h>
 
-#ifdef _DEBUG
-#include <imgui_impl_sdl.h>
-#endif // _DEBUG
-
 #include "scene.h"
 
 #include "renderer.h"
 #include "input.h"
 
 #ifdef _DEBUG
+#include <imgui_impl_sdl.h>
 #include "editor.h"
 #endif // _DEBUG
 
@@ -86,10 +83,13 @@ int main(int argc, char* args[]) {
 #ifdef _DEBUG
 		if (input::button_down("Exit")) {
 			if (CurrentState == GAME_STATE::EDITOR) {
+				editor::editor_level.clean();
 				runtime_level.load(editor::editor_level.name);
 				CurrentState = GAME_STATE::GAMEPLAY;
 			}
 			else if (CurrentState == GAME_STATE::GAMEPLAY) {
+				runtime_level.clean();
+				editor::editor_level.load(editor::editor_level.name);
 				CurrentState = GAME_STATE::EDITOR;
 			}
 		}
@@ -104,7 +104,7 @@ int main(int argc, char* args[]) {
 
 #ifdef NDEBUG
 		player::update(dt);
-		level::update(dt);
+		runtime_level.update(dt);
 #endif // NDEBUG
 
 		input::update();
