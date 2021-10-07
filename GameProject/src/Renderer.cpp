@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <map>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -249,9 +248,9 @@ void renderer::sprite::draw() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void renderer::sprite::set_sprite_path(const char* texture_name) {
+void renderer::sprite::set_sprite_path(std::string sprite_name) {
 	std::string path = "data/textures/";
-	path.append(texture_name);
+	path.append(sprite_name);
 
 	// Load and Generate Textures
 	glGenTextures(1, &texture);
