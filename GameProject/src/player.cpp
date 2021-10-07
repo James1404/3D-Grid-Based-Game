@@ -9,7 +9,7 @@ void player::init() {
 	printf("------------------\n");
 
 	data.spr = renderer::create_sprite();
-	data.spr->set_sprite_path("data/textures/player.png");
+	data.spr->set_sprite_path("player.png");
 	data.spr->position = &data.pos;
 	data.spr->layer = 1;
 
@@ -40,11 +40,11 @@ void player::update(double dt) {
 	float movementSpeed = .1f;
 	if (input::button_pressed("Run")) { movementSpeed = .5f; }
 
-	if (!level::data.path_nodes.empty()) {
+	if (!runtime_level.path_nodes.empty()) {
 		if (data.vel.x > 0) {
-			if (current_node != level::data.path_nodes.size() - 1) {
-				if (glm::distance(data.pos, level::data.path_nodes[current_node + 1]) > 0.01) {
-					glm::vec2 dir = glm::normalize(level::data.path_nodes[current_node + 1] - data.pos);
+			if (current_node != runtime_level.path_nodes.size() - 1) {
+				if (glm::distance(data.pos, runtime_level.path_nodes[current_node + 1]) > 0.01) {
+					glm::vec2 dir = glm::normalize(runtime_level.path_nodes[current_node + 1] - data.pos);
 					glm::vec2 move_vector = dir * data.vel.x;
 
 					move_vector *= dt;
@@ -64,8 +64,8 @@ void player::update(double dt) {
 		}
 		else {
 			if (current_node >= 0) {
-				if (glm::distance(data.pos, level::data.path_nodes[current_node]) > 0.01) {
-					glm::vec2 dir = glm::normalize(level::data.path_nodes[current_node] - data.pos);
+				if (glm::distance(data.pos, runtime_level.path_nodes[current_node]) > 0.01) {
+					glm::vec2 dir = glm::normalize(runtime_level.path_nodes[current_node] - data.pos);
 					glm::vec2 move_vector = dir * data.vel.x;
 
 					move_vector *= dt;

@@ -32,7 +32,7 @@ struct obstacle_entity {
 		spr = renderer::create_sprite();
 		spr->position = &pos;
 		spr->layer = -1;
-		spr->set_sprite_path("data/textures/face.png");
+		spr->set_sprite_path("face.png");
 
 		pos = { 0,0 };
 
@@ -94,7 +94,7 @@ struct enemy_entity {
 		spr = renderer::create_sprite();
 		spr->position = &pos;
 		spr->layer = -1;
-		spr->set_sprite_path("data/textures/player.png");
+		spr->set_sprite_path("player.png");
 
 		col = collision::create_collider(spr->size);
 

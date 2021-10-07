@@ -249,7 +249,10 @@ void renderer::sprite::draw() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void renderer::sprite::set_sprite_path(const char* _path) {
+void renderer::sprite::set_sprite_path(const char* texture_name) {
+	std::string path = "data/textures/";
+	path.append(texture_name);
+
 	// Load and Generate Textures
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -262,7 +265,7 @@ void renderer::sprite::set_sprite_path(const char* _path) {
 	stbi_set_flip_vertically_on_load(true);
 
 	int nrChannels;
-	unsigned char* data = stbi_load(_path, &size.x, &size.y, &nrChannels, 0);
+	unsigned char* data = stbi_load(path.c_str(), &size.x, &size.y, &nrChannels, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);

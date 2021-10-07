@@ -33,9 +33,8 @@ namespace renderer {
 		~sprite();
 
 		void draw();
-		void set_sprite_path(const char* _path);
-	
-		// TODO: make sprite store its own position not a pointer
+		void set_sprite_path(const char* texture_name);
+
 		glm::vec2* position;
 		glm::ivec2 size;
 		int layer;
