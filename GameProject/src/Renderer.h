@@ -35,14 +35,18 @@ namespace renderer {
 		~sprite();
 
 		void draw();
-		void set_sprite_path(std::string sprite_name);
+
+		// void set_sprite_path(std::string sprite_name);
 
 		glm::vec2* position;
 		glm::ivec2 size;
 		int layer;
 
+		glm::vec3 colour;
 		unsigned int vao;
-		unsigned int texture;
+
+		// lets keep things squares for now
+		// unsigned int texture;
 	};
 
 	sprite* create_sprite();

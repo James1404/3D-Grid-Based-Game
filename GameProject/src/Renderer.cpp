@@ -219,7 +219,7 @@ renderer::sprite::sprite() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set image attribute
-	glUniform1i(glGetUniformLocation(sprite_shader, "image"), 0);
+	// glUniform1i(glGetUniformLocation(sprite_shader, "image"), 0);
 
 	// Set projection matrix attribute
 	glUseProgram(sprite_shader);
@@ -227,7 +227,7 @@ renderer::sprite::sprite() {
 }
 
 renderer::sprite::~sprite() {
-	glDeleteTextures(1, &texture);
+	// glDeleteTextures(1, &texture);
 	glDeleteVertexArrays(1, &vao);
 }
 
@@ -238,16 +238,21 @@ void renderer::sprite::draw() {
 	model = glm::translate(model, glm::vec3((glm::ivec2)*position, layer));
 	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 
+	glUniform3fv(glGetUniformLocation(sprite_shader, "colour"), 1, glm::value_ptr(colour));
+
 	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "view"), 1, false, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "model"), 1, false, glm::value_ptr(model));
 
+	/*
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
+	*/
 
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+/*
 void renderer::sprite::set_sprite_path(std::string sprite_name) {
 	std::string path = "data/textures/";
 	path.append(sprite_name);
@@ -269,6 +274,7 @@ void renderer::sprite::set_sprite_path(std::string sprite_name) {
 
 	stbi_image_free(data);
 }
+*/
 
 renderer::sprite* renderer::create_sprite() {
 	auto s = std::make_unique<sprite>();
