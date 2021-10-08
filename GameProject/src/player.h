@@ -10,6 +10,7 @@ namespace player {
 		renderer::sprite* spr = nullptr;
 		collision::box_collider* col = nullptr;
 		float speed = 50;
+		int current_node = 0;
 	};
 
 	extern player_data data;

@@ -8,17 +8,21 @@ player::player_data player::data;
 void player::init() {
 	printf("------------------\n");
 
+	data.current_node = 0;
+	data.pos = { 0,0 };
+
 	data.spr = renderer::create_sprite();
-	data.spr->set_sprite_path("player.png");
+	//data.spr->set_sprite_path("player.png");
 	data.spr->position = &data.pos;
 	data.spr->layer = 1;
+	data.spr->size = { 16,80 };
+	data.spr->colour = { 0,0,1 };
 
 	data.col = collision::create_collider(data.spr->size);
 
 	printf("PLAYER INITIALIZED\n");
 }
 
-int current_node = 0;
 void player::update(double dt) {
 	if (input::button_pressed("Aim")) {
 		if (input::button_down("Shoot")) {
@@ -40,11 +44,11 @@ void player::update(double dt) {
 	float movementSpeed = .1f;
 	if (input::button_pressed("Run")) { movementSpeed = .5f; }
 
-	if (!runtime_level.path_nodes.empty()) {
+	if (!level::data.path_nodes.empty()) {
 		if (data.vel.x > 0) {
-			if (current_node != runtime_level.path_nodes.size() - 1) {
-				if (glm::distance(data.pos, runtime_level.path_nodes[current_node + 1]) > 0.01) {
-					glm::vec2 dir = glm::normalize(runtime_level.path_nodes[current_node + 1] - data.pos);
+			if (data.current_node != level::data.path_nodes.size() - 1) {
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node + 1]) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node + 1] - data.pos);
 					glm::vec2 move_vector = dir * data.vel.x;
 
 					move_vector *= dt;
@@ -58,14 +62,14 @@ void player::update(double dt) {
 					data.pos += move_vector;
 				}
 				else {
-					current_node++;
+					data.current_node++;
 				}
 			}
 		}
 		else {
-			if (current_node >= 0) {
-				if (glm::distance(data.pos, runtime_level.path_nodes[current_node]) > 0.01) {
-					glm::vec2 dir = glm::normalize(runtime_level.path_nodes[current_node] - data.pos);
+			if (data.current_node >= 0) {
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node]) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node] - data.pos);
 					glm::vec2 move_vector = dir * data.vel.x;
 
 					move_vector *= dt;
@@ -79,7 +83,7 @@ void player::update(double dt) {
 					data.pos -= move_vector;
 				}
 				else {
-					current_node--;
+					data.current_node--;
 				}
 			}
 		}

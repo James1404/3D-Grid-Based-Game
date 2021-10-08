@@ -32,7 +32,9 @@ struct obstacle_entity {
 		spr = renderer::create_sprite();
 		spr->position = &pos;
 		spr->layer = -1;
-		spr->set_sprite_path("face.png");
+		//spr->set_sprite_path("face.png");
+		spr->size = { 48,48 };
+		spr->colour = { 0,1,0 };
 
 		pos = { 0,0 };
 
@@ -57,17 +59,19 @@ struct sprite_entity {
 	glm::vec2 pos;
 	renderer::sprite* spr;
 
-	std::string sprite_path;
+	// std::string sprite_path;
 
 	sprite_entity() {
 		pos = { 0,0 };
-		sprite_path = "";
+		// sprite_path = "";
 		
 		spr = renderer::create_sprite();
 
 		spr->position = &pos;
 		spr->layer = 0;
-		spr->set_sprite_path(sprite_path.c_str());
+		//spr->set_sprite_path(sprite_path.c_str());
+		spr->size = { 1,1 };
+		spr->colour = { 0,0,0 };
 
 		printf("SPRITE_ENTITY %p INITIALIZED\n", this);
 	}
@@ -94,7 +98,9 @@ struct enemy_entity {
 		spr = renderer::create_sprite();
 		spr->position = &pos;
 		spr->layer = -1;
-		spr->set_sprite_path("player.png");
+		//spr->set_sprite_path("player.png");
+		spr->size = { 16,80 };
+		spr->colour = { 1,0,0 };
 
 		col = collision::create_collider(spr->size);
 
