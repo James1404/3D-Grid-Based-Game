@@ -3,12 +3,11 @@
 #include "scene.h"
 
 namespace editor {
-	extern level editor_level;
-
 	void init();
 	void update(double dt);
 	void draw();
 	void clean();
+	void clear_selected();
 }
 
 #endif // _DEBUG
