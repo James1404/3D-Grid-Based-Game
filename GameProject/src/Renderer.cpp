@@ -235,7 +235,7 @@ void renderer::sprite::draw() {
 	glUseProgram(sprite_shader);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3((glm::ivec2)*position, layer));
+	model = glm::translate(model, glm::vec3((glm::ivec2)*position, 0));
 	model = glm::scale(model, glm::vec3(size.x, size.y, 1.0f));
 
 	glUniform3fv(glGetUniformLocation(sprite_shader, "colour"), 1, glm::value_ptr(colour));
