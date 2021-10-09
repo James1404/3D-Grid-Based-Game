@@ -11,6 +11,7 @@
 #endif // _DEBUG
 
 #include "player.h"
+#include "camera.h"
 
 // TODO: implement centrilaised log system
 
@@ -96,14 +97,15 @@ int main(int argc, char* args[]) {
 			player::update(dt);
 			level::update(dt);
 		}
-		else if (CurrentState == GAME_STATE::EDITOR)
-			editor::update(dt);
+
 #endif // _DEBUG
 
 #ifdef NDEBUG
 		player::update(dt);
 		level::update(dt);
 #endif // NDEBUG
+
+		camera::update(dt);
 
 		input::update();
 
@@ -129,7 +131,6 @@ int main(int argc, char* args[]) {
 #endif // _DEBUG
 
 	player::clean();
-
 	level::clean();
 
 	renderer::clean();
