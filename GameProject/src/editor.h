@@ -4,7 +4,6 @@
 
 namespace editor {
 	void init();
-	void update(double dt);
 	void draw();
 	void clean();
 	void clear_selected();
