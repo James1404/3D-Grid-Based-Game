@@ -143,7 +143,7 @@ void level::load(std::string level_name) {
 				glm::ivec2 position;
 				glm::ivec2 size;
 				int layer;
-				glm::ivec3 colour;
+				glm::vec3 colour;
 				//std::string path;
 
 				ss >> position.x >> position.y
@@ -163,7 +163,11 @@ void level::load(std::string level_name) {
 			}
 		}
 
-		player::data.pos = data.path_nodes[0];
+		if(!data.path_nodes.empty())
+			player::data.pos = data.path_nodes[0];
+		else
+			player::data.pos = { 0,0 };
+
 		player::data.current_node = 0;
 
 		data.name = level_name;
