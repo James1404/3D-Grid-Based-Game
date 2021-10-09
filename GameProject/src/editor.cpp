@@ -12,6 +12,55 @@
 #include "scene.h"
 #include "entity.h"
 #include "player.h"
+#include "camera.h"
+
+struct editor_camera : public camera::camera_interface {
+	void update(double dt) override {
+		/*
+		if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) { velocity.y = 0; }
+		else if (input::button_pressed("MoveUp")) { velocity.y = 1; }
+		else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
+		else { velocity.y = 0; }
+
+		if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) { velocity.x = 0; }
+		else if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
+		else if (input::button_pressed("MoveRight")) { velocity.x = 1; }
+		else { velocity.x = 0; }
+
+		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
+		moveVector /= speed;
+		moveVector *= dt;
+		*/
+		view = renderer::view;
+
+		if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
+			glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
+
+			view = glm::translate(view, { mouseDelta, 0.0f });
+		}
+
+		/*
+		float zoom = 1;
+		if (input::button_down("Shoot")) {
+			zoom += .1f;
+		}
+		else if (input::button_down("Aim")) {
+			zoom -= .1f;
+		}
+
+		renderer::view = glm::scale(renderer::view, { zoom, zoom, 0 });
+		*/
+
+		/*
+		if (input::button_down("Shoot")) {
+			renderer::view = glm::scale(renderer::view, { 0.9f, 0.9f, 0 });
+		}
+		else if (input::button_down("Aim")) {
+			renderer::view = glm::scale(renderer::view, { 1.1f, 1.1f, 0 });
+		}
+		*/
+	}
+};
 
 void editor::init() {
 	IMGUI_CHECKVERSION();
@@ -23,61 +72,12 @@ void editor::init() {
 	ImGui_ImplOpenGL3_Init("#version 330");
 
 	level::init();
-}
 
-Uint64 start, end;
-float FPS;
+	camera::register_camera("Editor", std::make_shared<editor_camera>());
+}
 
 glm::vec2 velocity;
 float speed = 2;
-
-void editor::update(double dt) {
-	start = SDL_GetPerformanceCounter();
-
-	/*
-	if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) { velocity.y = 0; }
-	else if (input::button_pressed("MoveUp")) { velocity.y = 1; }
-	else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
-	else { velocity.y = 0; }
-
-	if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) { velocity.x = 0; }
-	else if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
-	else if (input::button_pressed("MoveRight")) { velocity.x = 1; }
-	else { velocity.x = 0; }
-
-	glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
-	moveVector /= speed;
-	moveVector *= dt;
-	*/
-
-	if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
-		glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
-
-		renderer::view = glm::translate(renderer::view,
-			{ mouseDelta, 0.0f });
-	}
-
-	/*
-	float zoom = 1;
-	if (input::button_down("Shoot")) {
-		zoom += .1f;
-	}
-	else if (input::button_down("Aim")) {
-		zoom -= .1f;
-	}
-
-	renderer::view = glm::scale(renderer::view, { zoom, zoom, 0 });
-	*/
-
-	/*
-	if (input::button_down("Shoot")) {
-		renderer::view = glm::scale(renderer::view, { 0.9f, 0.9f, 0 });
-	}
-	else if (input::button_down("Aim")) {
-		renderer::view = glm::scale(renderer::view, { 1.1f, 1.1f, 0 });
-	}
-	*/
-}
 
 static std::shared_ptr<obstacle_entity> current_obstacle = nullptr;
 static glm::vec2* current_path_node = nullptr;
@@ -92,6 +92,8 @@ void editor::clear_selected() {
 }
 
 void editor::draw() {
+	camera::set_camera("Editor");
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
 	ImGui::NewFrame();
@@ -114,7 +116,6 @@ void editor::draw() {
 
 			ImGui::Separator();
 			ImGui::Text("Screen Size: (%i, %i)", renderer::screen_width, renderer::screen_height);
-			ImGui::Text("%f FPS", FPS);
 			
 			ImGui::Separator();
 			ImGui::Text("Number of:");
@@ -457,12 +458,15 @@ void editor::draw() {
 						ImGui::DragInt("Y", &current_sprite->spr->size.y);
 						ImGui::PopID();
 
-						ImGui::PushID(current_sprite.get());
+						ImGui::PushID(&current_sprite->spr->layer);
 						ImGui::DragInt("Layer", &current_sprite->spr->layer);
+						ImGui::PopID();
 
+						ImGui::PushID(&current_sprite->spr->colour);
 						static float color[3] = { 0.0f, 0.0f, 0.0f };
 						ImGui::ColorEdit3("Colour", color);
 						current_sprite->spr->colour = { color[0], color[1], color[2] };
+						ImGui::PopID();
 
 						/*
 						std::string name;
@@ -474,8 +478,6 @@ void editor::draw() {
 							current_sprite->spr->set_sprite_path(name.c_str());
 						}
 						*/
-
-						ImGui::PopID();
 					}
 					ImGui::EndTabItem();
 				}
@@ -488,11 +490,6 @@ void editor::draw() {
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	end = SDL_GetPerformanceCounter();
-
-	float elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
-	FPS = 1.0f / elapsed;
 }
 
 void editor::clean() {
