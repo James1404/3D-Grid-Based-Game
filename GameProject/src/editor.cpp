@@ -278,10 +278,8 @@ void editor::draw() {
 
 					if (current_path_node != nullptr) {
 						ImGui::PushID(current_path_node);
-						ImGui::Text("Position");
 
-						ImGui::DragFloat("X", &current_path_node->x);
-						ImGui::DragFloat("Y", &current_path_node->y);
+						ImGui::DragFloat2("Position", (float*)current_path_node);
 
 						ImGui::PopID();
 					}
@@ -333,10 +331,8 @@ void editor::draw() {
 
 					if (current_obstacle != nullptr) {
 						ImGui::PushID(current_obstacle.get());
-						ImGui::Text("Position");
 
-						ImGui::DragFloat("X", &current_obstacle->pos.x);
-						ImGui::DragFloat("Y", &current_obstacle->pos.y);
+						ImGui::DragFloat2("Position", (float*)&current_obstacle->pos);
 
 						ImGui::PopID();
 					}
@@ -389,10 +385,8 @@ void editor::draw() {
 
 					if (current_enemy != nullptr) {
 						ImGui::PushID(current_enemy.get());
-						ImGui::Text("Position");
 
-						ImGui::DragFloat("X", &current_enemy->pos.x);
-						ImGui::DragFloat("Y", &current_enemy->pos.y);
+						ImGui::DragFloat2("Position", (float*)&current_enemy->pos);
 
 						ImGui::PopID();
 					}
@@ -445,17 +439,11 @@ void editor::draw() {
 
 					if (current_sprite != nullptr) {
 						ImGui::PushID(&current_sprite->pos);
-						ImGui::Text("Position");
-
-						ImGui::DragFloat("X", &current_sprite->pos.x);
-						ImGui::DragFloat("Y", &current_sprite->pos.y);
+						ImGui::DragFloat2("Position", (float*)&current_sprite->pos);
 						ImGui::PopID();
 
 						ImGui::PushID(&current_sprite->spr->size);
-						ImGui::Text("Size");
-
-						ImGui::DragInt("X", &current_sprite->spr->size.x);
-						ImGui::DragInt("Y", &current_sprite->spr->size.y);
+						ImGui::DragInt2("Size", (int*)&current_sprite->spr->size);
 						ImGui::PopID();
 
 						ImGui::PushID(&current_sprite->spr->layer);
@@ -463,7 +451,9 @@ void editor::draw() {
 						ImGui::PopID();
 
 						ImGui::PushID(&current_sprite->spr->colour);
-						static float color[3] = { 0.0f, 0.0f, 0.0f };
+						float color[3] = { current_sprite->spr->colour.x,
+										   current_sprite->spr->colour.y,
+										   current_sprite->spr->colour.z };
 						ImGui::ColorEdit3("Colour", color);
 						current_sprite->spr->colour = { color[0], color[1], color[2] };
 						ImGui::PopID();
