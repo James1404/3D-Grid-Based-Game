@@ -118,7 +118,7 @@ int main(int argc, char* args[]) {
 		if (CurrentState == GAME_STATE::EDITOR)
 			editor::draw();
 #endif // _DEBUG
-
+		
 		renderer::stop_draw();
 	}
 

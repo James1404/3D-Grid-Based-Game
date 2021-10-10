@@ -12,7 +12,9 @@ static uint32_t currentID = 0;
 struct entity {
 	uint32_t id;
 
-	entity() : id(currentID++) {}
+	glm::vec2 pos;
+
+	entity() : id(currentID++), pos(0,0) {}
 	~entity() {}
 
 	virtual void update(double dt) {}
@@ -22,10 +24,9 @@ struct entity {
 // ENTITIES
 //
 
-struct obstacle_entity {
+struct obstacle_entity : public entity {
 	collision::box_collider* col;
 
-	glm::vec2 pos;
 	renderer::sprite* spr;
 
 	obstacle_entity() {
@@ -35,8 +36,6 @@ struct obstacle_entity {
 		//spr->set_sprite_path("face.png");
 		spr->size = { 48,48 };
 		spr->colour = { 0,1,0 };
-
-		pos = { 0,0 };
 
 		col = collision::create_collider(spr->size);
 
@@ -55,14 +54,12 @@ struct obstacle_entity {
 	}
 };
 
-struct sprite_entity {
-	glm::vec2 pos;
+struct sprite_entity : public entity {
 	renderer::sprite* spr;
 
 	// std::string sprite_path;
 
 	sprite_entity() {
-		pos = { 0,0 };
 		// sprite_path = "";
 		
 		spr = renderer::create_sprite();
@@ -87,14 +84,11 @@ struct sprite_entity {
 	}
 };
 
-struct enemy_entity {
-	glm::vec2 pos;
+struct enemy_entity : public entity {
 	renderer::sprite* spr;
 	collision::box_collider* col;
 
 	enemy_entity() {
-		pos = { 0,0 };
-		
 		spr = renderer::create_sprite();
 		spr->position = &pos;
 		spr->layer = -1;
@@ -116,5 +110,21 @@ struct enemy_entity {
 
 	void update(double dt) {
 		col->pos = pos;
+	}
+};
+
+struct trigger_entity : public entity {
+	collision::box_collider* col;
+
+	trigger_entity() {
+		
+	}
+
+	~trigger_entity() {
+
+	}
+
+	void update(double dt) override {
+
 	}
 };
