@@ -33,6 +33,8 @@ void level::clean() {
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 	data.sprites.clear();
 
+	data.name.clear();
+
 	printf("CLEANED LEVEL DATA\n");
 }
 

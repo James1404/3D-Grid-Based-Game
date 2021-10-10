@@ -41,7 +41,7 @@ int main(int argc, char* args[]) {
 
 #ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
-		level::load("Level1.scene");
+		level::load("testlevel");
 #endif // NDEBUG
 		
 #ifdef _DEBUG
@@ -113,6 +113,14 @@ int main(int argc, char* args[]) {
 		renderer::start_draw();
 
 		renderer::draw_sprites();
+
+#ifdef _DEBUG
+		for (auto node : level::data.path_nodes) {
+			renderer::debug::draw_square(node, { 10,10 }, renderer::COLOUR::CYAN);
+		}
+#endif // _DEBUG
+
+		
 
 #ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR)

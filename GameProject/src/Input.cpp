@@ -23,6 +23,13 @@ void input::init() {
 	printf("INITIALIZED INPUT\n");
 }
 
+void input::update() {
+	previous_mouse_state = mouse_state;
+	previous_mouse_position = mouse_position;
+	mouse_state = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
+}
+
 void input::clean() {
 	delete[] previous_keyboard_state;
 	previous_keyboard_state = NULL;
@@ -77,13 +84,6 @@ struct INPUT {
 };
 
 static std::multimap<std::string, INPUT> MAPPED_INPUTS;
-
-void input::update() {
-	previous_mouse_state = mouse_state;
-	previous_mouse_position = mouse_position;
-	mouse_state = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
-	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
-}
 
 bool input::button_down(std::string button) {
 	auto range = MAPPED_INPUTS.equal_range(button);
