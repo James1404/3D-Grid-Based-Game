@@ -309,7 +309,7 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 // ----- DEBUG RENDERER -----
 //
 
-void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour) {
+void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
 	unsigned int square_shader;
 	square_shader = create_shader("data/shaders/square.vs", "data/shaders/square.fs");
@@ -347,6 +347,7 @@ void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size
 
 	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
+	glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), screen_space);
 
 	glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(colour));
 
