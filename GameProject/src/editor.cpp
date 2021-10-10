@@ -200,6 +200,9 @@ void editor::draw() {
 
 					if (ImGui::Button("+")) {
 						glm::vec2 n = { 0,0 };
+						if (!level::data.path_nodes.empty())
+							n = level::data.path_nodes.back();
+
 						level::data.path_nodes.push_back(n);
 						current_path_node = &level::data.path_nodes.back();
 					}
