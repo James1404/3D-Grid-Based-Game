@@ -34,6 +34,8 @@ struct editor_camera : public camera::camera_interface {
 		view = renderer::view;
 
 		if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
+			//  TODO: convert mouse position to world space
+			//	which fixed panning speed.
 			glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
 
 			view = glm::translate(view, { mouseDelta, 0.0f });
@@ -128,64 +130,6 @@ void editor::draw() {
 		}
 	}
 
-	static bool save_menu_open = false;
-	static bool load_menu_open = false;
-	/* ----- SAVE / LOAD MENU ----- */ {
-		ImGuiWindowFlags window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoDecoration;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-
-		if (save_menu_open) {
-			if (ImGui::Begin("Save", &p_open, window_flags)) {
-				static char name[128];
-
-				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_EnterReturnsTrue)) {
-					level::save();
-					save_menu_open = false;
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::Button("SAVE")) {
-					level::save();
-					save_menu_open = false;
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::Button("CLOSE")) { save_menu_open = false; }
-
-				ImGui::End();
-			}
-		}
-
-		if (load_menu_open) {
-			if (ImGui::Begin("Load", &p_open, window_flags)) {
-				static char name[128];
-				if (ImGui::InputText("", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_EnterReturnsTrue)) {
-					clear_selected();
-
-					level::load(name);
-					load_menu_open = false;
-				}
-
-				ImGui::SameLine();
-				if (ImGui::Button("LOAD")) {
-					clear_selected();
-
-					level::load(name);
-					load_menu_open = false;
-				}
-
-				ImGui::SameLine();
-				if (ImGui::Button("CLOSE")) { load_menu_open = false; }
-
-				ImGui::End();
-			}
-		}
-	}
 	/* ----- LEVEL DATA ----- */ {
 		// Set Windows Flags
 		ImGuiWindowFlags window_flags = 0;
@@ -200,25 +144,6 @@ void editor::draw() {
 		ImGui::SetNextWindowSize(ImVec2(300.0f, work_size.y), ImGuiCond_Always);
 
 		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
-			if (ImGui::BeginMenuBar()) {
-				if (ImGui::BeginMenu("File")) {
-					if (ImGui::MenuItem("New")) {
-						clear_selected();
-						level::clean();
-					}
-
-					if (ImGui::MenuItem("Save")) {
-						save_menu_open = true;
-					}
-
-					if (ImGui::MenuItem("Load")) {
-						load_menu_open = true;
-					}
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenuBar();
-			}
-
 			ImGui::InputText("Level Name", &level::data.name);
 
 			if (ImGui::Button("Save")) {
@@ -228,6 +153,24 @@ void editor::draw() {
 				else {
 					printf("Name Empty\n");
 				}
+			}
+			
+			ImGui::SameLine();
+
+			if (ImGui::Button("Load")) {
+				if (!level::data.name.empty()) {
+					level::load(level::data.name);
+				}
+				else {
+					printf("Name Empty\n");
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clear")) {
+				clear_selected();
+				level::clean();
 			}
 
 			ImGui::Separator();
