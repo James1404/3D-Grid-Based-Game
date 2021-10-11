@@ -14,53 +14,23 @@
 #include "player.h"
 #include "camera.h"
 
+float camera_zoom_speed = .001f;
 struct editor_camera : public camera::camera_interface {
 	void update(double dt) override {
-		/*
-		if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) { velocity.y = 0; }
-		else if (input::button_pressed("MoveUp")) { velocity.y = 1; }
-		else if (input::button_pressed("MoveDown")) { velocity.y = -1; }
-		else { velocity.y = 0; }
-
-		if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) { velocity.x = 0; }
-		else if (input::button_pressed("MoveLeft")) { velocity.x = -1; }
-		else if (input::button_pressed("MoveRight")) { velocity.x = 1; }
-		else { velocity.x = 0; }
-
-		glm::vec2 moveVector = glm::vec2(std::floor(velocity.x), std::floor(velocity.y));
-		moveVector /= speed;
-		moveVector *= dt;
-		*/
 		view = renderer::view;
 
 		if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
 			//  TODO: convert mouse position to world space
 			//	which fixed panning speed.
 			glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
-
 			view = glm::translate(view, { mouseDelta, 0.0f });
 		}
 
-		/*
 		float zoom = 1;
-		if (input::button_down("Shoot")) {
-			zoom += .1f;
-		}
-		else if (input::button_down("Aim")) {
-			zoom -= .1f;
-		}
+		if (input::key_pressed(SDL_SCANCODE_Q)) { zoom -= camera_zoom_speed * dt; }
+		if (input::key_pressed(SDL_SCANCODE_E)) { zoom += camera_zoom_speed * dt; }
 
-		renderer::view = glm::scale(renderer::view, { zoom, zoom, 0 });
-		*/
-
-		/*
-		if (input::button_down("Shoot")) {
-			renderer::view = glm::scale(renderer::view, { 0.9f, 0.9f, 0 });
-		}
-		else if (input::button_down("Aim")) {
-			renderer::view = glm::scale(renderer::view, { 1.1f, 1.1f, 0 });
-		}
-		*/
+		view = glm::scale(view, { zoom, zoom, 0 });
 	}
 };
 
@@ -82,7 +52,7 @@ glm::vec2 velocity;
 float speed = 2;
 
 static std::shared_ptr<obstacle_entity> current_obstacle = nullptr;
-static glm::vec2* current_path_node = nullptr;
+static std::shared_ptr<path_node> current_path_node = nullptr;
 static std::shared_ptr<sprite_entity> current_sprite = nullptr;
 static std::shared_ptr<enemy_entity> current_enemy = nullptr;
 
@@ -179,13 +149,13 @@ void editor::draw() {
 				if (ImGui::BeginTabItem("PATH")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto& node : level::data.path_nodes) {
-							const bool is_selected = (current_path_node != nullptr) && (current_path_node == &node);
+							const bool is_selected = (current_path_node != nullptr) && (current_path_node == node);
 
 							std::string label = "Node";
 
 							ImGui::PushID(&node);
 							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_path_node = &node;
+								current_path_node = node;
 							}
 
 							if (is_selected) {
@@ -199,23 +169,24 @@ void editor::draw() {
 					}
 
 					if (ImGui::Button("+")) {
-						glm::vec2 n = { 0,0 };
+						auto n = std::make_shared<path_node>();
+
 						if (!level::data.path_nodes.empty())
-							n = level::data.path_nodes.back();
+							n->pos = level::data.path_nodes.back()->pos;
 
 						level::data.path_nodes.push_back(n);
-						current_path_node = &level::data.path_nodes.back();
+						current_path_node = level::data.path_nodes.back();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button("-")) {
 						level::data.path_nodes.erase(
 							std::remove(level::data.path_nodes.begin(),
-							level::data.path_nodes.end(), *current_path_node),
+							level::data.path_nodes.end(), current_path_node),
 							level::data.path_nodes.end());
 
 						if (!level::data.path_nodes.empty())
-							current_path_node = &level::data.path_nodes.back();
+							current_path_node = level::data.path_nodes.back();
 						else
 							current_path_node = nullptr;
 					}
@@ -223,9 +194,10 @@ void editor::draw() {
 					ImGui::Separator();
 
 					if (current_path_node != nullptr) {
-						ImGui::PushID(current_path_node);
+						ImGui::PushID(&current_path_node);
 
-						ImGui::DragFloat2("Position", (float*)current_path_node);
+						ImGui::DragFloat2("Position", (float*)&current_path_node->pos);
+						ImGui::Checkbox("Combat", &current_path_node->combat_node);
 
 						ImGui::PopID();
 					}

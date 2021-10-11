@@ -38,7 +38,7 @@ void level::clean() {
 	printf("CLEANED LEVEL DATA\n");
 }
 
-uint32_t fileVersion = 2;
+uint32_t fileVersion = 3;
 void level::save() {
 	std::string levelPath = "data/scenes/";
 	levelPath.append(data.name);
@@ -58,7 +58,7 @@ void level::save() {
 
 		if (!data.path_nodes.empty()) {
 			for (auto& _node : data.path_nodes) {
-				ofs << "PATH_NODE" << " " << (int)_node.x << " " << (int)_node.y << std::endl;
+				ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->combat_node << std::endl;
 			}
 
 			ofs << std::endl;
@@ -128,9 +128,15 @@ void level::load(std::string level_name) {
 				data.obstacles.push_back(o);
 			}
 			else if (type == "PATH_NODE") {
-				glm::vec2 node;
-				ss >> node.x >> node.y;
-				data.path_nodes.push_back(node);
+				glm::vec2 pos;
+				bool combat;
+				ss >> pos.x >> pos.y >> combat;
+
+				auto n = std::make_shared<path_node>();
+				n->pos = pos;
+				n->combat_node = combat;
+
+				data.path_nodes.push_back(n);
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
@@ -166,7 +172,7 @@ void level::load(std::string level_name) {
 		}
 
 		if(!data.path_nodes.empty())
-			player::data.pos = data.path_nodes[0];
+			player::data.pos = data.path_nodes[0]->pos;
 		else
 			player::data.pos = { 0,0 };
 

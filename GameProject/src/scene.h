@@ -6,6 +6,11 @@
 #include <vector>
 #include <memory>
 
+struct path_node {
+	glm::vec2 pos = { 0,0 };
+	bool combat_node = false;
+};
+
 namespace level {
 	struct level_data {
 		std::string name;
@@ -13,7 +18,7 @@ namespace level {
 		std::vector<std::shared_ptr<obstacle_entity>> obstacles;
 		std::vector<std::shared_ptr<sprite_entity>> sprites;
 		std::vector<std::shared_ptr<enemy_entity>> enemies;
-		std::vector<glm::vec2> path_nodes;
+		std::vector<std::shared_ptr<path_node>> path_nodes;
 	};
 
 	extern level_data data;
