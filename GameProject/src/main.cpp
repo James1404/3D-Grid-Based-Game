@@ -116,7 +116,12 @@ int main(int argc, char* args[]) {
 
 #ifdef _DEBUG
 		for (auto node : level::data.path_nodes) {
-			renderer::debug::draw_square(node, { 10,10 }, renderer::COLOUR::CYAN);
+			glm::vec3 colour = renderer::COLOUR::CYAN;
+
+			if (node->combat_node)
+				colour = renderer::COLOUR::RED;
+
+			renderer::debug::draw_square(node->pos, { 10,10 }, colour);
 		}
 #endif // _DEBUG
 

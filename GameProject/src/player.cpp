@@ -16,9 +16,10 @@ struct player_camera : public camera::camera_interface {
 		glm::vec2 pos = player::data.pos + ((glm::vec2)player::data.spr->size * .5f);
 		pos += offset;
 
+		glm::ivec2 casted_pos = (glm::ivec2)pos;
 		view = glm::translate(glm::mat4(1.0f),
-			glm::vec3(pos.x - (renderer::screen_resolution_x / 2),
-			pos.y - (renderer::screen_resolution_y / 2),
+			glm::vec3(casted_pos.x - (renderer::screen_resolution_x / 2),
+			casted_pos.y - (renderer::screen_resolution_y / 2),
 			0.0f));
 
 		view = glm::inverse(view);
@@ -47,19 +48,11 @@ void player::init() {
 }
 
 void player::update(double dt) {
+	// TODO: implement momentum build up for player.
+	// As the player moves their momuntum builds up and
+	// makes them go faster until hitting some max speed.
+	// Player also doesnt stop instantly, instead their momentum slows down until zero.
 	camera::set_camera("Player");
-	if (input::button_pressed("Aim")) {
-		if (input::button_down("Shoot")) {
-			printf("Shoot\n");
-
-			collision::ray_data hit;
-			if (collision::ray_vs_collider(hit, data.pos, { 20,0 })) {
-				printf("Hit Collider\n");
-			}
-		}
-
-		return;
-	}
 
 	if (input::button_pressed("MoveLeft")) { data.vel.x = -1; }
 	else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
@@ -69,10 +62,27 @@ void player::update(double dt) {
 	if (input::button_pressed("Run")) { movementSpeed = .5f; }
 
 	if (!level::data.path_nodes.empty()) {
+		if (data.current_node != level::data.path_nodes.size() - 1 && data.current_node >= 0) {
+			if (level::data.path_nodes[data.current_node]->combat_node) {
+				if (input::button_pressed("Aim")) {
+					if (input::button_down("Shoot")) {
+						printf("Shoot\n");
+
+						collision::ray_data hit;
+						if (collision::ray_vs_collider(hit, data.pos, { 20,0 })) {
+							printf("Hit Collider\n");
+						}
+					}
+
+					return;
+				}
+			}
+		}
+
 		if (data.vel.x > 0) {
 			if (data.current_node != level::data.path_nodes.size() - 1) {
-				if (glm::distance(data.pos, level::data.path_nodes[data.current_node + 1]) > 1) {
-					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node + 1] - data.pos);
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node + 1]->pos) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node + 1]->pos - data.pos);
 					data.vel = dir * data.vel.x;
 
 					data.vel *= dt;
@@ -92,8 +102,8 @@ void player::update(double dt) {
 		}
 		else {
 			if (data.current_node >= 0) {
-				if (glm::distance(data.pos, level::data.path_nodes[data.current_node]) > 1) {
-					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node] - data.pos);
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node]->pos) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node]->pos - data.pos);
 					data.vel = dir * data.vel.x;
 
 					data.vel *= dt;
