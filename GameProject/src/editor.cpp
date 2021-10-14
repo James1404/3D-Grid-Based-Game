@@ -26,6 +26,7 @@ struct editor_camera : public camera::camera_interface {
 			view = glm::translate(view, { mouseDelta, 0.0f });
 		}
 
+		// TODO: it zooms into the center of the game, not the center of the camera
 		float zoom = 1;
 		if (input::key_pressed(SDL_SCANCODE_Q)) { zoom -= camera_zoom_speed * dt; }
 		if (input::key_pressed(SDL_SCANCODE_E)) { zoom += camera_zoom_speed * dt; }
@@ -129,6 +130,7 @@ void editor::draw() {
 
 			if (ImGui::Button("Load")) {
 				if (!level::data.name.empty()) {
+					clear_selected();
 					level::load(level::data.name);
 				}
 				else {
@@ -195,9 +197,28 @@ void editor::draw() {
 
 					if (current_path_node != nullptr) {
 						ImGui::PushID(&current_path_node);
-
 						ImGui::DragFloat2("Position", (float*)&current_path_node->pos);
-						ImGui::Checkbox("Combat", &current_path_node->combat_node);
+
+						ImGui::Spacing();
+						ImGui::Text("Flags");
+
+						static bool is_combat = false;
+						static bool is_slow = false;
+						static bool is_speed = false;
+
+						PATH_NODE_FLAGS node_flags = 0;
+						if (is_combat)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_COMBAT);
+						if (is_slow)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_SLOW);
+						if (is_speed)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_FAST);
+
+						if (ImGui::BeginTable("split", 3)) {
+							ImGui::TableNextColumn(); ImGui::Checkbox("Combat", &is_combat);
+							ImGui::TableNextColumn(); ImGui::Checkbox("Slow", &is_slow);
+							ImGui::TableNextColumn(); ImGui::Checkbox("Speed", &is_speed);
+							ImGui::EndTable();
+						}
+
+						current_path_node->flags = node_flags;
 
 						ImGui::PopID();
 					}

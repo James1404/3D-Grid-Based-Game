@@ -54,16 +54,9 @@ void player::update(double dt) {
 	// Player also doesnt stop instantly, instead their momentum slows down until zero.
 	camera::set_camera("Player");
 
-	if (input::button_pressed("MoveLeft")) { data.vel.x = -1; }
-	else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
-	else { data.vel.x = 0; }
-
-	float movementSpeed = .1f;
-	if (input::button_pressed("Run")) { movementSpeed = .5f; }
-
 	if (!level::data.path_nodes.empty()) {
 		if (data.current_node != level::data.path_nodes.size() - 1 && data.current_node >= 0) {
-			if (level::data.path_nodes[data.current_node]->combat_node) {
+			if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_COMBAT) {
 				if (input::button_pressed("Aim")) {
 					if (input::button_down("Shoot")) {
 						printf("Shoot\n");
@@ -75,6 +68,26 @@ void player::update(double dt) {
 					}
 
 					return;
+				}
+			}
+		}
+
+		if (input::button_pressed("MoveLeft")) { data.vel.x = -1; }
+		else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
+		else { data.vel.x = 0; }
+
+		float movementSpeed = .1f;
+
+		if (data.current_node != level::data.path_nodes.size() - 1 && data.current_node >= 0) {
+			if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_FAST) {
+				movementSpeed = .75f;
+			}
+			else if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_SLOW) {
+				movementSpeed = .05f;
+			}
+			else {
+				if (input::button_pressed("Run")) {
+					movementSpeed = .5f;
 				}
 			}
 		}

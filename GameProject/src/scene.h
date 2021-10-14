@@ -6,9 +6,21 @@
 #include <vector>
 #include <memory>
 
+typedef uint32_t PATH_NODE_FLAGS;
+enum PATH_NODE_FLAGS_ {
+	PATH_NODE_NONE		= 0,
+	PATH_NODE_COMBAT	= 1 << 0,
+	PATH_NODE_SLOW		= 1 << 1,
+	PATH_NODE_FAST		= 1 << 2
+};
+
+static void PATH_NODE_FLAG_SET(uint32_t* x, PATH_NODE_FLAGS_ mask) { *x |= mask; }
+static void PATH_NODE_FLAG_CLEAR(uint32_t* x, PATH_NODE_FLAGS_ mask) { *x &= ~mask; }
+static void PATH_NODE_FLAG_TOGGLE(uint32_t* x, PATH_NODE_FLAGS_ mask) { *x ^= mask; }
+
 struct path_node {
 	glm::vec2 pos = { 0,0 };
-	bool combat_node = false;
+	PATH_NODE_FLAGS flags = 0;
 };
 
 namespace level {
