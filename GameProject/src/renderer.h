@@ -10,6 +10,18 @@
 
 #include <string>
 
+namespace colour {
+	static const glm::vec3 black = glm::vec3(0, 0, 0);
+	static const glm::vec3 white = glm::vec3(1, 1, 1);
+	static const glm::vec3 grey = glm::vec3(.5, .5, .5);
+	static const glm::vec3 red = glm::vec3(1, 0, 0);
+	static const glm::vec3 green = glm::vec3(0, 1, 0);
+	static const glm::vec3 blue = glm::vec3(0, 0, 1);
+	static const glm::vec3 yellow = glm::vec3(1, 1, 0);
+	static const glm::vec3 cyan = glm::vec3(0, 1, 1);
+	static const glm::vec3 purple = glm::vec3(1, 0, 1);
+};
+
 namespace renderer {
 	extern SDL_Window* window;
 	extern SDL_GLContext context;
@@ -29,18 +41,6 @@ namespace renderer {
 
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering
-
-	namespace COLOUR {
-		static const glm::vec3 BLACK	= glm::vec3(0, 0, 0);
-		static const glm::vec3 WHITE	= glm::vec3(1, 1, 1);
-		static const glm::vec3 GREY		= glm::vec3(.5, .5, .5);
-		static const glm::vec3 RED		= glm::vec3(1, 0, 0);
-		static const glm::vec3 GREEN	= glm::vec3(0, 1, 0);
-		static const glm::vec3 BLUE		= glm::vec3(0, 0, 1);
-		static const glm::vec3 YELLOW	= glm::vec3(1, 1, 0);
-		static const glm::vec3 CYAN		= glm::vec3(0, 1, 1);
-		static const glm::vec3 PURPLE	= glm::vec3(1, 0, 1);
-	};
 
 	struct sprite {
 		sprite();
@@ -66,7 +66,10 @@ namespace renderer {
 
 #ifdef _DEBUG
 	namespace debug {
+		void init_debug();
+		void clean_debug();
 		void draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
+		void draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space = false);
 	}
 #endif // _DEBUG
 }

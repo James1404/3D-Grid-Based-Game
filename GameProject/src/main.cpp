@@ -89,21 +89,23 @@ int main(int argc, char* args[]) {
 			else if (CurrentState == GAME_STATE::GAMEPLAY) {
 				level::load(level::data.name);
 				editor::clear_selected();
+
+				if (!level::data.path_nodes.empty())
+					player::data.pos = level::data.path_nodes[0]->pos;
+				else
+					player::data.pos = { 0,0 };
+
+				player::data.current_node = 0;
+
 				CurrentState = GAME_STATE::EDITOR;
 			}
 		}
+#endif // _DEBUG
 
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
 			player::update(dt);
 			level::update(dt);
 		}
-
-#endif // _DEBUG
-
-#ifdef NDEBUG
-		player::update(dt);
-		level::update(dt);
-#endif // NDEBUG
 
 		camera::update(dt);
 
@@ -115,19 +117,15 @@ int main(int argc, char* args[]) {
 		renderer::draw_sprites();
 
 #ifdef _DEBUG
-		for (auto node : level::data.path_nodes) {
-			glm::vec3 colour = renderer::COLOUR::CYAN;
+		for (auto& node : level::data.path_nodes) {
+			glm::vec3 colour = colour::cyan;
 
-			if (node->combat_node)
-				colour = renderer::COLOUR::RED;
+			if (node->flags & PATH_NODE_COMBAT)
+				colour = colour::red;
 
-			renderer::debug::draw_square(node->pos, { 10,10 }, colour);
+			renderer::debug::draw_circle(node->pos, 20, colour);
 		}
-#endif // _DEBUG
 
-		
-
-#ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR)
 			editor::draw();
 #endif // _DEBUG
