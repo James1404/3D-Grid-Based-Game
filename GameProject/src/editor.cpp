@@ -202,23 +202,28 @@ void editor::draw() {
 						ImGui::Spacing();
 						ImGui::Text("Flags");
 
-						static bool is_combat = false;
-						static bool is_slow = false;
-						static bool is_speed = false;
+						static const float button_width = 0.25f;
 
-						PATH_NODE_FLAGS node_flags = 0;
-						if (is_combat)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_COMBAT);
-						if (is_slow)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_SLOW);
-						if (is_speed)	PATH_NODE_FLAG_SET(&node_flags, PATH_NODE_FAST);
+						// COMBAT
+						if (ImGui::Button("Combat", { ImGui::GetWindowSize().x * button_width, 0.0f }))
+							PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_COMBAT);
 
-						if (ImGui::BeginTable("split", 3)) {
-							ImGui::TableNextColumn(); ImGui::Checkbox("Combat", &is_combat);
-							ImGui::TableNextColumn(); ImGui::Checkbox("Slow", &is_slow);
-							ImGui::TableNextColumn(); ImGui::Checkbox("Speed", &is_speed);
-							ImGui::EndTable();
-						}
+						ImGui::SameLine();
+						ImGui::Text((current_path_node->flags & PATH_NODE_COMBAT) ? "ON" : "OFF");
 
-						current_path_node->flags = node_flags;
+						// SLOW
+						if (ImGui::Button("Slow", { ImGui::GetWindowSize().x * button_width, 0.0f }))
+							PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_SLOW);
+
+						ImGui::SameLine();
+						ImGui::Text((current_path_node->flags & PATH_NODE_SLOW) ? "ON" : "OFF");
+
+						// FAST
+						if (ImGui::Button("Fast", { ImGui::GetWindowSize().x * button_width, 0.0f }))
+							PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_FAST);
+
+						ImGui::SameLine();
+						ImGui::Text((current_path_node->flags & PATH_NODE_FAST) ? "ON" : "OFF");
 
 						ImGui::PopID();
 					}
