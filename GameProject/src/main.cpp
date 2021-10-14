@@ -123,7 +123,7 @@ int main(int argc, char* args[]) {
 			if (node->flags & PATH_NODE_COMBAT)
 				colour = colour::red;
 
-			renderer::debug::draw_circle(node->pos, 20, colour);
+			renderer::debug::draw_circle(node->pos, 5, colour);
 		}
 
 		if (CurrentState == GAME_STATE::EDITOR)
