@@ -320,14 +320,17 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 
 unsigned int square_shader;
 unsigned int circle_shader;
+unsigned int line_shader;
 void renderer::debug::init_debug() {
 	square_shader = create_shader("data/shaders/square.vs", "data/shaders/square.fs");
 	circle_shader = create_shader("data/shaders/circle.vs", "data/shaders/circle.fs");
+	line_shader	= create_shader("data/shaders/line.vs", "data/shaders/line.fs");
 }
 
 void renderer::debug::clean_debug() {
 	glDeleteProgram(square_shader);
 	glDeleteProgram(circle_shader);
+	glDeleteProgram(line_shader);
 }
 
 void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
@@ -371,6 +374,11 @@ void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size
 
 	glBindVertexArray(square_vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// DELETE BUFFERS
+	glDeleteBuffers(1, &square_vbo);
+	glDeleteBuffers(1, &square_ebo);
+	glDeleteVertexArrays(1, &square_vao);
 }
 
 void renderer::debug::draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space) {
@@ -427,5 +435,46 @@ void renderer::debug::draw_circle(const glm::vec2 position, const float radius, 
 
 	glBindVertexArray(circle_vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// DELETE BUFFERS
+	glDeleteBuffers(1, &circle_vbo);
+	glDeleteBuffers(1, &circle_ebo);
+	glDeleteVertexArrays(1, &circle_vao);
+}
+
+void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space) {
+	// SETUP STUFF
+	unsigned int line_vao, line_vbo;
+
+	float vertices[] = {
+		p1.x, p1.y,	// first point
+		p2.x, p2.y	// second point
+	};
+
+	glGenVertexArrays(1, &line_vao);
+	glBindVertexArray(line_vao);
+
+	glGenBuffers(1, &line_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+
+	// DRAW STUFF
+	glUseProgram(square_shader);
+
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
+	glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), screen_space);
+
+	glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(colour));
+
+	glBindVertexArray(line_vao);
+	glDrawArrays(GL_LINES, 0, 2);
+
+	// DELETE BUFFERS
+	glDeleteBuffers(1, &line_vbo);
+	glDeleteVertexArrays(1, &line_vao);
 }
 #endif // _DEBUG

@@ -68,8 +68,10 @@ namespace renderer {
 	namespace debug {
 		void init_debug();
 		void clean_debug();
+
 		void draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
 		void draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space = false);
+		void draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space = false);
 	}
 #endif // _DEBUG
 }
