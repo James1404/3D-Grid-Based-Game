@@ -22,7 +22,11 @@ namespace collision {
         box_collider* col;
     };
 
-    bool collider_vs_collider(box_collider* _collider);
-    bool ray_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
-    bool point_vs_collider(const glm::vec2& _point);
+	bool collider_vs_collider(box_collider* _col1, box_collider* _col2);
+    bool ray_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction, box_collider* _col);
+    bool point_vs_collider(const glm::vec2& _point, box_collider* _col);
+
+    bool check_box_collision(box_collider* _collider);
+    bool check_ray_collision(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
+    bool check_point_collision(const glm::vec2& _point);
 }
