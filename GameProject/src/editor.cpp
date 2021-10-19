@@ -56,12 +56,14 @@ static std::shared_ptr<obstacle_entity> current_obstacle = nullptr;
 static std::shared_ptr<path_node> current_path_node = nullptr;
 static std::shared_ptr<sprite_entity> current_sprite = nullptr;
 static std::shared_ptr<enemy_entity> current_enemy = nullptr;
+static std::shared_ptr<trigger_entity> current_trigger = nullptr;
 
 void editor::clear_selected() {
 	current_obstacle = nullptr;
 	current_path_node = nullptr;
 	current_sprite = nullptr;
 	current_enemy = nullptr;
+	current_trigger = nullptr;
 }
 
 void editor::draw() {
@@ -201,7 +203,7 @@ void editor::draw() {
 
 						ImGui::Spacing();
 						ImGui::Text("Flags");
-
+						
 						static const float button_width = 0.25f;
 
 						/* COMBAT */ {
@@ -413,6 +415,62 @@ void editor::draw() {
 							current_sprite->spr->set_sprite_path(name.c_str());
 						}
 						*/
+					}
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("TRIGGER")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& node : level::data.triggers) {
+							const bool is_selected = (current_trigger != nullptr) && (current_trigger == node);
+
+							std::string label = "Trigger";
+
+							ImGui::PushID(&node);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_trigger = node;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						auto t = std::make_shared<trigger_entity>();
+
+						if (!level::data.triggers.empty())
+							t->pos = level::data.triggers.back()->pos;
+
+						level::data.triggers.push_back(t);
+						current_trigger = level::data.triggers.back();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						level::data.triggers.erase(
+							std::remove(level::data.triggers.begin(),
+							level::data.triggers.end(), current_trigger),
+							level::data.triggers.end());
+
+						if (!level::data.triggers.empty())
+							current_trigger = level::data.triggers.back();
+						else
+							current_trigger = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_trigger != nullptr) {
+						ImGui::PushID(&current_trigger);
+						ImGui::DragFloat2("Position", (float*)&current_trigger->pos);
+						ImGui::DragInt2("Size", (int*)&current_trigger->size);
+
+						ImGui::PopID();
 					}
 					ImGui::EndTabItem();
 				}

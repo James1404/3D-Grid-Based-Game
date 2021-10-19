@@ -23,6 +23,16 @@ void level::update(double dt) {
 	for (auto& _sprite : data.sprites) {
 		_sprite->update(dt);
 	}
+
+	for (auto& _trigger : data.triggers) {
+		_trigger->update(dt);
+	}
+
+	/*
+	for (auto& _cutscene : data.cutscenes) {
+		_cutscene->update(dt);
+	}
+	*/
 }
 
 void level::clean() {
@@ -33,12 +43,15 @@ void level::clean() {
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 	data.sprites.clear();
 
+	data.triggers.clear();
+	data.cutscenes.clear();
+
 	data.name.clear();
 
 	printf("CLEANED LEVEL DATA\n");
 }
 
-uint32_t fileVersion = 4;
+uint32_t fileVersion = 5;
 void level::save() {
 	std::string levelPath = "data/scenes/";
 	levelPath.append(data.name);
@@ -78,6 +91,14 @@ void level::save() {
 					(int)_sprite->spr->size.x << " " << (int)_sprite->spr->size.y << " " <<
 					(int)_sprite->spr->layer << " " <<
 					_sprite->spr->colour.x << " " << _sprite->spr->colour.y << " " << _sprite->spr->colour.z << std::endl;
+			}
+
+			ofs << std::endl;
+		}
+
+		if (!data.triggers.empty()) {
+			for (auto& _trigger : data.triggers) {
+				ofs << "TRIGGER" << " " << (int)_trigger->pos.x << " " << (int)_trigger->pos.y << " " << _trigger->size.x << " " << _trigger->size.y << std::endl;
 			}
 
 			ofs << std::endl;
@@ -168,6 +189,18 @@ void level::load(std::string level_name) {
 				// s->spr->set_sprite_path(s->sprite_path.c_str());
 
 				data.sprites.push_back(s);
+			}
+			else if (type == "TRIGGER") {
+				glm::ivec2 position;
+				glm::ivec2 size;
+
+				ss >> position.x >> position.y >> size.x >> size.y;
+
+				auto t = std::make_shared<trigger_entity>();
+				t->pos = position;
+				t->size = size;
+
+				data.triggers.push_back(t);
 			}
 		}
 
