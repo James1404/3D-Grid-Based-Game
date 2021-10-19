@@ -47,6 +47,12 @@ void player::init() {
 	camera::register_camera("Player", std::make_shared<player_camera>());
 }
 
+const float walk_speed = 0.1f;
+const float run_speed = 0.5f;
+const float aim_speed = 0.025f;
+const float slow_speed = 0.05f;
+const float fast_speed = 0.75f;
+
 void player::update(double dt) {
 	// TODO: implement momentum build up for player.
 	// As the player moves their momuntum builds up and
@@ -54,44 +60,86 @@ void player::update(double dt) {
 	// Player also doesnt stop instantly, instead their momentum slows down until zero.
 	camera::set_camera("Player");
 
-	if (!level::data.path_nodes.empty()) {
+	if (!level::data.path_nodes.empty()) {	
+		if (input::button_pressed("MoveLeft")) { data.vel.x = -1; }
+		else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
+		else { data.vel.x = 0; }
+		
+		float movementSpeed = walk_speed;
+
 		if (data.current_node != level::data.path_nodes.size() - 1 && data.current_node >= 0) {
+			if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_FAST) {
+				movementSpeed = fast_speed;
+			}
+			else if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_SLOW) {
+				movementSpeed = slow_speed;
+			}
+			else {
+				if (input::button_pressed("Run")) {
+					movementSpeed = run_speed;
+				}
+			}
+
 			if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_COMBAT) {
 				if (input::button_pressed("Aim")) {
 					if (input::button_down("Shoot")) {
 						printf("Shoot\n");
 
 						collision::ray_data hit;
-						if (collision::ray_vs_collider(hit, data.pos, { 20,0 })) {
+						if (collision::check_ray_collision(hit, data.pos, { 20,0 })) {
 							printf("Hit Collider\n");
 						}
 					}
 
-					return;
+					movementSpeed = aim_speed;
 				}
 			}
 		}
 
-		if (input::button_pressed("MoveLeft")) { data.vel.x = -1; }
-		else if (input::button_pressed("MoveRight")) { data.vel.x = 1; }
-		else { data.vel.x = 0; }
+		printf("Current_node %i\n", data.current_node);
+		if (data.vel.x > 0) {
+			if (data.current_node != level::data.path_nodes.size() - 1) {
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node + 1]->pos) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node + 1]->pos - data.pos);
+					data.vel = dir * data.vel.x;
 
-		float movementSpeed = .1f;
+					data.vel *= dt;
+					data.vel *= movementSpeed;
+					
+					data.col->pos = data.pos + data.vel;
+					if (collision::check_box_collision(data.col)) {
+						return;
+					}
 
-		if (data.current_node != level::data.path_nodes.size() - 1 && data.current_node >= 0) {
-			if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_FAST) {
-				movementSpeed = .75f;
-			}
-			else if (level::data.path_nodes[data.current_node]->flags & PATH_NODE_SLOW) {
-				movementSpeed = .05f;
-			}
-			else {
-				if (input::button_pressed("Run")) {
-					movementSpeed = .5f;
+					data.pos += data.vel;
+				}
+				else {
+					data.current_node++;
 				}
 			}
 		}
+		else {
+			if (data.current_node >= 0) {
+				if (glm::distance(data.pos, level::data.path_nodes[data.current_node]->pos) > 1) {
+					glm::vec2 dir = glm::normalize(level::data.path_nodes[data.current_node]->pos - data.pos);
+					data.vel = dir * data.vel.x;
 
+					data.vel *= dt;
+					data.vel *= movementSpeed;
+
+					data.col->pos = data.pos - data.vel;
+					if (collision::check_box_collision(data.col)) {
+						return;
+					}
+
+					data.pos -= data.vel;
+				}
+				else {
+					data.current_node--;
+				}
+			}
+		}
+			/*
 		if (data.vel.x > 0) {
 			if (data.current_node != level::data.path_nodes.size() - 1) {
 				if (glm::distance(data.pos, level::data.path_nodes[data.current_node + 1]->pos) > 1) {
@@ -134,6 +182,7 @@ void player::update(double dt) {
 				}
 			}
 		}
+		*/
 	}
 }
 
