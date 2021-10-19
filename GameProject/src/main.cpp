@@ -35,15 +35,12 @@ int main(int argc, char* args[]) {
 		input::init();
 		input::load();
 
-		player::init();
-
-		level::init();
-
-#ifdef NDEBUG
 		CurrentState = GAME_STATE::GAMEPLAY;
 		level::load("testlevel");
-#endif // NDEBUG
-		
+		level::init();
+
+		player::init();
+
 #ifdef _DEBUG
 		CurrentState = GAME_STATE::EDITOR;
 		editor::init();
@@ -91,7 +88,7 @@ int main(int argc, char* args[]) {
 				editor::clear_selected();
 
 				if (!level::data.path_nodes.empty())
-					player::data.pos = level::data.path_nodes[0]->pos;
+					player::data.pos = level::data.path_nodes.front()->pos;
 				else
 					player::data.pos = { 0,0 };
 
@@ -130,6 +127,10 @@ int main(int argc, char* args[]) {
 			renderer::debug::draw_circle(node->pos, 2, colour);
 
 			previous_node = node.get();
+		}
+
+		for (auto& trigger : level::data.triggers) {
+			renderer::debug::draw_box(trigger->pos, trigger->size, colour::red);
 		}
 
 		if (CurrentState == GAME_STATE::EDITOR)
