@@ -4,6 +4,7 @@
 #include <glm.hpp>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "renderer.h"
 #include "collision.h"
@@ -133,30 +134,37 @@ static void PATH_NODE_FLAG_CLEAR(uint32_t* x, PATH_NODE_FLAGS_ mask) { *x &= ~ma
 static void PATH_NODE_FLAG_TOGGLE(uint32_t* x, PATH_NODE_FLAGS_ mask) { *x ^= mask; }
 
 struct path_node {
+	uuid id;
 	glm::vec2 pos = { 0,0 };
 	PATH_NODE_FLAGS flags = 0;
 };
 
-typedef void (*callback_function)(void);
-struct callback_event {
-	std::vector<callback_function> observer_functions;
+//
+// EVENTS
+//
 
-	void add_callback_function(callback_function func) {
-		observer_functions.push_back(*func);
+typedef void (*callback_function)(void);
+struct game_event {
+	std::vector<callback_function> registered_functions;
+	
+	std::string event_name;
+
+	void register_function(callback_function func) {
+		registered_functions.push_back(*func);
 	}
 
-	void remove_observer() {
-
+	void remove_function(callback_function func) {
+		registered_functions.erase(std::remove(registered_functions.begin(), registered_functions.end(), func), registered_functions.end());
 	}
 
 	void notify() {
-		for(auto observer : observer_functions) {
-			observer();
+		for(auto& func : registered_functions) {
+			func();
 		}
 	}
 };
 
-struct trigger_entity : public callback_event {
+struct trigger_entity {
 	uuid id;
 
 	collision::box_collider* col;
@@ -164,14 +172,19 @@ struct trigger_entity : public callback_event {
 	glm::vec2 pos;
 	glm::ivec2 size;
 
+	game_event* linked_event;
+
 	trigger_entity() {
 		pos = { 0,0 };
 		size = { 0,0 };
 		col = collision::create_collider(size);
+
+		printf("TRIGGER_ENTITY %p INITIALIZED\n", this);
 	}
 
 	~trigger_entity() {
 		collision::delete_collider(col);
+		printf("TRIGGER_ENTITY %p CLEANED\n", this);
 	}
 
 	void update(double dt) {
@@ -179,22 +192,25 @@ struct trigger_entity : public callback_event {
 		col->size = size;
 
 		if (collision::check_box_collision(col)) {
-			notify();
+			linked_event->notify();
 		}
 	}
 };
 
 struct cutscene_entity {
 	uuid id;
-	std::string event_name;
-	callback_event* linked_trigger;
 
+	game_event* linked_event;
+
+	// TODO: uncomment register and remove function
 	cutscene_entity() {
-		linked_trigger->add_callback_function(start_cutscene);
+		//linked_event->register_function(start_cutscene);
+		printf("CUTSCENE_ENTITY %p INITIALIZED\n", this);
 	}
 
 	~cutscene_entity() {
-
+		//linked_event->remove_function(start_cutscene);
+		printf("CUTSCENE_ENTITY %p CLEANED\n", this);
 	}
 
 	static void start_cutscene() {

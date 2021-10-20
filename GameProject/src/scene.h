@@ -16,6 +16,7 @@ namespace level {
 		std::vector<std::shared_ptr<path_node>> path_nodes;
 		std::vector<std::shared_ptr<trigger_entity>> triggers;
 		std::vector<std::shared_ptr<cutscene_entity>> cutscenes;
+		std::vector<std::shared_ptr<game_event>> game_events;
 	};
 
 	extern level_data data;

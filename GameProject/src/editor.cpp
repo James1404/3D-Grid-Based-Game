@@ -57,6 +57,8 @@ static std::shared_ptr<path_node> current_path_node = nullptr;
 static std::shared_ptr<sprite_entity> current_sprite = nullptr;
 static std::shared_ptr<enemy_entity> current_enemy = nullptr;
 static std::shared_ptr<trigger_entity> current_trigger = nullptr;
+static std::shared_ptr<cutscene_entity> current_cutscene = nullptr;
+static std::shared_ptr<game_event> current_game_event = nullptr;
 
 void editor::clear_selected() {
 	current_obstacle = nullptr;
@@ -64,6 +66,8 @@ void editor::clear_selected() {
 	current_sprite = nullptr;
 	current_enemy = nullptr;
 	current_trigger = nullptr;
+	current_cutscene = nullptr;
+	current_game_event = nullptr;
 }
 
 void editor::draw() {
@@ -420,14 +424,14 @@ void editor::draw() {
 				}
 				if (ImGui::BeginTabItem("TRIGGER")) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& node : level::data.triggers) {
-							const bool is_selected = (current_trigger != nullptr) && (current_trigger == node);
+						for (auto& trigger : level::data.triggers) {
+							const bool is_selected = (current_trigger != nullptr) && (current_trigger == trigger);
 
 							std::string label = "Trigger";
 
-							ImGui::PushID(&node);
+							ImGui::PushID(&trigger);
 							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_trigger = node;
+								current_trigger = trigger;
 							}
 
 							if (is_selected) {
@@ -442,9 +446,6 @@ void editor::draw() {
 
 					if (ImGui::Button("+")) {
 						auto t = std::make_shared<trigger_entity>();
-
-						if (!level::data.triggers.empty())
-							t->pos = level::data.triggers.back()->pos;
 
 						level::data.triggers.push_back(t);
 						current_trigger = level::data.triggers.back();
@@ -469,6 +470,110 @@ void editor::draw() {
 						ImGui::PushID(&current_trigger);
 						ImGui::DragFloat2("Position", (float*)&current_trigger->pos);
 						ImGui::DragInt2("Size", (int*)&current_trigger->size);
+
+						ImGui::PopID();
+					}
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("CUTSCENE")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& cutscene : level::data.cutscenes) {
+							const bool is_selected = (current_cutscene != nullptr) && (current_cutscene == cutscene);
+
+							std::string label = "Cutscene";
+
+							ImGui::PushID(&cutscene);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_cutscene = cutscene;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						auto c = std::make_shared<cutscene_entity>();
+
+						level::data.cutscenes.push_back(c);
+						current_cutscene = level::data.cutscenes.back();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						level::data.cutscenes.erase(
+							std::remove(level::data.cutscenes.begin(),
+							level::data.cutscenes.end(), current_cutscene),
+							level::data.cutscenes.end());
+
+						if (!level::data.cutscenes.empty())
+							current_cutscene = level::data.cutscenes.back();
+						else
+							current_cutscene = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_cutscene != nullptr) {
+						ImGui::PushID(&current_cutscene);
+						
+						ImGui::PopID();
+					}
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("GAME_EVENTS")) {
+					if (ImGui::ListBoxHeader("", { -1,0 })) {
+						for (auto& g_event : level::data.game_events) {
+							const bool is_selected = (current_game_event != nullptr) && (current_game_event == g_event);
+
+							std::string label = "Game Event";
+
+							ImGui::PushID(&g_event);
+							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_game_event = g_event;
+							}
+
+							if (is_selected) {
+								ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::PopID();
+						}
+
+						ImGui::ListBoxFooter();
+					}
+
+					if (ImGui::Button("+")) {
+						auto e = std::make_shared<game_event>();
+
+						level::data.game_events.push_back(e);
+						current_game_event = level::data.game_events.back();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("-")) {
+						level::data.game_events.erase(
+							std::remove(level::data.game_events.begin(),
+							level::data.game_events.end(), current_game_event),
+							level::data.game_events.end());
+
+						if (!level::data.game_events.empty())
+							current_game_event = level::data.game_events.back();
+						else
+							current_game_event = nullptr;
+					}
+
+					ImGui::Separator();
+
+					if (current_game_event != nullptr) {
+						ImGui::PushID(&current_game_event);
+
+						ImGui::InputText("Name", &current_game_event->event_name, ImGuiInputTextFlags_CharsNoBlank);
 
 						ImGui::PopID();
 					}

@@ -39,12 +39,12 @@ void level::clean() {
 	data.obstacles.clear();
 	data.enemies.clear();
 	data.path_nodes.clear();
+	data.triggers.clear();
+	data.cutscenes.clear();
+	data.game_events.clear();
 
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 	data.sprites.clear();
-
-	data.triggers.clear();
-	data.cutscenes.clear();
 
 	data.name.clear();
 
@@ -99,6 +99,22 @@ void level::save() {
 		if (!data.triggers.empty()) {
 			for (auto& _trigger : data.triggers) {
 				ofs << "TRIGGER" << " " << (int)_trigger->pos.x << " " << (int)_trigger->pos.y << " " << _trigger->size.x << " " << _trigger->size.y << std::endl;
+			}
+
+			ofs << std::endl;
+		}
+		
+		/*
+		CUTSCENE HAS NO DATA!
+
+		if(!data.cutscenes.empty()){
+
+		}
+		*/
+
+		if(!data.game_events.empty()) {
+			for(auto& _event : data.game_events) {
+				ofs << "EVENT" << " " << _event->event_name << std::endl;
 			}
 
 			ofs << std::endl;
@@ -201,6 +217,16 @@ void level::load(std::string level_name) {
 				t->size = size;
 
 				data.triggers.push_back(t);
+			}
+			else if(type == "EVENT") {
+				std::string name;
+
+				ss >> name;
+
+				auto e = std::make_shared<game_event>();
+				e->event_name = name;
+
+				data.game_events.push_back(e);
 			}
 		}
 
