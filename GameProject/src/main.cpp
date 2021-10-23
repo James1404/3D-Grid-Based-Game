@@ -26,6 +26,8 @@ enum class GAME_STATE {
 #endif // _DEBUG
 } static CurrentState;
 
+std::shared_ptr<player_entity> player;
+
 Uint64 NOW = SDL_GetPerformanceCounter(), LAST = 0;
 int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
@@ -36,10 +38,10 @@ int main(int argc, char* args[]) {
 		input::load();
 
 		CurrentState = GAME_STATE::GAMEPLAY;
-		level::load("testlevel");
-		level::init();
-
-		player::init();
+		current_level.load("testlevel");
+		current_level.init();
+		
+		player = std::make_shared<player_entity>();
 
 #ifdef _DEBUG
 		CurrentState = GAME_STATE::EDITOR;
@@ -84,15 +86,16 @@ int main(int argc, char* args[]) {
 				CurrentState = GAME_STATE::GAMEPLAY;
 			}
 			else if (CurrentState == GAME_STATE::GAMEPLAY) {
-				level::load(level::data.name);
+				current_level.load(current_level.name);
+				current_level.init();
 				editor::clear_selected();
 
-				if (!level::data.path_nodes.empty())
-					player::data.pos = level::data.path_nodes.front()->pos;
+				if (!current_level.path_nodes.empty())
+					player->pos = current_level.path_nodes.front()->pos;
 				else
-					player::data.pos = { 0,0 };
+					player->pos = { 0,0 };
 
-				player::data.current_node = 0;
+				player->current_node = 0;
 
 				CurrentState = GAME_STATE::EDITOR;
 			}
@@ -100,8 +103,8 @@ int main(int argc, char* args[]) {
 #endif // _DEBUG
 
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
-			player::update(dt);
-			level::update(dt);
+			player->update(dt);
+			current_level.update(dt);
 		}
 
 		camera::update(dt);
@@ -115,7 +118,7 @@ int main(int argc, char* args[]) {
 
 #ifdef _DEBUG
 		path_node* previous_node = nullptr;
-		for (auto& node : level::data.path_nodes) {
+		for (auto& node : current_level.path_nodes) {
 			glm::vec3 colour = colour::cyan;
 
 			if (node->flags & PATH_NODE_COMBAT)
@@ -127,10 +130,6 @@ int main(int argc, char* args[]) {
 			renderer::debug::draw_circle(node->pos, 2, colour);
 
 			previous_node = node.get();
-		}
-
-		for (auto& trigger : level::data.triggers) {
-			renderer::debug::draw_box(trigger->pos, trigger->size, colour::red);
 		}
 
 		if (CurrentState == GAME_STATE::EDITOR)
@@ -148,8 +147,7 @@ int main(int argc, char* args[]) {
 	editor::clean();
 #endif // _DEBUG
 
-	player::clean();
-	level::clean();
+	current_level.clean();
 
 	renderer::clean();
 
