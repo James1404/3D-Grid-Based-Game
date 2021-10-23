@@ -5,48 +5,92 @@
 
 #include "player.h"
 
-level::level_data level::data;
+level current_level;
+
+//
+// EVENTS
+//
+
+void game_event::register_function(callback_function func) {
+	registered_functions.push_back(*func);
+}
+
+void game_event::remove_function(callback_function func) {
+	registered_functions.erase(std::remove(registered_functions.begin(), registered_functions.end(), func), registered_functions.end());
+}
+
+void game_event::notify() {
+	for(auto& func : registered_functions) {
+			func();
+	}
+}
+
+bool find_game_event(game_event* _event, std::string _name)  {
+	for(auto& e : current_level.game_events) {
+		if(e->event_name == _name) {
+			_event = e.get();
+			return true;
+		}	
+	}
+	return false;
+}
+
+//
+// CUTSCENE
+//
+
+void cutscene::init() {
+
+}
+
+void cutscene::clean() {
+
+}
+
+void cutscene::start_cutscene() {
+
+}
+
+void cutscene::update(double dt) {
+
+}
+
+//
+// LEVEL
+//
 
 void level::init() {
 
 }
 
 void level::update(double dt) {
-	for (auto& _obstacle : data.obstacles) {
+	for (auto& _obstacle : obstacles) {
 		_obstacle->update(dt);
 	}
 
-	for (auto& _enemy : data.enemies) {
-		_enemy->update(dt);
-	}
-
-	for (auto& _sprite : data.sprites) {
+	for (auto& _sprite : sprites) {
 		_sprite->update(dt);
 	}
 
-	for (auto& _trigger : data.triggers) {
-		_trigger->update(dt);
+	for (auto& _enemy : enemies) {
+		_enemy->update(dt);
 	}
-
-	/*
-	for (auto& _cutscene : data.cutscenes) {
-		_cutscene->update(dt);
-	}
-	*/
 }
 
 void level::clean() {
-	data.obstacles.clear();
-	data.enemies.clear();
-	data.path_nodes.clear();
-	data.triggers.clear();
-	data.cutscenes.clear();
-	data.game_events.clear();
+	game_events.clear();
+	path_nodes.clear();
+	cutscenes.clear();
+
+	entities.clear();
+
+	obstacles.clear();
+	enemies.clear();
 
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
-	data.sprites.clear();
+	sprites.clear();
 
-	data.name.clear();
+	name.clear();
 
 	printf("CLEANED LEVEL DATA\n");
 }
@@ -54,39 +98,50 @@ void level::clean() {
 uint32_t fileVersion = 5;
 void level::save() {
 	std::string levelPath = "data/scenes/";
-	levelPath.append(data.name);
+	levelPath.append(name);
 	levelPath.append(".scene");
 
 	std::ofstream ofs(levelPath, std::ofstream::trunc);
 	if (ofs.is_open()) {
 		ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
 
-		if (!data.obstacles.empty()) {
-			for (auto& _obstacle : data.obstacles) {
+		if (!game_events.empty()) {
+			for (auto& _event : game_events) {
+				ofs << "EVENT" << " " << _event->event_name << std::endl;
+			}
+
+			ofs << std::endl;
+		}
+
+		if (!obstacles.empty()) {
+			for (auto& _obstacle : obstacles) {
 				ofs << "OBSTACLE" << " " << (int)_obstacle->pos.x << " " << (int)_obstacle->pos.y << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.path_nodes.empty()) {
-			for (auto& _node : data.path_nodes) {
-				ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << std::endl;
+		if (!path_nodes.empty()) {
+			for (auto& _node : path_nodes) {
+				if(_node->is_trigger)
+					ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << _node->event_name << std::endl;
+				else
+					ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << "NULL" << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.enemies.empty()) {
-			for (auto& _enemy : data.enemies) {
+		if (!enemies.empty()) {
+			for (auto& _enemy : enemies) {
 				ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
-		if (!data.sprites.empty()) {
-			for (auto& _sprite : data.sprites) {
+		if (!sprites.empty()) {
+			for (auto& _sprite : sprites) {
 				ofs << "SPRITE" << " " << (int)_sprite->pos.x << " " << (int)_sprite->pos.y << " " <<
 					(int)_sprite->spr->size.x << " " << (int)_sprite->spr->size.y << " " <<
 					(int)_sprite->spr->layer << " " <<
@@ -96,25 +151,9 @@ void level::save() {
 			ofs << std::endl;
 		}
 
-		if (!data.triggers.empty()) {
-			for (auto& _trigger : data.triggers) {
-				ofs << "TRIGGER" << " " << (int)_trigger->pos.x << " " << (int)_trigger->pos.y << " " << _trigger->size.x << " " << _trigger->size.y << std::endl;
-			}
-
-			ofs << std::endl;
-		}
-		
-		/*
-		CUTSCENE HAS NO DATA!
-
-		if(!data.cutscenes.empty()){
-
-		}
-		*/
-
-		if(!data.game_events.empty()) {
-			for(auto& _event : data.game_events) {
-				ofs << "EVENT" << " " << _event->event_name << std::endl;
+		if(!cutscenes.empty()){
+			for (auto& _cutscene : cutscenes) {
+				ofs << "CUTSCENE" << " " << std::endl;
 			}
 
 			ofs << std::endl;
@@ -155,14 +194,24 @@ void level::load(std::string level_name) {
 				}
 			}
 
-			if (type == "OBSTACLE") {
+			if (type == "EVENT") {
+				std::string name;
+
+				ss >> name;
+
+				auto e = std::make_shared<game_event>();
+				e->event_name = name;
+
+				game_events.push_back(e);
+			}
+			else if (type == "OBSTACLE") {
 				glm::ivec2 position;
 				ss >> position.x >> position.y;
 
 				auto o = std::make_shared<obstacle_entity>();
 				o->pos = position;
 
-				data.obstacles.push_back(o);
+				obstacles.push_back(o);
 			}
 			else if (type == "PATH_NODE") {
 				glm::vec2 pos;
@@ -173,7 +222,7 @@ void level::load(std::string level_name) {
 				n->pos = pos;
 				n->flags = flags;
 
-				data.path_nodes.push_back(n);
+				path_nodes.push_back(n);
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
@@ -182,7 +231,7 @@ void level::load(std::string level_name) {
 				auto e = std::make_shared<enemy_entity>();
 				e->pos = position;
 
-				data.enemies.push_back(e);
+				enemies.push_back(e);
 			}
 			else if (type == "SPRITE") {
 				glm::ivec2 position;
@@ -204,33 +253,16 @@ void level::load(std::string level_name) {
 				// s->sprite_path = path;
 				// s->spr->set_sprite_path(s->sprite_path.c_str());
 
-				data.sprites.push_back(s);
+				sprites.push_back(s);
 			}
-			else if (type == "TRIGGER") {
-				glm::ivec2 position;
-				glm::ivec2 size;
+			else if (type == "CUTSCENE") {
+				auto c = std::make_shared<cutscene>();
 
-				ss >> position.x >> position.y >> size.x >> size.y;
-
-				auto t = std::make_shared<trigger_entity>();
-				t->pos = position;
-				t->size = size;
-
-				data.triggers.push_back(t);
-			}
-			else if(type == "EVENT") {
-				std::string name;
-
-				ss >> name;
-
-				auto e = std::make_shared<game_event>();
-				e->event_name = name;
-
-				data.game_events.push_back(e);
+				cutscenes.push_back(c);
 			}
 		}
 
-		data.name = level_name;
+		name = level_name;
 
 		printf("FINISHED LOADING SCENE DATA\n");
 		printf("---------------------------\n");
