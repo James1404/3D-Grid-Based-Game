@@ -135,7 +135,6 @@ void renderer::clean() {
 	debug::clean_debug();
 #endif // _DEBUG
 
-
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
