@@ -9,10 +9,10 @@ namespace collision {
         uint32_t id;
 
         glm::vec2 pos;
-        glm::vec2 size;
+        glm::ivec2 size;
     };
 
-    box_collider* create_collider(glm::vec2 size);
+    box_collider* create_collider();
     void delete_collider(box_collider* _collider);
 
     struct ray_data {

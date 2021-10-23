@@ -6,10 +6,9 @@
 std::vector<std::unique_ptr<collision::box_collider>> collider_list;
 
 static uint32_t current_id = 0;
-collision::box_collider* collision::create_collider(glm::vec2 _size) {
+collision::box_collider* collision::create_collider() {
     auto c = std::make_unique<box_collider>();
     c->id = current_id++;
-    c->size = _size;
 
     auto pointer = c.get();
 
@@ -36,10 +35,10 @@ void collision::delete_collider(box_collider* _collider) {
 
 bool collision::collider_vs_collider(box_collider* _col1, box_collider* _col2) {
 	if (_col1->id != _col2->id) {
-        if (_col1->pos.x < _col2->pos.x +   _col2->size.x &&
-            _col1->pos.x + _col1->size.x >  _col2->pos.x &&
-            _col1->pos.y < _col2->pos.y +   _col2->size.y&&
-			_col1->pos.y + _col1->size.y >  _col2->pos.y) {
+        if (_col1->pos.x < _col2->pos.x +  _col2->size.x &&
+            _col1->pos.x + _col1->size.x > _col2->pos.x &&
+            _col1->pos.y < _col2->pos.y +  _col2->size.y&&
+			_col1->pos.y + _col1->size.y > _col2->pos.y) {
 			return true;
         }
 	}
@@ -55,7 +54,7 @@ bool collision::ray_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _di
     glm::vec2 invdir = 1.0f / _direction;
 
     glm::vec2 t_near = (_col->pos - _origin) * invdir;
-    glm::vec2 t_far = (_col->pos + _col->size - _origin) * invdir;
+    glm::vec2 t_far = (_col->pos + (glm::vec2)_col->size - _origin) * invdir;
 
     if (std::isnan(t_far.y) || std::isnan(t_far.x)) return false;
     if (std::isnan(t_near.y) || std::isnan(t_near.x)) return false;
