@@ -9,6 +9,8 @@
 #include <gtc/type_ptr.hpp>
 #include <memory>
 
+std::shared_ptr<player_entity> player;
+
 struct player_camera : public camera::camera_interface {
 	glm::vec2 offset = { 20,10 };
 	player_entity* p;
@@ -33,12 +35,24 @@ struct player_camera : public camera::camera_interface {
 player_entity::player_entity() {
 	printf("------------------\n");
 
+	spr = renderer::create_sprite();
 	//data.spr->set_sprite_path("player.png");
+	spr->position = &pos;
 	spr->layer = 1;
 	spr->size = { 16,80 };
 	spr->colour = { 0,0,1 };
 
+	col = collision::create_collider();
+	col->size = spr->size;
+
+	player_state = PLAYER_STANDING;
+
 	camera::register_camera("Player", std::make_shared<player_camera>(this));
+}
+
+player_entity::~player_entity() {
+	renderer::delete_sprite(spr);
+	collision::delete_collider(col);
 }
 
 const float walk_speed = 0.1f;
@@ -55,10 +69,20 @@ void player_entity::update(double dt) {
 	camera::set_camera("Player");
 
 	if (!current_level.path_nodes.empty()) {
-		if (input::button_pressed("MoveLeft")) { vel.x = -1; }
-		else if (input::button_pressed("MoveRight")) { vel.x = 1; }
-		else { vel.x = 0; }
+		if (input::button_down("MoveLeft")) { player_direction = PLAYER_DIRECTION_LEFT; }
+		else if (input::button_down("MoveRight")) { player_direction = PLAYER_DIRECTION_RIGHT; }
 		
+		if (player_direction == PLAYER_DIRECTION_LEFT) {
+			spr->colour = { 1,0,1 };
+		}
+		else if (player_direction == PLAYER_DIRECTION_RIGHT) {
+			spr->colour = { 0,1,1 };
+		}
+
+		if(input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) { vel.x = -1; }
+		else if(input::button_pressed("MoveRight") && !input::button_down("MoveRight")) { vel.x = 1; }
+		else { vel.x = 0; }
+
 		float movementSpeed = walk_speed;
 
 		if (current_node != current_level.path_nodes.size() - 1 && current_node >= 0) {
@@ -78,6 +102,10 @@ void player_entity::update(double dt) {
 				}
 			}
 
+			if(input::button_released("MoveDown")) {
+				player_state = PLAYER_CROUCHED;
+			}
+
 			if (current_level.path_nodes[current_node]->flags & PATH_NODE_COMBAT) {
 				if (input::button_pressed("Aim")) {
 					if (input::button_down("Shoot")) {
@@ -90,6 +118,7 @@ void player_entity::update(double dt) {
 					}
 
 					movementSpeed = aim_speed;
+					return;
 				}
 			}
 		}
