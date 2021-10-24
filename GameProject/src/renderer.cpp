@@ -332,6 +332,26 @@ void renderer::debug::clean_debug() {
 	glDeleteProgram(line_shader);
 }
 
+/*
+std::vector<unsigned int> square_draw_list;
+std::vector<unsigned int> circle_draw_list;
+std::vector<unsigned int> line_draw_list;
+
+void renderer::debug:draw_debug() {
+	for(const auto& square : square_draw_list) {
+
+	}
+
+	for(const auto& circle : circle_draw_list) {
+
+	}
+
+	for(const auto& line : line_draw_list) {
+
+	}
+}
+*/
+
 void renderer::debug::draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
 	unsigned int square_vao, square_vbo, square_ebo;
