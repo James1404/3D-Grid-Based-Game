@@ -26,8 +26,6 @@ enum class GAME_STATE {
 #endif // _DEBUG
 } static CurrentState;
 
-std::shared_ptr<player_entity> player;
-
 Uint64 NOW = SDL_GetPerformanceCounter(), LAST = 0;
 int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
@@ -131,6 +129,8 @@ int main(int argc, char* args[]) {
 
 			previous_node = node.get();
 		}
+
+		//renderer::debug::draw();
 
 		if (CurrentState == GAME_STATE::EDITOR)
 			editor::draw();
