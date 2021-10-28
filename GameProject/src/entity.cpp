@@ -72,12 +72,13 @@ void enemy_entity::update(double dt) {
 		if(player->current_node == current_node) {
 			// start chasing player
 			float x_dir = glm::normalize(player->pos - pos).x;
+			// printf("X Diff %f\n", x_dir);
 			if(x_dir < 0) {
 				// player is to the left
 			} else if(x_dir > 0){
 				// player is to the right
 			} else {
-				// player is at the same position as enemy
+				// player x is the same as enemy
 			}
 		}
 	}

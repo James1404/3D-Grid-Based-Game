@@ -350,6 +350,7 @@ void editor::draw() {
 						ImGui::PushID(current_enemy.get());
 
 						ImGui::DragFloat2("Position", (float*)&current_enemy->pos);
+						ImGui::DragInt("Starting Node", &current_enemy->current_node);
 
 						ImGui::PopID();
 					}

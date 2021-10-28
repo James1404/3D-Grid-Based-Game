@@ -497,7 +497,7 @@ void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const gl
 	glDeleteVertexArrays(1, &line_vao);
 }
 
-void renderer::debug::draw_box(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
+void renderer::debug::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	draw_line(pos, { size.x + pos.x, pos.y }, colour);
 	draw_line(pos, { pos.x, size.y + pos.y }, colour);
 	draw_line(size + pos, { pos.x, size.y + pos.y }, colour);
