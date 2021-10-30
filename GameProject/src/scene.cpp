@@ -134,7 +134,7 @@ void level::save() {
 
 		if (!enemies.empty()) {
 			for (auto& _enemy : enemies) {
-				ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << std::endl;
+				ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << " " << _enemy->current_node << std::endl;
 			}
 
 			ofs << std::endl;
@@ -226,10 +226,12 @@ void level::load(std::string level_name) {
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
-				ss >> position.x >> position.y;
+				int node;
+				ss >> position.x >> position.y >> node;
 
 				auto e = std::make_shared<enemy_entity>();
 				e->pos = position;
+				e->current_node = node;
 
 				enemies.push_back(e);
 			}

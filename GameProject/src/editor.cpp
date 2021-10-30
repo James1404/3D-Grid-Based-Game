@@ -23,12 +23,13 @@ struct editor_camera : public camera::camera_interface {
 
 		if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
 			//  TODO: convert mouse position to world space
-			//	which fixed panning speed.
+			//	which will fix panning speed.
 			glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
 			view = glm::translate(view, { mouseDelta, 0.0f });
 		}
 
 		// TODO: it zooms into the center of the game, not the center of the camera
+		// TODO: use mouse wheel not buttons
 		float zoom = 1;
 		if (input::key_pressed(SDL_SCANCODE_Q)) { zoom -= camera_zoom_speed * dt; }
 		if (input::key_pressed(SDL_SCANCODE_E)) { zoom += camera_zoom_speed * dt; }

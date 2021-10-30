@@ -153,22 +153,28 @@ void player_entity::update(double dt) {
 			}
 		}
 
-		col->pos = pos;
-		if (collision::check_box_collision(col))
-			return;
-
 		if (vel.x > 0) {
 			if (current_node != current_level.path_nodes.size() - 1) {
-				pos = move_towards(pos, current_level.path_nodes[current_node + 1]->pos, 1 * movementSpeed * dt);
+				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node + 1]->pos, 1 * movementSpeed * dt);
 				
+				col->pos = new_pos;
+				if (collision::check_box_collision(col))
+					return;
+
+				pos = new_pos;
 				if(pos == current_level.path_nodes[current_node + 1]->pos)
 					current_node++;
 			}
 		}
 		else if(vel.x < 0) {
 			if (current_node >= 0) {
-				pos = move_towards(pos, current_level.path_nodes[current_node]->pos, 1 * movementSpeed * dt);
-				
+				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node]->pos, 1 * movementSpeed * dt);
+
+				col->pos = new_pos;
+				if (collision::check_box_collision(col))
+					return;
+
+				pos = new_pos;
 				if(pos == current_level.path_nodes[current_node]->pos)
 					current_node--;
 			}

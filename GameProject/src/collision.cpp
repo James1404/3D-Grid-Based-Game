@@ -59,45 +59,6 @@ bool collision::point_vs_collider(const glm::vec2& _point, box_collider* _col) {
 }
 
 bool collision::line_vs_line(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d, glm::vec2& intersection) {
-    /*
-    float ax = b.x - a.x;
-    float ay = b.y - a.y;
-
-    float bx = c.x - d.x;
-    float by = c.y - d.y;
-
-    float dx = c.x - a.x;
-    float dy = c.y - a.y;
-
-    float det = ax * by - ay * bx;
-
-    if (det == 0) return false;
-
-    float r = (dx * by - dy * bx) / det;
-    float s = (ax * dy - ay * dx) / det;
-
-    return !(r < 0 || r > 1 || s < 0 || s > 1);
-    */
-
-    /*
-    float denominator = ((b.x - a.x) * (d.y - c.y)) - ((b.y - a.y) * (d.x - c.x));
-    float numerator1 = ((a.y - c.y) * (d.x - c.x)) - ((a.x - c.x) * (d.y - c.y));
-    float numerator2 = ((a.y - c.y) * (b.x - a.x)) - ((a.x - c.x) * (b.y - a.y));
-
-    if (denominator == 0) return numerator1 == 0 && numerator2 == 0;
-
-    float t = numerator1 / denominator;
-    float u = numerator2 / denominator;
-
-    if ((t > 0 && t < 1) && (u > 0)) {
-        intersection.x = a.x + t * (b.x - a.x);
-        intersection.y = a.y + t * (b.y - a.y);
-        return true;
-    }
-
-    return false;
-    */
-
     float ax = b.x - a.x;
     float ay = b.y - a.y;
 

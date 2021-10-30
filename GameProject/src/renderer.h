@@ -13,13 +13,14 @@
 namespace colour {
 	static const glm::vec3 black = glm::vec3(0, 0, 0);
 	static const glm::vec3 white = glm::vec3(1, 1, 1);
-	static const glm::vec3 grey = glm::vec3(.5, .5, .5);
+	static const glm::vec3 grey = glm::vec3(0.5f, 0.5f, 0.5f);
 	static const glm::vec3 red = glm::vec3(1, 0, 0);
 	static const glm::vec3 green = glm::vec3(0, 1, 0);
 	static const glm::vec3 blue = glm::vec3(0, 0, 1);
 	static const glm::vec3 yellow = glm::vec3(1, 1, 0);
 	static const glm::vec3 cyan = glm::vec3(0, 1, 1);
 	static const glm::vec3 purple = glm::vec3(1, 0, 1);
+	static const glm::vec3 pink = glm::vec3(1, 0.75f, 0.75f);
 };
 
 namespace renderer {
@@ -71,10 +72,10 @@ namespace renderer {
 
 		// void draw_debug();
 
-		void draw_square(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
-		void draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space = false);
 		void draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space = false);
+		void draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
 		void draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
+		void draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space = false);
 	}
 #endif // _DEBUG
 }
