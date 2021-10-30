@@ -54,6 +54,9 @@ struct enemy_entity : public entity {
 	renderer::sprite* spr;
 	collision::box_collider* col;
 
+	const int max_health_points = 3;
+	int current_health_points;
+
 	glm::vec2 vel;
 	int current_node = 0;
 
@@ -65,4 +68,6 @@ struct enemy_entity : public entity {
 	enemy_entity();
 	~enemy_entity();
 	virtual void update(double dt);
+
+	void take_damage(int damage_points);
 };

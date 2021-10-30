@@ -42,8 +42,8 @@ void sprite_entity::update(double dt) {
 
 }
 
-const float enemy_move_speed = 0.1f;
-const float enemy_lunge_speed = 0.2f;
+const float enemy_move_speed = 0.025f;
+const float enemy_lunge_speed = 0.05f;
 const float enemy_attack_damage = 5;
 
 enemy_entity::enemy_entity() {
@@ -58,6 +58,8 @@ enemy_entity::enemy_entity() {
 
 	col = collision::create_collider();
 	col->size = spr->size;
+
+	current_health_points = max_health_points;
 }
 
 enemy_entity::~enemy_entity() {
@@ -66,22 +68,54 @@ enemy_entity::~enemy_entity() {
 }
 
 void enemy_entity::update(double dt) {
+	// ENEMY IS DEAD
+	if (current_health_points <= 0)
+		return;
+
 	if (!current_level.path_nodes.empty()) {
 		// if player is at a node behind ours than walk to
 		// the previous node and vise versa
 		if(player->current_node == current_node) {
 			// start chasing player
-			float x_dir = glm::normalize(player->pos - pos).x;
-			// printf("X Diff %f\n", x_dir);
-			if(x_dir < 0) {
+			if (player->pos.x > pos.x)
+				enemy_direction = ENEMY_DIRECTION_RIGHT;
+			else
+				enemy_direction = ENEMY_DIRECTION_LEFT;
+			
+			spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
+
+			if(enemy_direction == ENEMY_DIRECTION_LEFT) {
 				// player is to the left
-			} else if(x_dir > 0){
+				vel = { -1, 0 };
+				vel *= enemy_move_speed;
+				vel *= dt;
+
+				col->pos = pos + vel;
+				if (collision::check_box_collision(col))
+					return;
+
+				pos += vel;
+			} else if(enemy_direction == ENEMY_DIRECTION_RIGHT){
 				// player is to the right
-			} else {
-				// player x is the same as enemy
+				vel = { 1, 0 };
+				vel *= enemy_move_speed;
+				vel *= dt;
+
+				col->pos = pos + vel;
+				if (collision::check_box_collision(col))
+					return;
+
+				pos += vel;
 			}
+		}
+		else {
+			// move back to start position.
 		}
 	}
 
 	col->pos = pos + vel;
+}
+
+void enemy_entity::take_damage(int damage_points) {
+	current_health_points -= damage_points;
 }
