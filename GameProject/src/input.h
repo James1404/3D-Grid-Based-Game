@@ -28,6 +28,11 @@ namespace input {
 	const glm::ivec2* get_previous_mouse_pos();
 	const glm::ivec2 get_mouse_delta();
 
+	// TODO: implement relative mouse positions.
+	const glm::ivec2 get_relative_mouse_pos();
+	const glm::ivec2 get_relative_previous_mouse_pos();
+	const glm::ivec2 get_relative_mouse_delta();
+
 	void save();
 	void load();
 }
