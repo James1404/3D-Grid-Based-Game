@@ -36,7 +36,7 @@ int main(int argc, char* args[]) {
 		input::load();
 
 		CurrentState = GAME_STATE::GAMEPLAY;
-		current_level.load("testlevel");
+		current_level.load("newtestlevel");
 		current_level.init();
 		
 		player = std::make_shared<player_entity>();
@@ -118,9 +118,6 @@ int main(int argc, char* args[]) {
 		path_node* previous_node = nullptr;
 		for (auto& node : current_level.path_nodes) {
 			glm::vec3 colour = colour::cyan;
-
-			if (node->flags & PATH_NODE_COMBAT)
-				colour = colour::red;
 
 			if (previous_node != nullptr)
 				renderer::debug::draw_line(node->pos, previous_node->pos, colour::green);

@@ -99,9 +99,7 @@ void editor::draw() {
 			
 			ImGui::Separator();
 			ImGui::Text("Number of:");
-			ImGui::Text(" - Obstacles %i", current_level.obstacles.size());
 			ImGui::Text(" - Sprites %i", current_level.sprites.size());
-			ImGui::Text(" - Enemies %i", current_level.enemies.size());
 			ImGui::Text(" - Path Nodes %i", current_level.path_nodes.size());
 
 			ImGui::End();
@@ -154,7 +152,7 @@ void editor::draw() {
 
 			ImGui::Separator();
 
-			static const char* entity_types[] = { "path", "obstacles", "enemies", "sprites", "trigger", "cutscene", "events" };
+			static const char* entity_types[] = { "path", "sprites", "trigger", "cutscene", "events" };
 			static const char* current_entity_type = NULL;
 
 			if(ImGui::BeginCombo("Types", current_entity_type)) {
@@ -179,6 +177,9 @@ void editor::draw() {
 
 							ImGui::PushID(&node);
 							if (ImGui::Selectable(label.c_str(), is_selected)) {
+								current_obstacle = nullptr;
+								current_enemy = nullptr;
+
 								current_path_node = node;
 							}
 
@@ -226,13 +227,9 @@ void editor::draw() {
 
 						static const float button_width = 0.25f;
 
-						/* COMBAT */ {
-							if (ImGui::Button("Combat", { ImGui::GetWindowSize().x * button_width, 0.0f }))
-								PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_COMBAT);
+						ImGui::Checkbox("Is Trigger", &current_path_node->is_trigger);
+						ImGui::InputText("Trigger Event Name", &current_path_node->trigger_event_name);
 
-							ImGui::SameLine();
-							ImGui::Text((current_path_node->flags & PATH_NODE_COMBAT) ? "ON" : "OFF");
-						}
 						/* SLOW */ {
 							if (ImGui::Button("Slow", { ImGui::GetWindowSize().x * button_width, 0.0f }))
 								PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_SLOW);
@@ -248,115 +245,122 @@ void editor::draw() {
 							ImGui::Text((current_path_node->flags & PATH_NODE_FAST) ? "ON" : "OFF");
 						}
 
-						ImGui::PopID();
-					}
-				}
-				/* OBSTACLES */if (current_entity_type == entity_types[1]) {
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& obstacle : current_level.obstacles) {
-							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
+						/* OBSTACLES */ {
+							ImGui::PushID(&current_path_node->obstacles);
+							ImGui::Separator();
+							ImGui::Text("Obstacles");
 
-							std::string label = "Obstacle";
+							if (ImGui::ListBoxHeader("", { -1,0 })) {
+								for (auto& obstacle : current_path_node->obstacles) {
+									const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
 
-							ImGui::PushID(&obstacle);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_obstacle = obstacle;
+									std::string label = "Obstacle";
+
+									ImGui::PushID(&obstacle);
+									if (ImGui::Selectable(label.c_str(), is_selected)) {
+										current_obstacle = obstacle;
+									}
+
+									if (is_selected) {
+
+										ImGui::SetItemDefaultFocus();
+									}
+
+									ImGui::PopID();
+								}
+
+								ImGui::ListBoxFooter();
+							}
+							ImGui::PopID();
+
+							if (ImGui::Button("+")) {
+								auto o = std::make_shared<obstacle_entity>();
+								o->pos = { 0,0 };
+								current_path_node->obstacles.push_back(o);
+								current_obstacle = o;
 							}
 
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
+							ImGui::SameLine();
+							if (ImGui::Button("-")) {
+								current_path_node->obstacles.erase(
+									std::remove(current_path_node->obstacles.begin(),
+									current_path_node->obstacles.end(), current_obstacle),
+									current_path_node->obstacles.end());
+
+								if (!current_path_node->obstacles.empty())
+									current_obstacle = current_path_node->obstacles.back();
+								else
+									current_obstacle = nullptr;
+							}
+
+							if (current_obstacle != nullptr) {
+								ImGui::PushID(current_obstacle.get());
+
+								ImGui::DragFloat2("Position", (float*)&current_obstacle->pos);
+
+								ImGui::PopID();
 							}
 
 							ImGui::PopID();
 						}
+						/* ENEMIES */ {
+							ImGui::PushID(&current_path_node->enemies);
+							ImGui::Separator();
+							ImGui::Text("Enemies");
 
-						ImGui::ListBoxFooter();
-					}
+							if (ImGui::ListBoxHeader("", { -1,0 })) {
+								for (auto& enemy : current_path_node->enemies) {
+									const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
 
-					if (ImGui::Button("+")) {
-						auto o = std::make_shared<obstacle_entity>();
-						o->pos = { 0,0 };
-						current_level.obstacles.push_back(o);
-						current_obstacle = o;
-					}
+									std::string label = "Enemy";
 
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.obstacles.erase(
-							std::remove(current_level.obstacles.begin(),
-							current_level.obstacles.end(), current_obstacle),
-							current_level.obstacles.end());
+									ImGui::PushID(&enemy);
+									if (ImGui::Selectable(label.c_str(), is_selected)) {
+										current_enemy = enemy;
+									}
 
-						if (!current_level.obstacles.empty())
-							current_obstacle = current_level.obstacles.back();
-						else
-							current_obstacle = nullptr;
-					}
+									if (is_selected) {
+										ImGui::SetItemDefaultFocus();
+									}
 
-					ImGui::Separator();
+									ImGui::PopID();
+								}
 
-					if (current_obstacle != nullptr) {
-						ImGui::PushID(current_obstacle.get());
-
-						ImGui::DragFloat2("Position", (float*)&current_obstacle->pos);
-
-						ImGui::PopID();
-					}
-				}
-				/* ENEMIES */if (current_entity_type == entity_types[2]) {
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& enemy : current_level.enemies) {
-							const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
-
-							std::string label = "Enemy";
-
-							ImGui::PushID(&enemy);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_enemy = enemy;
+								ImGui::ListBoxFooter();
 							}
 
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
+							if (ImGui::Button("+")) {
+								auto e = std::make_shared<enemy_entity>();
+								e->pos = { 0,0 };
+								current_path_node->enemies.push_back(e);
+								current_enemy = e;
 							}
 
+							ImGui::SameLine();
+							if (ImGui::Button("-")) {
+								current_path_node->enemies.erase(
+									std::remove(current_path_node->enemies.begin(),
+									current_path_node->enemies.end(), current_enemy),
+									current_path_node->enemies.end());
+
+								if (!current_path_node->enemies.empty())
+									current_enemy = current_path_node->enemies.back();
+								else
+									current_enemy = nullptr;
+							}
+
+							if (current_enemy != nullptr) {
+								ImGui::PushID(current_enemy.get());
+
+								ImGui::DragFloat2("Position", (float*)&current_enemy->pos);
+
+								ImGui::PopID();
+							}
 							ImGui::PopID();
 						}
-
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto e = std::make_shared<enemy_entity>();
-						e->pos = { 0,0 };
-						current_level.enemies.push_back(e);
-						current_enemy = e;
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.enemies.erase(
-							std::remove(current_level.enemies.begin(),
-							current_level.enemies.end(), current_enemy),
-							current_level.enemies.end());
-
-						if (!current_level.enemies.empty())
-							current_enemy = current_level.enemies.back();
-						else
-							current_enemy = nullptr;
-					}
-
-					ImGui::Separator();
-
-					if (current_enemy != nullptr) {
-						ImGui::PushID(current_enemy.get());
-
-						ImGui::DragFloat2("Position", (float*)&current_enemy->pos);
-						ImGui::DragInt("Starting Node", &current_enemy->current_node);
-
-						ImGui::PopID();
 					}
 				}
-				/* SPRITES */if (current_entity_type == entity_types[3]) {
+				/* SPRITES */if (current_entity_type == entity_types[1]) {
 					// TODO: finally implement sprite creation
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto& sprite : current_level.sprites) {
@@ -434,7 +438,7 @@ void editor::draw() {
 						*/
 					}
 				}
-				/* CUTSCENES */if (current_entity_type == entity_types[5]) {
+				/* CUTSCENES */if (current_entity_type == entity_types[2]) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto& cutscene : current_level.cutscenes) {
 							const bool is_selected = (current_cutscene != nullptr) && (current_cutscene == cutscene);
@@ -484,7 +488,7 @@ void editor::draw() {
 						ImGui::PopID();
 					}
 				}
-				/* EVENTS */if (current_entity_type == entity_types[6]) {
+				/* EVENTS */if (current_entity_type == entity_types[4]) {
 					if (ImGui::ListBoxHeader("", { -1,0 })) {
 						for (auto& g_event : current_level.game_events) {
 							const bool is_selected = (current_game_event != nullptr) && (current_game_event == g_event);

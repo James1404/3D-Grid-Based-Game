@@ -32,6 +32,7 @@ bool find_game_event(game_event* _event, std::string _name)  {
 			return true;
 		}	
 	}
+
 	return false;
 }
 
@@ -64,28 +65,29 @@ void level::init() {
 }
 
 void level::update(double dt) {
-	for (auto& _obstacle : obstacles) {
-		_obstacle->update(dt);
+	for (auto& _node : path_nodes) {
+		for (auto& _obstacle : _node->obstacles) {
+			_obstacle->update(dt);
+		}
+
+		for (auto& _enemy : _node->enemies) {
+			_enemy->update(dt);
+		}
 	}
+	
 
 	for (auto& _sprite : sprites) {
 		_sprite->update(dt);
 	}
-
-	for (auto& _enemy : enemies) {
-		_enemy->update(dt);
-	}
 }
 
 void level::clean() {
-	game_events.clear();
 	path_nodes.clear();
+
+	game_events.clear();
 	cutscenes.clear();
 
 	entities.clear();
-
-	obstacles.clear();
-	enemies.clear();
 
 	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 	sprites.clear();
@@ -95,7 +97,7 @@ void level::clean() {
 	printf("CLEANED LEVEL DATA\n");
 }
 
-uint32_t fileVersion = 5;
+uint32_t fileVersion = 6;
 void level::save() {
 	std::string levelPath = "data/scenes/";
 	levelPath.append(name);
@@ -113,6 +115,7 @@ void level::save() {
 			ofs << std::endl;
 		}
 
+		/*
 		if (!obstacles.empty()) {
 			for (auto& _obstacle : obstacles) {
 				ofs << "OBSTACLE" << " " << (int)_obstacle->pos.x << " " << (int)_obstacle->pos.y << std::endl;
@@ -120,18 +123,37 @@ void level::save() {
 
 			ofs << std::endl;
 		}
+		*/
 
 		if (!path_nodes.empty()) {
 			for (auto& _node : path_nodes) {
+				if(!_node->obstacles.empty()) {
+					for(auto& _obstacle : _node->obstacles) {
+						ofs << "OBSTACLE" << " " << (int)_obstacle->pos.x << " " << (int)_obstacle->pos.y << std::endl;
+					}
+
+					ofs << std::endl;
+				}
+
+				if(!_node->enemies.empty()){
+					for(auto& _enemy : _node->enemies) {
+						ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << std::endl;
+					}
+
+					ofs << std::endl;
+				}
+
+				std::string temp_event_name = "NULL";
 				if(_node->is_trigger)
-					ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << _node->event_name << std::endl;
-				else
-					ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << "NULL" << std::endl;
+					temp_event_name = _node->trigger_event_name;
+				
+				ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << temp_event_name << std::endl;
 			}
 
 			ofs << std::endl;
 		}
 
+		/*
 		if (!enemies.empty()) {
 			for (auto& _enemy : enemies) {
 				ofs << "ENEMY" << " " << (int)_enemy->pos.x << " " << (int)_enemy->pos.y << " " << _enemy->current_node << std::endl;
@@ -139,6 +161,7 @@ void level::save() {
 
 			ofs << std::endl;
 		}
+		*/
 
 		if (!sprites.empty()) {
 			for (auto& _sprite : sprites) {
@@ -177,6 +200,9 @@ void level::load(std::string level_name) {
 	if (ifs.is_open()) {
 		printf("PARSING SCENE FILE\n");
 
+		std::vector<std::shared_ptr<enemy_entity>> temp_enemies;
+		std::vector<std::shared_ptr<obstacle_entity>> temp_obstacles;
+
 		std::string line;
 		while (std::getline(ifs, line)) {
 			std::stringstream ss(line);
@@ -211,18 +237,7 @@ void level::load(std::string level_name) {
 				auto o = std::make_shared<obstacle_entity>();
 				o->pos = position;
 
-				obstacles.push_back(o);
-			}
-			else if (type == "PATH_NODE") {
-				glm::vec2 pos;
-				PATH_NODE_FLAGS flags;
-				ss >> pos.x >> pos.y >> flags;
-
-				auto n = std::make_shared<path_node>();
-				n->pos = pos;
-				n->flags = flags;
-
-				path_nodes.push_back(n);
+				temp_obstacles.push_back(o);
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
@@ -231,9 +246,30 @@ void level::load(std::string level_name) {
 
 				auto e = std::make_shared<enemy_entity>();
 				e->pos = position;
-				e->current_node = node;
 
-				enemies.push_back(e);
+				temp_enemies.push_back(e);
+			}
+			else if (type == "PATH_NODE") {
+				glm::vec2 pos;
+				PATH_NODE_FLAGS flags;
+				bool is_trigger;
+				std::string trigger_event_name;
+				ss >> pos.x >> pos.y >> flags >> is_trigger >> trigger_event_name;
+
+				auto n = std::make_shared<path_node>();
+				n->pos = pos;
+				n->flags = flags;
+				n->is_trigger = is_trigger;
+				if (trigger_event_name != "NULL")
+					n->trigger_event_name = trigger_event_name;
+
+				n->enemies = temp_enemies;
+				temp_enemies.clear();
+
+				n->obstacles = temp_obstacles;
+				temp_obstacles.clear();
+
+				path_nodes.push_back(n);
 			}
 			else if (type == "SPRITE") {
 				glm::ivec2 position;
