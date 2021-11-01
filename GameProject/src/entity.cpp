@@ -73,43 +73,37 @@ void enemy_entity::update(double dt) {
 		return;
 
 	if (!current_level.path_nodes.empty()) {
-		// if player is at a node behind ours than walk to
-		// the previous node and vise versa
-		if(player->current_node == current_node) {
-			// start chasing player
-			if (player->pos.x > pos.x)
-				enemy_direction = ENEMY_DIRECTION_RIGHT;
-			else
-				enemy_direction = ENEMY_DIRECTION_LEFT;
-			
-			spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
+		// start chasing player
+		if (player->pos.x > pos.x)
+			enemy_direction = ENEMY_DIRECTION_RIGHT;
+		else
+			enemy_direction = ENEMY_DIRECTION_LEFT;
 
-			if(enemy_direction == ENEMY_DIRECTION_LEFT) {
-				// player is to the left
-				vel = { -1, 0 };
-				vel *= enemy_move_speed;
-				vel *= dt;
+		spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
 
-				col->pos = pos + vel;
-				if (collision::check_box_collision(col))
-					return;
+		if (enemy_direction == ENEMY_DIRECTION_LEFT) {
+			// player is to the left
+			vel = { -1, 0 };
+			vel *= enemy_move_speed;
+			vel *= dt;
 
-				pos += vel;
-			} else if(enemy_direction == ENEMY_DIRECTION_RIGHT){
-				// player is to the right
-				vel = { 1, 0 };
-				vel *= enemy_move_speed;
-				vel *= dt;
+			col->pos = pos + vel;
+			if (collision::check_box_collision(col))
+				return;
 
-				col->pos = pos + vel;
-				if (collision::check_box_collision(col))
-					return;
-
-				pos += vel;
-			}
+			pos += vel;
 		}
-		else {
-			// move back to start position.
+		else if (enemy_direction == ENEMY_DIRECTION_RIGHT) {
+			// player is to the right
+			vel = { 1, 0 };
+			vel *= enemy_move_speed;
+			vel *= dt;
+
+			col->pos = pos + vel;
+			if (collision::check_box_collision(col))
+				return;
+
+			pos += vel;
 		}
 	}
 

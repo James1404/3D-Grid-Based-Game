@@ -133,23 +133,23 @@ void player_entity::update(double dt) {
 			else if(input::button_down("MoveUp"))
 				player_state = PLAYER_STANDING;
 
-			if (current_level.path_nodes[current_node]->flags & PATH_NODE_COMBAT) {
-				if (input::button_pressed("Aim")) {
-					if (input::button_down("Shoot")) {
-						printf("Shoot\n");
+			if (input::button_pressed("Aim")) {
+				if (input::button_down("Shoot")) {
+					printf("Shoot\n");
 
-						collision::ray_data hit;
-						glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
-						float shoot_dir = 100;
-						if (collision::check_linecast_collision(hit, ray_origin, { shoot_dir,0 })) {
-							// damage enemy or who ever you hit
-							printf("Hit Collider\n");
+					collision::ray_data hit;
+					glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
+					float shoot_dir = 100;
+					for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
+						if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
+							printf("Hit Enemy\n");
+							enemy->take_damage(1);
 						}
 					}
-
-					movementSpeed = aim_speed;
-					return;
 				}
+
+				movementSpeed = aim_speed;
+				return;
 			}
 		}
 

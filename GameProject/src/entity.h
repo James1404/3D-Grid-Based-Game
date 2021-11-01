@@ -58,7 +58,6 @@ struct enemy_entity : public entity {
 	int current_health_points;
 
 	glm::vec2 vel;
-	int current_node = 0;
 
 	enum {
 		ENEMY_DIRECTION_LEFT,
