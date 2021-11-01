@@ -68,8 +68,6 @@ struct cutscene {
 struct level {
 	std::string name;
 
-	std::vector<std::shared_ptr<entity>> entities;
-
 	std::vector<std::shared_ptr<cutscene>> cutscenes;
 	std::vector<std::shared_ptr<game_event>> game_events;
 	std::vector<std::shared_ptr<path_node>> path_nodes;
