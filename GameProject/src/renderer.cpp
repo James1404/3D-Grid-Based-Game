@@ -372,13 +372,13 @@ void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const gl
 	glEnableVertexAttribArray(0);
 
 	// DRAW STUFF
-	glUseProgram(square_shader);
+	glUseProgram(line_shader);
 
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
-	glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), screen_space);
+	glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_view"), 1, false, glm::value_ptr(view));
+	glUniform1i(glGetUniformLocation(line_shader, "u_is_screen_space"), screen_space);
 
-	glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(colour));
+	glUniform3fv(glGetUniformLocation(line_shader, "u_color"), 1, glm::value_ptr(colour));
 
 	glBindVertexArray(line_vao);
 	glDrawArrays(GL_LINES, 0, 2);
