@@ -89,13 +89,13 @@ bool collision::line_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _d
     std::map<float, glm::vec2> hit_points;
 
 	glm::vec2 temp_point;
-    if (line_vs_line(_col->pos, { _col->pos.x, _col->pos.y + _col->size.y }, _origin, _direction, temp_point))
+    if (line_vs_line(_col->pos, { _col->pos.x, _col->pos.y + _col->size.y }, _origin, _direction + _origin, temp_point))
         { hit_points.insert({ glm::distance(_origin, temp_point), temp_point }); }
-    if (line_vs_line(_col->pos, { _col->pos.x + _col->size.x, _col->pos.y }, _origin, _direction, temp_point))
+    if (line_vs_line(_col->pos, { _col->pos.x + _col->size.x, _col->pos.y }, _origin, _direction + _origin, temp_point))
         { hit_points.insert({ glm::distance(_origin, temp_point), temp_point }); }
-    if (line_vs_line(_col->pos + (glm::vec2)_col->size, { _col->pos.x, _col->pos.y + _col->size.y }, _origin, _direction, temp_point))
+    if (line_vs_line(_col->pos + (glm::vec2)_col->size, { _col->pos.x, _col->pos.y + _col->size.y }, _origin, _direction + _origin, temp_point))
         { hit_points.insert({ glm::distance(_origin, temp_point), temp_point }); }
-    if (line_vs_line(_col->pos + (glm::vec2)_col->size, { _col->pos.x + _col->pos.x, _col->pos.y }, _origin, _direction, temp_point))
+    if (line_vs_line(_col->pos + (glm::vec2)_col->size, { _col->pos.x + _col->pos.x, _col->pos.y }, _origin, _direction + _origin, temp_point))
         { hit_points.insert({ glm::distance(_origin, temp_point), temp_point }); }
 
     if (hit_points.empty()) return false;
