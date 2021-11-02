@@ -75,7 +75,6 @@ void level::update(double dt) {
 		}
 	}
 	
-
 	for (auto& _sprite : sprites) {
 		_sprite->update(dt);
 	}
@@ -87,7 +86,6 @@ void level::clean() {
 	game_events.clear();
 	cutscenes.clear();
 
-	// TODO: maybe delete sprites from existence on level clear. maybe it might not be worth it.
 	sprites.clear();
 
 	name.clear();

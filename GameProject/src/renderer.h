@@ -58,7 +58,7 @@ namespace renderer {
 		glm::vec3 colour;
 		unsigned int vao;
 
-		// lets keep things squares for now
+		// lets keep things simple squares for now
 		// unsigned int texture;
 	};
 
