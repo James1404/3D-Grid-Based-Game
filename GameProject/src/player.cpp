@@ -11,17 +11,35 @@
 
 std::shared_ptr<player_entity> player;
 
+static float lerp(const float a, const float b, const float t) {
+	return (a * (1.0f - t) + (b * t));
+}
+
+static glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step) {
+	const glm::vec2 delta = target - pos; 		// Gap vector
+	const float len2 = glm::dot(delta, delta); 	// Squared length of the gap
+
+	if (len2 < step * step) // were close enought to close the gap in one step
+		return target;
+
+	// unit vector that points from 'pos' to 'target'
+	const glm::vec2 direction = delta / glm::sqrt(len2);
+
+	// perform the step
+	return pos + step * direction;
+}
+
 struct player_camera : public camera::camera_interface {
 	glm::vec2 offset = { 20,10 };
 
+	glm::vec2 pos;
 	void update(double dt) override {
-		glm::vec2 pos = player->pos + ((glm::vec2)player->spr->size * .5f);
-		pos += offset;
+		// pos = move_towards(pos, player->pos + ((glm::vec2)player->spr->size * .5f) + offset, .125f * dt);
+		pos = player->pos + ((glm::vec2)player->spr->size * .5f) + offset;
 
-		glm::ivec2 casted_pos = (glm::ivec2)pos;
 		view = glm::translate(glm::mat4(1.0f),
-			glm::vec3(casted_pos.x - (renderer::screen_resolution_x / 2),
-			casted_pos.y - (renderer::screen_resolution_y / 2),
+			glm::vec3(pos.x - (renderer::screen_resolution_x / 2),
+			pos.y - (renderer::screen_resolution_y / 2),
 			0.0f));
 
 		view = glm::inverse(view);
@@ -51,19 +69,7 @@ player_entity::~player_entity() {
 	collision::delete_collider(col);
 }
 
-glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step) {
-	const glm::vec2 delta = target - pos; 		// Gap vector
-	const float len2 = glm::dot(delta, delta); 	// Squared length of the gap
-
-	if(len2 < step * step) // were close enought to close the gap in one step
-		return target;
-
-	// unit vector that points from 'pos' to 'target'
-	const glm::vec2 direction = delta / glm::sqrt(len2);
-
-	// perform the step
-	return pos + step * direction;
-}
+const float accel_speed = 0.01f;
 
 const float walk_speed = 0.1f;
 const float run_speed = 0.5f;
@@ -71,6 +77,8 @@ const float crouch_speed = 0.025f;
 const float aim_speed = 0.025f;
 const float slow_speed = 0.05f;
 const float fast_speed = 0.75f;
+
+float prev_movement_speed;
 
 void player_entity::update(double dt) {
 	if(player_state == PLAYER_DEAD)
@@ -109,7 +117,7 @@ void player_entity::update(double dt) {
 		else if(input::button_pressed("MoveRight") && !input::button_down("MoveRight")) { vel.x = 1; }
 		else { vel.x = 0; }
 
-		float movementSpeed = walk_speed;
+		float desired_speed = walk_speed;
 
 		if (current_node != current_level.path_nodes.size() - 1 && current_node >= 0) {
 			if(current_level.path_nodes[current_node]->is_trigger) {
@@ -118,14 +126,14 @@ void player_entity::update(double dt) {
 
 			// set move speed
 			if(player_state == PLAYER_CROUCHED)
-				movementSpeed = crouch_speed;
+				desired_speed = crouch_speed;
 			else if (current_level.path_nodes[current_node]->flags & PATH_NODE_FAST)
-				movementSpeed = fast_speed;
+				desired_speed = fast_speed;
 			else if (current_level.path_nodes[current_node]->flags & PATH_NODE_SLOW)
-				movementSpeed = slow_speed;
+				desired_speed = slow_speed;
 			else
 				if (input::button_pressed("Run"))
-					movementSpeed = run_speed;
+					desired_speed = run_speed;
 
 			// change player state to crouched or standing
 			if(input::button_down("MoveDown"))
@@ -139,7 +147,7 @@ void player_entity::update(double dt) {
 
 					collision::ray_data hit;
 					glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
-					float shoot_dir = 100;
+					float shoot_dir = 100 * ((player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1);
 					for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
 						if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
 							printf("Hit Enemy\n");
@@ -148,14 +156,15 @@ void player_entity::update(double dt) {
 					}
 				}
 
-				movementSpeed = aim_speed;
-				return;
+				desired_speed = aim_speed;
 			}
 		}
 
+		float movementSpeed = lerp(prev_movement_speed, desired_speed, accel_speed * dt);
+
 		if (vel.x > 0) {
 			if (current_node != current_level.path_nodes.size() - 1) {
-				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node + 1]->pos, 1 * movementSpeed * dt);
+				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node + 1]->pos, movementSpeed * dt);
 				
 				col->pos = new_pos;
 				if (collision::check_box_collision(col))
@@ -168,7 +177,7 @@ void player_entity::update(double dt) {
 		}
 		else if(vel.x < 0) {
 			if (current_node >= 0) {
-				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node]->pos, 1 * movementSpeed * dt);
+				glm::vec2 new_pos = move_towards(pos, current_level.path_nodes[current_node]->pos, movementSpeed * dt);
 
 				col->pos = new_pos;
 				if (collision::check_box_collision(col))
@@ -179,5 +188,7 @@ void player_entity::update(double dt) {
 					current_node--;
 			}
 		}
+
+		prev_movement_speed = movementSpeed;
 	}
 }
