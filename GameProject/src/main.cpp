@@ -115,20 +115,7 @@ int main(int argc, char* args[]) {
 		renderer::draw_sprites();
 
 #ifdef _DEBUG
-		path_node* previous_node = nullptr;
-		for (auto& node : current_level.path_nodes) {
-			glm::vec3 colour = colour::cyan;
-
-			if (previous_node != nullptr)
-				renderer::debug::draw_line(node->pos, previous_node->pos, colour::green);
-
-			renderer::debug::draw_circle(node->pos, 2, colour);
-
-			previous_node = node.get();
-		}
-
 		//renderer::debug::draw();
-
 		if (CurrentState == GAME_STATE::EDITOR)
 			editor::draw();
 #endif // _DEBUG

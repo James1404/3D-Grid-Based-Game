@@ -153,7 +153,7 @@ void editor::draw() {
 			ImGui::Separator();
 
 			static const char* entity_types[] = { "path", "sprites", "trigger", "cutscene", "events" };
-			static const char* current_entity_type = NULL;
+			static const char* current_entity_type = entity_types[0];
 
 			if(ImGui::BeginCombo("Types", current_entity_type)) {
 				for (size_t i = 0; i < IM_ARRAYSIZE(entity_types); i++) {
@@ -225,31 +225,30 @@ void editor::draw() {
 						ImGui::Spacing();
 						ImGui::Text("Flags");
 
-						static const float button_width = 0.25f;
+						const float button_width = ImGui::GetWindowSize().x * 0.25f;
 
 						ImGui::Checkbox("Is Trigger", &current_path_node->is_trigger);
 						ImGui::InputText("Trigger Event Name", &current_path_node->trigger_event_name);
 
 						/* SLOW */ {
-							if (ImGui::Button("Slow", { ImGui::GetWindowSize().x * button_width, 0.0f }))
+							if (ImGui::Button("Slow", { button_width, 0.0f }))
 								PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_SLOW);
 
 							ImGui::SameLine();
 							ImGui::Text((current_path_node->flags & PATH_NODE_SLOW) ? "ON" : "OFF");
 						}
 						/* FAST */ {
-							if (ImGui::Button("Fast", { ImGui::GetWindowSize().x * button_width, 0.0f }))
+							if (ImGui::Button("Fast", { button_width, 0.0f }))
 								PATH_NODE_FLAG_TOGGLE(&current_path_node->flags, PATH_NODE_FAST);
 
 							ImGui::SameLine();
 							ImGui::Text((current_path_node->flags & PATH_NODE_FAST) ? "ON" : "OFF");
 						}
 
-						/* OBSTACLES */ {
-							ImGui::PushID(&current_path_node->obstacles);
-							ImGui::Separator();
-							ImGui::Text("Obstacles");
+						ImGui::Separator();
 
+						if (ImGui::CollapsingHeader("Obstacles")) {
+							ImGui::PushID(&current_path_node->obstacles);
 							if (ImGui::ListBoxHeader("", { -1,0 })) {
 								for (auto& obstacle : current_path_node->obstacles) {
 									const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
@@ -262,20 +261,17 @@ void editor::draw() {
 									}
 
 									if (is_selected) {
-
 										ImGui::SetItemDefaultFocus();
 									}
 
 									ImGui::PopID();
 								}
-
 								ImGui::ListBoxFooter();
 							}
-							ImGui::PopID();
 
 							if (ImGui::Button("+")) {
 								auto o = std::make_shared<obstacle_entity>();
-								o->pos = { 0,0 };
+								o->pos = current_path_node->pos;
 								current_path_node->obstacles.push_back(o);
 								current_obstacle = o;
 							}
@@ -300,14 +296,10 @@ void editor::draw() {
 
 								ImGui::PopID();
 							}
-
 							ImGui::PopID();
 						}
-						/* ENEMIES */ {
+						if (ImGui::CollapsingHeader("Enemies")) {
 							ImGui::PushID(&current_path_node->enemies);
-							ImGui::Separator();
-							ImGui::Text("Enemies");
-
 							if (ImGui::ListBoxHeader("", { -1,0 })) {
 								for (auto& enemy : current_path_node->enemies) {
 									const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
@@ -325,13 +317,12 @@ void editor::draw() {
 
 									ImGui::PopID();
 								}
-
 								ImGui::ListBoxFooter();
 							}
 
 							if (ImGui::Button("+")) {
 								auto e = std::make_shared<enemy_entity>();
-								e->pos = { 0,0 };
+								e->pos = current_path_node->pos;
 								current_path_node->enemies.push_back(e);
 								current_enemy = e;
 							}
@@ -358,6 +349,8 @@ void editor::draw() {
 							}
 							ImGui::PopID();
 						}
+
+						ImGui::PopID();
 					}
 				}
 				/* SPRITES */if (current_entity_type == entity_types[1]) {
@@ -546,6 +539,23 @@ void editor::draw() {
 
 			ImGui::End();
 		}
+	}
+
+	if (current_path_node != nullptr) {
+		float box_size = 10.0f;
+		renderer::debug::draw_box({ current_path_node->pos.x - (box_size / 2), current_path_node->pos.y - (box_size / 2) }, { box_size, box_size }, colour::black);
+		renderer::debug::draw_box_wireframe({ current_path_node->pos.x - (box_size / 2), current_path_node->pos.y - (box_size / 2) }, { box_size, box_size }, colour::white);
+	}
+
+	path_node* previous_node = nullptr;
+	for (auto& node : current_level.path_nodes) {
+		glm::vec3 colour = colour::cyan;
+
+		if (previous_node != nullptr)
+			renderer::debug::draw_line(node->pos, previous_node->pos, colour::green);
+
+		renderer::debug::draw_circle(node->pos, 2, colour);
+		previous_node = node.get();
 	}
 
 	ImGui::Render();
