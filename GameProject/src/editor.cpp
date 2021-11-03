@@ -60,7 +60,6 @@ static std::shared_ptr<path_node> current_path_node = nullptr;
 static std::shared_ptr<sprite_entity> current_sprite = nullptr;
 static std::shared_ptr<enemy_entity> current_enemy = nullptr;
 static std::shared_ptr<cutscene> current_cutscene = nullptr;
-static std::shared_ptr<game_event> current_game_event = nullptr;
 
 void editor::clear_selected() {
 	current_obstacle = nullptr;
@@ -68,7 +67,6 @@ void editor::clear_selected() {
 	current_sprite = nullptr;
 	current_enemy = nullptr;
 	current_cutscene = nullptr;
-	current_game_event = nullptr;
 }
 
 void editor::draw() {
@@ -152,7 +150,7 @@ void editor::draw() {
 
 			ImGui::Separator();
 
-			static const char* entity_types[] = { "path", "sprites", "trigger", "cutscene", "events" };
+			static const char* entity_types[] = { "path", "sprites", "cutscene" };
 			static const char* current_entity_type = entity_types[0];
 
 			if(ImGui::BeginCombo("Types", current_entity_type)) {
@@ -478,59 +476,7 @@ void editor::draw() {
 					if (current_cutscene != nullptr) {
 						ImGui::PushID(&current_cutscene);
 
-						ImGui::PopID();
-					}
-				}
-				/* EVENTS */if (current_entity_type == entity_types[4]) {
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& g_event : current_level.game_events) {
-							const bool is_selected = (current_game_event != nullptr) && (current_game_event == g_event);
-
-							std::string label = "Empty Event";
-							if (!g_event->event_name.empty())
-								label = g_event->event_name;
-
-							ImGui::PushID(&g_event);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_game_event = g_event;
-							}
-
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-
-							ImGui::PopID();
-						}
-
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto e = std::make_shared<game_event>();
-
-						current_level.game_events.push_back(e);
-						current_game_event = current_level.game_events.back();
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.game_events.erase(
-							std::remove(current_level.game_events.begin(),
-							current_level.game_events.end(), current_game_event),
-							current_level.game_events.end());
-
-						if (!current_level.game_events.empty())
-							current_game_event = current_level.game_events.back();
-						else
-							current_game_event = nullptr;
-					}
-
-					ImGui::Separator();
-
-					if (current_game_event != nullptr) {
-						ImGui::PushID(&current_game_event);
-
-						ImGui::InputText("Name", &current_game_event->event_name, ImGuiInputTextFlags_CharsNoBlank);
+						ImGui::InputText("event name", &current_cutscene->event_name);
 
 						ImGui::PopID();
 					}

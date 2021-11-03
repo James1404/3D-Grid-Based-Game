@@ -11,49 +11,56 @@ level current_level;
 // EVENTS
 //
 
-void game_event::register_function(callback_function func) {
-	registered_functions.push_back(*func);
+void event_manager::register_function(std::string _event_name, listener* _listener) {
+	events.emplace(_event_name, _listener);
 }
 
-void game_event::remove_function(callback_function func) {
-	registered_functions.erase(std::remove(registered_functions.begin(), registered_functions.end(), func), registered_functions.end());
-}
-
-void game_event::notify() {
-	for(auto& func : registered_functions) {
-			func();
+void event_manager::remove_function(std::string _event_name, listener* _listener) {
+	auto range = events.equal_range(_event_name);
+	for(auto i = range.first; i != range.second; ++i) {
+		if(i->second == _listener) {
+			events.erase(i);
+			break;
+		}
 	}
 }
 
-bool find_game_event(game_event* _event, std::string _name)  {
-	for(auto& e : current_level.game_events) {
-		if(e->event_name == _name) {
-			_event = e.get();
-			return true;
-		}	
+void event_manager::notify(std::string _event_name) {
+	auto range = events.equal_range(_event_name);
+	for(auto i = range.first; i != range.second; ++i) {
+		i->second->on_notify();
 	}
+}
 
-	return false;
+void event_manager::clear() {
+	events.clear();
 }
 
 //
-// CUTSCENE
+// LISTENERS 
 //
 
 void cutscene::init() {
-
+	current_level.game_event_manager.register_function(event_name, this);
 }
 
 void cutscene::clean() {
-
-}
-
-void cutscene::start_cutscene() {
-
+	current_level.game_event_manager.remove_function(event_name, this);
 }
 
 void cutscene::update(double dt) {
+	if (is_active) {
+		// start cutscene
+		printf("Updating cutscene %p\n", this);
+	}
+}
 
+void cutscene::on_notify() {
+	if (is_active)
+		return;
+
+	printf("Started Cutscene %p\n", this);
+	is_active = true;
 }
 
 //
@@ -61,7 +68,9 @@ void cutscene::update(double dt) {
 //
 
 void level::init() {
-
+	for (auto& _cutscene : cutscenes) {
+		_cutscene->init();
+	}
 }
 
 void level::update(double dt) {
@@ -78,12 +87,16 @@ void level::update(double dt) {
 	for (auto& _sprite : sprites) {
 		_sprite->update(dt);
 	}
+
+	for (auto& _cutscene : cutscenes) {
+		_cutscene->update(dt);
+	}
 }
 
 void level::clean() {
 	path_nodes.clear();
 
-	game_events.clear();
+	game_event_manager.clear();
 	cutscenes.clear();
 
 	sprites.clear();
@@ -102,24 +115,6 @@ void level::save() {
 	std::ofstream ofs(levelPath, std::ofstream::trunc);
 	if (ofs.is_open()) {
 		ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
-
-		if (!game_events.empty()) {
-			for (auto& _event : game_events) {
-				ofs << "EVENT" << " " << _event->event_name << std::endl;
-			}
-
-			ofs << std::endl;
-		}
-
-		/*
-		if (!obstacles.empty()) {
-			for (auto& _obstacle : obstacles) {
-				ofs << "OBSTACLE" << " " << (int)_obstacle->pos.x << " " << (int)_obstacle->pos.y << std::endl;
-			}
-
-			ofs << std::endl;
-		}
-		*/
 
 		if (!path_nodes.empty()) {
 			for (auto& _node : path_nodes) {
@@ -172,7 +167,7 @@ void level::save() {
 
 		if(!cutscenes.empty()){
 			for (auto& _cutscene : cutscenes) {
-				ofs << "CUTSCENE" << " " << std::endl;
+				ofs << "CUTSCENE" << " " << _cutscene->event_name << " " << std::endl;
 			}
 
 			ofs << std::endl;
@@ -216,17 +211,8 @@ void level::load(std::string level_name) {
 				}
 			}
 
-			if (type == "EVENT") {
-				std::string name;
 
-				ss >> name;
-
-				auto e = std::make_shared<game_event>();
-				e->event_name = name;
-
-				game_events.push_back(e);
-			}
-			else if (type == "OBSTACLE") {
+			if (type == "OBSTACLE") {
 				glm::ivec2 position;
 				ss >> position.x >> position.y;
 
@@ -290,7 +276,12 @@ void level::load(std::string level_name) {
 				sprites.push_back(s);
 			}
 			else if (type == "CUTSCENE") {
+				std::string event_name;
+
+				ss >> event_name;
+
 				auto c = std::make_shared<cutscene>();
+				c->event_name = event_name;
 
 				cutscenes.push_back(c);
 			}

@@ -121,7 +121,7 @@ void player_entity::update(double dt) {
 
 		if (current_node != current_level.path_nodes.size() - 1 && current_node >= 0) {
 			if(current_level.path_nodes[current_node]->is_trigger) {
-				// trigger event
+				current_level.game_event_manager.notify(current_level.path_nodes[current_node]->trigger_event_name);
 			}
 
 			// set move speed

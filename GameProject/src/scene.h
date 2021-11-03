@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 //
 // PATH
@@ -36,29 +38,34 @@ struct path_node {
 // EVENTS
 //
 
-typedef void (*callback_function)(void);
-struct game_event {
-	std::vector<callback_function> registered_functions;
-	
-	std::string event_name;
-
-	void register_function(callback_function func);
-	void remove_function(callback_function func);
-	void notify();
+struct listener {
+	virtual ~listener() {}
+	virtual void on_notify() = 0;
 };
 
-static bool find_game_event(game_event* _event, std::string _name);
+struct event_manager {
+	std::unordered_multimap<std::string, listener*> events;
+
+	void register_function(std::string _event_name, listener* _listener);
+	void remove_function(std::string _event_name, listener* _listener);
+	void notify(std::string _event_name);
+	void clear();
+};
 
 //
-// CUTSCENE
+// LISTENERS
 //
 
-struct cutscene {
+struct cutscene : public listener {
+	std::string event_name;
+
 	void init();
 	void clean();
-
-	static void start_cutscene();
 	void update(double dt);
+
+	void on_notify() override;
+
+	bool is_active = false;
 };
 
 //
@@ -68,8 +75,9 @@ struct cutscene {
 struct level {
 	std::string name;
 
+	event_manager game_event_manager;
+
 	std::vector<std::shared_ptr<cutscene>> cutscenes;
-	std::vector<std::shared_ptr<game_event>> game_events;
 	std::vector<std::shared_ptr<path_node>> path_nodes;
 
 	std::vector<std::shared_ptr<sprite_entity>> sprites;
