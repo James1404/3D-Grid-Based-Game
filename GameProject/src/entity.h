@@ -69,4 +69,5 @@ struct enemy_entity : public entity {
 	virtual void update(double dt);
 
 	void take_damage(int damage_points);
+	void stagger(int stagger_time);
 };

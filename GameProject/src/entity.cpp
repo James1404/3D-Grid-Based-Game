@@ -81,30 +81,19 @@ void enemy_entity::update(double dt) {
 
 		spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
 
-		if (enemy_direction == ENEMY_DIRECTION_LEFT) {
-			// player is to the left
-			vel = { -1, 0 };
-			vel *= enemy_move_speed;
-			vel *= dt;
+		if (enemy_direction == ENEMY_DIRECTION_LEFT)
+			vel.x = -1;
+		else if (enemy_direction == ENEMY_DIRECTION_RIGHT)
+			vel.x = 1;
 
-			col->pos = pos + vel;
-			if (collision::check_box_collision(col))
-				return;
+		vel *= enemy_move_speed;
+		vel *= dt;
 
-			pos += vel;
-		}
-		else if (enemy_direction == ENEMY_DIRECTION_RIGHT) {
-			// player is to the right
-			vel = { 1, 0 };
-			vel *= enemy_move_speed;
-			vel *= dt;
+		col->pos = pos + vel;
+		if (collision::check_box_collision(col))
+			return;
 
-			col->pos = pos + vel;
-			if (collision::check_box_collision(col))
-				return;
-
-			pos += vel;
-		}
+		pos += vel;
 	}
 
 	col->pos = pos + vel;
@@ -112,4 +101,10 @@ void enemy_entity::update(double dt) {
 
 void enemy_entity::take_damage(int damage_points) {
 	current_health_points -= damage_points;
+}
+
+void enemy_entity::stagger(int stagger_time) {
+	// stagger for a certain amount of time then go back
+	// to normal state
+	printf("Enemy is staggered\n");
 }
