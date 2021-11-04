@@ -5,11 +5,6 @@
 #include "renderer.h"
 #include "input.h"
 
-#ifdef _DEBUG
-#include <imgui_impl_sdl.h>
-#include "editor.h"
-#endif // _DEBUG
-
 #include "player.h"
 #include "camera.h"
 
@@ -20,10 +15,7 @@ SDL_Event event;
 bool isRunning = false;
 
 enum class GAME_STATE {
-	GAMEPLAY,
-#ifdef _DEBUG
-	EDITOR
-#endif // _DEBUG
+	GAMEPLAY
 } static CurrentState;
 
 Uint64 NOW = SDL_GetPerformanceCounter(), LAST = 0;
@@ -36,15 +28,15 @@ int main(int argc, char* args[]) {
 		input::load();
 
 		CurrentState = GAME_STATE::GAMEPLAY;
-		current_level.load("newtestlevel");
+
+		// LEVEL NAMES :
+		// combattestlevel
+		// newtestlevel
+
+		current_level.load("combattestlevel");
 		current_level.init();
 		
 		player = std::make_shared<player_entity>();
-
-#ifdef _DEBUG
-		CurrentState = GAME_STATE::EDITOR;
-		editor::init();
-#endif // _DEBUG
 
 		isRunning = true;
 	}
@@ -52,9 +44,6 @@ int main(int argc, char* args[]) {
 	while (isRunning) {
 		/* ----- HANDLE EVENTS ----- */
 		if (SDL_PollEvent(&event)) {
-#ifdef _DEBUG
-			ImGui_ImplSDL2_ProcessEvent(&event);
-#endif // _DEBUG
 			switch (event.type) {
 			case SDL_QUIT:
 				isRunning = false;
@@ -78,28 +67,6 @@ int main(int argc, char* args[]) {
 		NOW = SDL_GetPerformanceCounter();
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-#ifdef _DEBUG
-		if (input::button_down("Exit")) {
-			if (CurrentState == GAME_STATE::EDITOR) {
-				CurrentState = GAME_STATE::GAMEPLAY;
-			}
-			else if (CurrentState == GAME_STATE::GAMEPLAY) {
-				current_level.load(current_level.name);
-				current_level.init();
-				editor::clear_selected();
-
-				if (!current_level.path_nodes.empty())
-					player->pos = current_level.path_nodes.front()->pos;
-				else
-					player->pos = { 0,0 };
-
-				player->current_node = 0;
-
-				CurrentState = GAME_STATE::EDITOR;
-			}
-		}
-#endif // _DEBUG
-
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
 			player->update(dt);
 			current_level.update(dt);
@@ -114,22 +81,12 @@ int main(int argc, char* args[]) {
 
 		renderer::draw_sprites();
 
-#ifdef _DEBUG
-		//renderer::debug::draw();
-		if (CurrentState == GAME_STATE::EDITOR)
-			editor::draw();
-#endif // _DEBUG
-		
 		renderer::stop_draw();
 	}
 
 	/* ----- CLEAN GAME ----- */
 	printf("----------------\n");
 	printf("STARTING CLEANUP\n");
-
-#ifdef _DEBUG
-	editor::clean();
-#endif // _DEBUG
 
 	current_level.clean();
 
