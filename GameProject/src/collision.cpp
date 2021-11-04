@@ -34,14 +34,12 @@ void collision::delete_collider(box_collider* _collider) {
     }
 }
 
-bool collision::collider_vs_collider(box_collider* _col1, box_collider* _col2) {
-	if (_col1->id != _col2->id) {
-        if (_col1->pos.x < _col2->pos.x +  _col2->size.x &&
-            _col1->pos.x + _col1->size.x > _col2->pos.x &&
-            _col1->pos.y < _col2->pos.y +  _col2->size.y&&
-			_col1->pos.y + _col1->size.y > _col2->pos.y) {
-			return true;
-        }
+bool collision::box_vs_box(glm::vec2 pos1, glm::ivec2 size1, glm::vec2 pos2, glm::ivec2 size2) {
+	if (pos1.x < pos2.x + size2.x &&
+    	pos1.x + size1.x > pos2.x &&
+        pos1.y < pos2.y + size2.y &&
+		pos1.y + size1.y > pos2.y) {
+		return true;
 	}
 
     return false;
@@ -109,7 +107,10 @@ bool collision::line_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _d
 
 bool collision::check_box_collision(box_collider* _collider) {
     for (const auto& collider : collider_list) {
-        if (collider_vs_collider(_collider, collider.get())) {
+        if (_collider->id == collider->id)
+            continue;
+
+        if (box_vs_box(_collider->pos, _collider->size, collider->pos, collider->size)) {
             return true;
         }
 	}

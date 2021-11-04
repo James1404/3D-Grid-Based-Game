@@ -22,7 +22,7 @@ namespace collision {
         box_collider* col;
     };
 
-	bool collider_vs_collider(box_collider* _col1, box_collider* _col2);
+	bool box_vs_box(glm::vec2 pos1, glm::ivec2 size1, glm::vec2 pos2, glm::ivec2 size2);
     bool point_vs_collider(const glm::vec2& _point, box_collider* _col);
     bool line_vs_line(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d, glm::vec2& intersection);
     bool line_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction, box_collider* _col);
