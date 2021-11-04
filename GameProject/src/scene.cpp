@@ -51,7 +51,6 @@ void cutscene::clean() {
 void cutscene::update(double dt) {
 	if (is_active) {
 		// start cutscene
-		printf("Updating cutscene %p\n", this);
 	}
 }
 
@@ -59,7 +58,7 @@ void cutscene::on_notify() {
 	if (is_active)
 		return;
 
-	printf("Started Cutscene %p\n", this);
+	printf("Started Cutscene %p %s\n", this, event_name.c_str());
 	is_active = true;
 }
 
@@ -135,10 +134,10 @@ void level::save() {
 				}
 
 				std::string temp_event_name = "NULL";
-				if(_node->is_trigger)
+				if(!_node->trigger_event_name.empty())
 					temp_event_name = _node->trigger_event_name;
 				
-				ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << _node->is_trigger << " " << temp_event_name << std::endl;
+				ofs << "PATH_NODE" << " " << (int)_node->pos.x << " " << (int)_node->pos.y << " " << _node->flags << " " << temp_event_name << std::endl;
 			}
 
 			ofs << std::endl;
@@ -211,7 +210,6 @@ void level::load(std::string level_name) {
 				}
 			}
 
-
 			if (type == "OBSTACLE") {
 				glm::ivec2 position;
 				ss >> position.x >> position.y;
@@ -234,14 +232,12 @@ void level::load(std::string level_name) {
 			else if (type == "PATH_NODE") {
 				glm::vec2 pos;
 				PATH_NODE_FLAGS flags;
-				bool is_trigger;
 				std::string trigger_event_name;
-				ss >> pos.x >> pos.y >> flags >> is_trigger >> trigger_event_name;
+				ss >> pos.x >> pos.y >> flags >> trigger_event_name;
 
 				auto n = std::make_shared<path_node>();
 				n->pos = pos;
 				n->flags = flags;
-				n->is_trigger = is_trigger;
 				if (trigger_event_name != "NULL")
 					n->trigger_event_name = trigger_event_name;
 

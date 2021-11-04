@@ -280,6 +280,8 @@ void input::load() {
 		MAPPED_INPUTS.insert({"Shoot", INPUT(SDL_SCANCODE_SPACE, KEYBOARD)});
 		MAPPED_INPUTS.insert({"Shoot", INPUT(MOUSE_LEFT, MOUSE)});
 
+		MAPPED_INPUTS.insert({ "Grab", INPUT(SDL_SCANCODE_E, KEYBOARD) });
+
 		//
 		// -- MISC INPUT --
 		//

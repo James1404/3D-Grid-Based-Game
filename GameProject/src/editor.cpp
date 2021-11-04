@@ -225,8 +225,7 @@ void editor::draw() {
 
 						const float button_width = ImGui::GetWindowSize().x * 0.25f;
 
-						ImGui::Checkbox("Is Trigger", &current_path_node->is_trigger);
-						ImGui::InputText("Trigger Event Name", &current_path_node->trigger_event_name);
+						ImGui::InputText("Trigger Event Name", &current_path_node->trigger_event_name, ImGuiInputTextFlags_CharsNoBlank);
 
 						/* SLOW */ {
 							if (ImGui::Button("Slow", { button_width, 0.0f }))
@@ -476,7 +475,7 @@ void editor::draw() {
 					if (current_cutscene != nullptr) {
 						ImGui::PushID(&current_cutscene);
 
-						ImGui::InputText("event name", &current_cutscene->event_name);
+						ImGui::InputText("event name", &current_cutscene->event_name, ImGuiInputTextFlags_CharsNoBlank);
 
 						ImGui::PopID();
 					}

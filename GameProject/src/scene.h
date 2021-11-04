@@ -27,7 +27,6 @@ struct path_node {
 	glm::vec2 pos = { 0,0 };
 	PATH_NODE_FLAGS flags = 0;
 
-	bool is_trigger = false;
 	std::string trigger_event_name = "";
 
 	std::vector<std::shared_ptr<enemy_entity>> enemies;
