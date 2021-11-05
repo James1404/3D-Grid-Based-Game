@@ -28,6 +28,8 @@ namespace collision {
     bool line_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction, box_collider* _col);
 
     bool check_box_collision(box_collider* _collider);
+    bool check_box_collision(glm::vec2 _pos, glm::ivec2 _size);
+
     bool check_linecast_collision(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
     bool check_point_collision(const glm::vec2& _point);
 }

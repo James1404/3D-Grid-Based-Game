@@ -118,6 +118,16 @@ bool collision::check_box_collision(box_collider* _collider) {
     return false;
 }
 
+bool collision::check_box_collision(glm::vec2 _pos, glm::ivec2 _size) {
+    for (const auto& collider : collider_list) {
+        if (box_vs_box(_pos, _size, collider->pos, collider->size)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool collision::check_linecast_collision(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction) {
     std::map<float, ray_data> hits;
     
