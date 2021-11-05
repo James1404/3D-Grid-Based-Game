@@ -121,19 +121,11 @@ void renderer::init() {
 
 	sprite_shader = create_shader("data/shaders/core.vs", "data/shaders/core.fs");
 
-#ifdef _DEBUG
-	debug::init_debug();
-#endif // _DEBUG
-
 	printf("SUCCESFULY COMPLETED RENDERER INITIALIZATION\n");
 }
 
 void renderer::clean() {
 	glDeleteProgram(sprite_shader);
-
-#ifdef _DEBUG
-	debug::clean_debug();
-#endif // _DEBUG
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
@@ -317,6 +309,23 @@ void renderer::delete_sprite(renderer::sprite* _sprite) {
 // ----- DEBUG RENDERER -----
 //
 
+renderer::debug::debug_drawing::debug_drawing() {
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+}
+
+renderer::debug::debug_drawing::~debug_drawing() {
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ebo);
+	glDeleteVertexArrays(1, &vao);
+}
+
 unsigned int square_shader;
 unsigned int circle_shader;
 unsigned int line_shader;
@@ -327,71 +336,85 @@ void renderer::debug::init_debug() {
 }
 
 void renderer::debug::clean_debug() {
+	clear_debug_list();
+
 	glDeleteProgram(square_shader);
 	glDeleteProgram(circle_shader);
 	glDeleteProgram(line_shader);
 }
 
-/*
-std::vector<unsigned int> square_draw_list;
-std::vector<unsigned int> circle_draw_list;
-std::vector<unsigned int> line_draw_list;
+std::vector<std::shared_ptr<renderer::debug::debug_drawing>> square_draw_list;
+std::vector<std::shared_ptr<renderer::debug::debug_drawing>> circle_draw_list;
+std::vector<std::shared_ptr<renderer::debug::debug_drawing>> line_draw_list;
 
-void renderer::debug:draw_debug() {
-	for(const auto& square : square_draw_list) {
+void renderer::debug::clear_debug_list () {
+	square_draw_list.clear();
+	circle_draw_list.clear();
+	line_draw_list.clear();
+}
 
+void renderer::debug::draw_debug() {
+	for(auto& square : square_draw_list) {
+		glUseProgram(square_shader);
+
+		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), square->screen_space);
+
+		glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(square->colour));
+
+		glBindVertexArray(square->vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
-	for(const auto& circle : circle_draw_list) {
+	for(auto& circle : circle_draw_list) {
+		glUseProgram(circle_shader);
 
+		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniform1i(glGetUniformLocation(circle_shader, "u_is_screen_space"), circle->screen_space);
+
+		glUniform3fv(glGetUniformLocation(circle_shader, "u_color"), 1, glm::value_ptr(circle->colour));
+
+		glBindVertexArray(circle->vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
-	for(const auto& line : line_draw_list) {
+	for(auto& line : line_draw_list) {
+		glUseProgram(line_shader);
 
+		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniform1i(glGetUniformLocation(line_shader, "u_is_screen_space"), line->screen_space);
+
+		glUniform3fv(glGetUniformLocation(line_shader, "u_color"), 1, glm::value_ptr(line->colour));
+
+		glBindVertexArray(line->vao);
+		glDrawArrays(GL_LINES, 0, 2);
 	}
 }
-*/
 
 void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
-	unsigned int line_vao, line_vbo;
-
 	float vertices[] = {
 		p1.x, p1.y,	// first point
 		p2.x, p2.y	// second point
 	};
 
-	glGenVertexArrays(1, &line_vao);
-	glBindVertexArray(line_vao);
+	auto drawing = std::make_shared<debug_drawing>();
 
-	glGenBuffers(1, &line_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+	drawing->screen_space = screen_space;
+	drawing->colour = colour;
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	// DRAW STUFF
-	glUseProgram(line_shader);
-
-	glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_view"), 1, false, glm::value_ptr(view));
-	glUniform1i(glGetUniformLocation(line_shader, "u_is_screen_space"), screen_space);
-
-	glUniform3fv(glGetUniformLocation(line_shader, "u_color"), 1, glm::value_ptr(colour));
-
-	glBindVertexArray(line_vao);
-	glDrawArrays(GL_LINES, 0, 2);
-
-	// DELETE BUFFERS
-	glDeleteBuffers(1, &line_vbo);
-	glDeleteVertexArrays(1, &line_vao);
+	line_draw_list.push_back(drawing);
 }
 
 void renderer::debug::draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
-	unsigned int square_vao, square_vbo, square_ebo;
-
 	float vertices[] = {
 		position.x + size.x, position.y + size.y,	// top right
 		position.x + size.x, position.y,			// bottom right
@@ -404,36 +427,18 @@ void renderer::debug::draw_box(const glm::vec2 position, const glm::vec2 size, c
 		1, 2, 3  // second triangle
 	};
 
-	glGenVertexArrays(1, &square_vao);
-	glBindVertexArray(square_vao);
+	auto drawing = std::make_shared<debug_drawing>();
 
-	glGenBuffers(1, &square_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
+	drawing->screen_space = screen_space;
+	drawing->colour = colour;
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	glGenBuffers(1, &square_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// DRAW STUFF
-	glUseProgram(square_shader);
-
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
-	glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), screen_space);
-
-	glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(colour));
-
-	glBindVertexArray(square_vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	// DELETE BUFFERS
-	glDeleteBuffers(1, &square_vbo);
-	glDeleteBuffers(1, &square_ebo);
-	glDeleteVertexArrays(1, &square_vao);
+	square_draw_list.push_back(drawing);
 }
 
 void renderer::debug::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
@@ -445,8 +450,6 @@ void renderer::debug::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 si
 
 void renderer::debug::draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
-	unsigned int circle_vao, circle_vbo, circle_ebo;
-
 	float vertices[] = {
 		position.x + (radius * .5f), position.y + (radius * .5f),	// top right
 		position.x + (radius * .5f), position.y - (radius * .5f),	// bottom right
@@ -467,11 +470,10 @@ void renderer::debug::draw_circle(const glm::vec2 position, const float radius, 
 		1, 2, 3  // second triangle
 	};
 
-	glGenVertexArrays(1, &circle_vao);
-	glBindVertexArray(circle_vao);
+	auto drawing = std::make_shared<debug_drawing>();
 
-	glGenBuffers(1, &circle_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, circle_vbo);
+	drawing->screen_space = screen_space;
+	drawing->colour = colour;
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texcoords), NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
@@ -482,25 +484,8 @@ void renderer::debug::draw_circle(const glm::vec2 position, const float radius, 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	glGenBuffers(1, &circle_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, circle_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// DRAW STUFF
-	glUseProgram(circle_shader);
-
-	glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_view"), 1, false, glm::value_ptr(view));
-	glUniform1i(glGetUniformLocation(circle_shader, "u_is_screen_space"), screen_space);
-
-	glUniform3fv(glGetUniformLocation(circle_shader, "u_color"), 1, glm::value_ptr(colour));
-
-	glBindVertexArray(circle_vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	// DELETE BUFFERS
-	glDeleteBuffers(1, &circle_vbo);
-	glDeleteBuffers(1, &circle_ebo);
-	glDeleteVertexArrays(1, &circle_vao);
+	circle_draw_list.push_back(drawing);
 }
 #endif // _DEBUG

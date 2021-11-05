@@ -24,6 +24,7 @@ int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		renderer::init();
+		renderer::debug::init_debug();
 
 		input::init();
 		input::load();
@@ -63,6 +64,11 @@ int main(int argc, char* args[]) {
 		}
 
 		/* ----- UPDATE GAME ----- */
+		renderer::debug::clear_debug_list();
+
+		renderer::debug::draw_circle({ 100, 75 }, 5, colour::pink);
+		renderer::debug::draw_line({ 0,0 }, { 100,75 }, colour::pink);
+
 		// calculate delta time;
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
@@ -82,6 +88,8 @@ int main(int argc, char* args[]) {
 
 		renderer::draw_sprites();
 
+		renderer::debug::draw_debug();
+
 		renderer::stop_draw();
 	}
 
@@ -91,6 +99,7 @@ int main(int argc, char* args[]) {
 
 	current_level.clean();
 
+	renderer::debug::clean_debug();
 	renderer::clean();
 
 	printf("CLEANUP FINISHED\n");

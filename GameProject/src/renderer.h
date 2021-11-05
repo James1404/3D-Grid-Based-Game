@@ -67,10 +67,21 @@ namespace renderer {
 
 #ifdef _DEBUG
 	namespace debug {
+		struct debug_drawing {
+			unsigned int vao, vbo, ebo;
+
+			bool screen_space;
+			glm::vec3 colour;
+
+			debug_drawing();
+			~debug_drawing();
+		};
+
 		void init_debug();
 		void clean_debug();
 
-		// void draw_debug();
+		void clear_debug_list();
+		void draw_debug();
 
 		void draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space = false);
 		void draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space = false);
