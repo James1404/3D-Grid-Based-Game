@@ -10,24 +10,33 @@ struct player_entity : public entity {
 	collision::box_collider* col;
 
 	int current_node = 0;
-	
+
+	const int max_health_points = 3;
+	int current_health_points;
+
 	enum {
 		PLAYER_DIRECTION_LEFT,
 		PLAYER_DIRECTION_RIGHT
 	} player_direction;
-	
+
 	enum {
-		PLAYER_STANDING,
-		PLAYER_CROUCHED,
-		PLAYER_STAGGERED,
+		PLAYER_STANCE_STANDING,
+		PLAYER_STANCE_CROUCHED
+	} player_stance;
+
+	enum {
+		PLAYER_IDLE,
 		PLAYER_AIMING,
 		PLAYER_RELOADING,
+		PLAYER_STAGGERED,
 		PLAYER_DEAD
 	} player_state;
 
 	player_entity();
 	~player_entity();
-	virtual void update(double dt);
+	void update(double dt) override;
+
+	void take_damage(int damage_amount);
 };
 
 extern std::shared_ptr<player_entity> player;

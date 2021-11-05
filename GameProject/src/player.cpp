@@ -61,7 +61,10 @@ player_entity::player_entity() {
 	col->size = spr->size;
 
 	player_direction = PLAYER_DIRECTION_RIGHT;
-	player_state = PLAYER_STANDING;
+	player_stance = PLAYER_STANCE_STANDING;
+	player_state = PLAYER_IDLE;
+
+	current_health_points = max_health_points;
 
 	camera::register_camera("Player", std::make_shared<player_camera>());
 }
@@ -75,10 +78,8 @@ const float accel_speed = 0.01f;
 
 const float walk_speed = 0.1f;
 const float run_speed = 0.5f;
-const float crouch_speed = 0.025f;
+const float crouch_speed = 0.05f;
 const float aim_speed = 0.025f;
-const float slow_speed = 0.05f;
-const float fast_speed = 0.75f;
 
 float prev_movement_speed;
 
@@ -89,31 +90,19 @@ uint32_t start_grab_time;
 uint32_t time_until_next_grab = 1000;
 
 void player_entity::update(double dt) {
+	camera::set_camera("Player");
+
+	// printf("current state: %i; prev state: %i;\n", player_state, player_prev_state);
+
 	if(player_state == PLAYER_DEAD)
 		return;
 
-	camera::set_camera("Player");
-
-	// set move speed
-	float desired_speed = walk_speed;
-
-	if (current_level.path_nodes[current_node]->flags & PATH_NODE_FAST) {
-		desired_speed = fast_speed;
-	}
-	else if (current_level.path_nodes[current_node]->flags & PATH_NODE_SLOW) {
-		desired_speed = slow_speed;
-	}
-	else if (input::button_pressed("Run")) {
-		player_state = PLAYER_STANDING;
-		desired_speed = run_speed;
-	}
-	else if (player_state == PLAYER_CROUCHED) {
-		desired_speed = crouch_speed;
-	}
-
 	// change player direction
 	float x_vel = 0;
-	if (input::button_pressed("MoveLeft")) {
+	if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) {
+		x_vel = 0;
+	}
+	else if (input::button_pressed("MoveLeft")) {
 		player_direction = PLAYER_DIRECTION_LEFT;
 		x_vel = -1;
 	}
@@ -122,18 +111,45 @@ void player_entity::update(double dt) {
 		x_vel = 1;
 	}
 
-	// change player state to crouched or standing
-	if (input::button_down("MoveDown"))
-		player_state = PLAYER_CROUCHED;
-	else if (input::button_down("MoveUp"))
-		player_state = PLAYER_STANDING;
+	// set move speed
+	float desired_speed = 0.0f;
+	if (player_state == PLAYER_STANCE_STANDING && player_state == PLAYER_IDLE)
+		desired_speed = walk_speed;
 
 	if (player_state == PLAYER_AIMING) {
 		desired_speed = aim_speed;
 		if (start_aiming_time < SDL_GetTicks()) {
-			player_state = PLAYER_STANDING;
+			player_state = PLAYER_IDLE;
 		}
 	}
+
+	if (input::button_pressed("Run") && x_vel != 0) {
+		desired_speed = run_speed;
+		if (player_stance == PLAYER_STANCE_CROUCHED) {
+			if (!collision::check_box_collision({ pos.x, pos.y + spr->size.y }, spr->size)) {
+				player_stance = PLAYER_STANCE_STANDING;
+				player_state = PLAYER_IDLE;
+			}
+		}
+		else {
+			player_stance = PLAYER_STANCE_STANDING;
+			player_state = PLAYER_IDLE;
+		}
+	}
+	
+	if (player_stance == PLAYER_STANCE_CROUCHED) {
+		if(player_state == PLAYER_IDLE)
+			desired_speed = crouch_speed;
+
+		renderer::debug::draw_box_wireframe({ pos.x, pos.y + spr->size.y }, spr->size, colour::blue);
+	}
+	
+	// change player state to crouched or standing
+	if (input::button_down("MoveDown"))
+		player_stance = PLAYER_STANCE_CROUCHED;
+	else if (input::button_down("MoveUp"))
+		if (!collision::check_box_collision({ pos.x, pos.y + spr->size.y }, spr->size))
+			player_stance = PLAYER_STANCE_STANDING;
 
 	if (input::button_down("Shoot")) {
 		if (player_state == PLAYER_AIMING) {
@@ -142,8 +158,11 @@ void player_entity::update(double dt) {
 			collision::ray_data hit;
 			glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
 			float shoot_dir = 500 * ((player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1);
+
+			renderer::debug::draw_line(ray_origin, { ray_origin.x + shoot_dir,ray_origin.y }, colour::green);
 			for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
 				if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
+					renderer::debug::draw_circle(hit.point, 5, colour::purple);
 					printf("Hit Enemy\n");
 					enemy->take_damage(1);
 					break;
@@ -163,10 +182,10 @@ void player_entity::update(double dt) {
 		spr->colour = { 0,1,1 };
 
 	// change collider height based on player state
-	if(player_state == PLAYER_STANDING) {
+	if(player_stance == PLAYER_STANCE_STANDING) {
 		col->size.y = 80;
 		spr->size.y = 80;
-	} else if(player_state == PLAYER_CROUCHED) {
+	} else if(player_stance == PLAYER_STANCE_CROUCHED) {
 		col->size.y = 40;
 		spr->size.y = 40;
 	}
@@ -234,4 +253,13 @@ void player_entity::update(double dt) {
 	}
 
 	prev_movement_speed = movementSpeed;
+}
+
+void player_entity::take_damage(int damage_amount) {
+	current_health_points -= damage_amount;
+
+	if (current_health_points <= 0) {
+		player_state = PLAYER_DEAD;
+		printf("Player dead\n");
+	}
 }
