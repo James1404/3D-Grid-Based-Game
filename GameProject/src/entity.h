@@ -64,10 +64,17 @@ struct enemy_entity : public entity {
 		ENEMY_DIRECTION_RIGHT
 	} enemy_direction;
 
+	enum {
+		ENEMY_STANDING,
+		ENEMY_CROUCHED,
+		ENEMY_STAGGERED,
+		ENEMY_DEAD
+	} enemy_state;
+
 	enemy_entity();
 	~enemy_entity();
 	virtual void update(double dt);
 
 	void take_damage(int damage_points);
-	void stagger(int stagger_time);
+	void stagger();
 };
