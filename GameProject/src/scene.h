@@ -45,8 +45,8 @@ struct listener {
 struct event_manager {
 	std::unordered_multimap<std::string, listener*> events;
 
-	void register_function(std::string _event_name, listener* _listener);
-	void remove_function(std::string _event_name, listener* _listener);
+	void register_listener(std::string _event_name, listener* _listener);
+	void remove_listener(std::string _event_name, listener* _listener);
 	void notify(std::string _event_name);
 	void clear();
 };
@@ -58,8 +58,9 @@ struct event_manager {
 struct cutscene : public listener {
 	std::string event_name;
 
-	void init();
-	void clean();
+	cutscene();
+	~cutscene();
+
 	void update(double dt);
 
 	void on_notify() override;

@@ -11,11 +11,11 @@ level current_level;
 // EVENTS
 //
 
-void event_manager::register_function(std::string _event_name, listener* _listener) {
+void event_manager::register_listener(std::string _event_name, listener* _listener) {
 	events.emplace(_event_name, _listener);
 }
 
-void event_manager::remove_function(std::string _event_name, listener* _listener) {
+void event_manager::remove_listener(std::string _event_name, listener* _listener) {
 	auto range = events.equal_range(_event_name);
 	for(auto i = range.first; i != range.second; ++i) {
 		if(i->second == _listener) {
@@ -40,12 +40,12 @@ void event_manager::clear() {
 // LISTENERS 
 //
 
-void cutscene::init() {
-	current_level.game_event_manager.register_function(event_name, this);
+cutscene::cutscene() {
+	current_level.game_event_manager.register_listener(event_name, this);
 }
 
-void cutscene::clean() {
-	current_level.game_event_manager.remove_function(event_name, this);
+cutscene::~cutscene() {
+	current_level.game_event_manager.remove_listener(event_name, this);
 }
 
 void cutscene::update(double dt) {
@@ -67,9 +67,7 @@ void cutscene::on_notify() {
 //
 
 void level::init() {
-	for (auto& _cutscene : cutscenes) {
-		_cutscene->init();
-	}
+
 }
 
 void level::update(double dt) {

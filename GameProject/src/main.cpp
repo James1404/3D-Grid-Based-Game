@@ -15,10 +15,11 @@ SDL_Event event;
 bool isRunning = false;
 
 enum class GAME_STATE {
-	GAMEPLAY
+	GAMEPLAY,
+	MENU
 } static CurrentState;
 
-Uint64 NOW = SDL_GetPerformanceCounter(), LAST = 0;
+uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
 int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
