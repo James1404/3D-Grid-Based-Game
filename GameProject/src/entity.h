@@ -65,8 +65,12 @@ struct enemy_entity : public entity {
 	} enemy_direction;
 
 	enum {
-		ENEMY_STANDING,
-		ENEMY_CROUCHED,
+		ENEMY_STANCE_STANDING,
+		ENEMY_STANCE_CROUCHED
+	} enemy_stance;
+
+	enum {
+		ENEMY_IDLE,
 		ENEMY_STAGGERED,
 		ENEMY_DEAD
 	} enemy_state;

@@ -56,6 +56,8 @@ enemy_entity::enemy_entity() {
 	col->size = spr->size;
 
 	current_health_points = max_health_points;
+
+	enemy_state = ENEMY_IDLE;
 }
 
 enemy_entity::~enemy_entity() {
@@ -86,15 +88,18 @@ void enemy_entity::update(double dt) {
 
 	if (start_stagger_time > SDL_GetTicks())
 		enemy_state = ENEMY_STAGGERED;
-	else
-		enemy_state = ENEMY_STANDING;
 
 	float desired_speed = enemy_walk_speed;
 
-	if (enemy_state == ENEMY_CROUCHED)
+	if (enemy_stance == ENEMY_STANCE_CROUCHED)
 		desired_speed = enemy_crouch_speed;
-	else if (enemy_state == ENEMY_STAGGERED)
+	
+	if (enemy_state == ENEMY_STAGGERED) {
+		if (start_stagger_time < SDL_GetTicks())
+			enemy_state = ENEMY_IDLE;
+
 		desired_speed = enemy_staggered_speed;
+	}
 
 	float movement_speed = lerp(enemy_prev_movement_speed, desired_speed, enemy_accel_speed);
 
