@@ -8,6 +8,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <memory>
+#include <SDL.h>
 
 std::shared_ptr<player_entity> player;
 
@@ -82,7 +83,10 @@ const float fast_speed = 0.75f;
 float prev_movement_speed;
 
 uint32_t start_aiming_time;
-uint32_t max_aiming_time = 5;
+uint32_t aiming_time = 2000;
+
+uint32_t start_grab_time;
+uint32_t time_until_next_grab = 1000;
 
 void player_entity::update(double dt) {
 	if(player_state == PLAYER_DEAD)
@@ -90,8 +94,25 @@ void player_entity::update(double dt) {
 
 	camera::set_camera("Player");
 
-	float x_vel = 0;
+	// set move speed
+	float desired_speed = walk_speed;
+
+	if (current_level.path_nodes[current_node]->flags & PATH_NODE_FAST) {
+		desired_speed = fast_speed;
+	}
+	else if (current_level.path_nodes[current_node]->flags & PATH_NODE_SLOW) {
+		desired_speed = slow_speed;
+	}
+	else if (input::button_pressed("Run")) {
+		player_state = PLAYER_STANDING;
+		desired_speed = run_speed;
+	}
+	else if (player_state == PLAYER_CROUCHED) {
+		desired_speed = crouch_speed;
+	}
+
 	// change player direction
+	float x_vel = 0;
 	if (input::button_pressed("MoveLeft")) {
 		player_direction = PLAYER_DIRECTION_LEFT;
 		x_vel = -1;
@@ -106,6 +127,34 @@ void player_entity::update(double dt) {
 		player_state = PLAYER_CROUCHED;
 	else if (input::button_down("MoveUp"))
 		player_state = PLAYER_STANDING;
+
+	if (player_state == PLAYER_AIMING) {
+		desired_speed = aim_speed;
+		if (start_aiming_time < SDL_GetTicks()) {
+			player_state = PLAYER_STANDING;
+		}
+	}
+
+	if (input::button_down("Shoot")) {
+		if (player_state == PLAYER_AIMING) {
+			printf("Shoot\n");
+
+			collision::ray_data hit;
+			glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
+			float shoot_dir = 500 * ((player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1);
+			for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
+				if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
+					printf("Hit Enemy\n");
+					enemy->take_damage(1);
+					break;
+				}
+			}
+
+		}
+
+		start_aiming_time = SDL_GetTicks() + aiming_time;
+		player_state = PLAYER_AIMING;
+	}
 
 	// change player sprite colour based on direction
 	if (player_direction == PLAYER_DIRECTION_LEFT)
@@ -122,18 +171,6 @@ void player_entity::update(double dt) {
 		spr->size.y = 40;
 	}
 
-	float desired_speed = walk_speed;
-
-	// set move speed
-	if (player_state == PLAYER_CROUCHED)
-		desired_speed = crouch_speed;
-	else if (current_level.path_nodes[current_node]->flags & PATH_NODE_FAST)
-		desired_speed = fast_speed;
-	else if (current_level.path_nodes[current_node]->flags & PATH_NODE_SLOW)
-		desired_speed = slow_speed;
-	else if (input::button_pressed("Run"))
-		desired_speed = run_speed;
-
 	// TODO: implement momentum build up for player.
 	// As the player moves their momuntum builds up and
 	// makes them go faster until hitting some max speed.
@@ -147,41 +184,25 @@ void player_entity::update(double dt) {
 		}
 
 		if (input::button_down("Grab")) {
-			printf("Grab\n");
-			for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
-				float grab_pos_x = (player_direction == PLAYER_DIRECTION_LEFT) ? pos.x - spr->size.x : pos.x + spr->size.x;
-				if (collision::box_vs_box({ grab_pos_x, pos.y }, spr->size, enemy->col->pos, enemy->col->size)) {
-					enemy->pos.x = pos.x + (50 * ((player_direction == PLAYER_DIRECTION_LEFT) ? 1 : -1));
-
-					if (player_direction == PLAYER_DIRECTION_LEFT)
-						player_direction = PLAYER_DIRECTION_RIGHT;
-					else
-						player_direction = PLAYER_DIRECTION_LEFT;
-
-					enemy->stagger(5);
-					break;
-				}
-			}
-		}
-
-		if (input::button_down("Shoot")) {
-			if (player_state == PLAYER_AIMING) {
-				printf("Shoot\n");
-
-				collision::ray_data hit;
-				glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
-				float shoot_dir = 500 * ((player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1);
+			if (start_grab_time < SDL_GetTicks()) {
+				printf("Grab\n");
 				for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
-					if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
-						printf("Hit Enemy\n");
-						enemy->take_damage(1);
+					float grab_pos_x = (player_direction == PLAYER_DIRECTION_LEFT) ? pos.x - spr->size.x : pos.x + spr->size.x;
+					if (collision::box_vs_box({ grab_pos_x, pos.y }, spr->size, enemy->col->pos, enemy->col->size)) {
+						enemy->pos.x = pos.x + (50 * ((player_direction == PLAYER_DIRECTION_LEFT) ? 1 : -1));
+
+						if (player_direction == PLAYER_DIRECTION_LEFT)
+							player_direction = PLAYER_DIRECTION_RIGHT;
+						else
+							player_direction = PLAYER_DIRECTION_LEFT;
+
+						enemy->stagger();
+
+						start_grab_time = SDL_GetTicks() + time_until_next_grab;
 						break;
 					}
 				}
-
-				desired_speed = aim_speed;
 			}
-			player_state = PLAYER_AIMING;
 		}
 	}
 

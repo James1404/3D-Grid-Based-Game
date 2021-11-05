@@ -9,7 +9,6 @@ struct player_entity : public entity {
 	renderer::sprite* spr;
 	collision::box_collider* col;
 
-	float speed = 50;
 	int current_node = 0;
 	
 	enum {
@@ -21,7 +20,6 @@ struct player_entity : public entity {
 		PLAYER_STANDING,
 		PLAYER_CROUCHED,
 		PLAYER_STAGGERED,
-		PLAYER_GRABBING,
 		PLAYER_AIMING,
 		PLAYER_RELOADING,
 		PLAYER_DEAD
