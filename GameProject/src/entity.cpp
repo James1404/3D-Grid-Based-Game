@@ -83,57 +83,64 @@ uint32_t start_stagger_time;
 uint32_t max_stagger_time = 1000;
 
 void enemy_entity::update(double dt) {
-	if (enemy_state == ENEMY_DEAD)
-		return;
-
-	if (start_stagger_time > SDL_GetTicks())
-		enemy_state = ENEMY_STAGGERED;
-
-	float desired_speed = enemy_walk_speed;
-
-	if (enemy_stance == ENEMY_STANCE_CROUCHED)
-		desired_speed = enemy_crouch_speed;
-	
-	if (enemy_state == ENEMY_STAGGERED) {
-		if (start_stagger_time < SDL_GetTicks())
-			enemy_state = ENEMY_IDLE;
-
-		desired_speed = enemy_staggered_speed;
-	}
-
-	float movement_speed = lerp(enemy_prev_movement_speed, desired_speed, enemy_accel_speed);
-
-	if (!current_level.path_nodes.empty()) {
-		// start chasing player
-		if (player->pos.x > pos.x)
-			enemy_direction = ENEMY_DIRECTION_RIGHT;
-		else
-			enemy_direction = ENEMY_DIRECTION_LEFT;
-
-		spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
-
-		if (enemy_direction == ENEMY_DIRECTION_LEFT)
-			vel.x = -1;
-		else if (enemy_direction == ENEMY_DIRECTION_RIGHT)
-			vel.x = 1;
-
-		vel *= movement_speed;
-		vel *= dt;
-
+	if (enemy_state == ENEMY_DEAD) {
 		col->pos = pos + vel;
-		if (collision::check_box_collision(col))
-			return;
-
-		pos += vel;
+		return;
 	}
+	else {
+		if (start_stagger_time > SDL_GetTicks())
+			enemy_state = ENEMY_STAGGERED;
 
-	col->pos = pos + vel;
-	enemy_prev_movement_speed = movement_speed;
+		float desired_speed = enemy_walk_speed;
+
+		if (enemy_stance == ENEMY_STANCE_CROUCHED)
+			desired_speed = enemy_crouch_speed;
+
+		if (enemy_state == ENEMY_STAGGERED) {
+			if (start_stagger_time < SDL_GetTicks())
+				enemy_state = ENEMY_IDLE;
+
+			desired_speed = enemy_staggered_speed;
+		}
+
+		float movement_speed = lerp(enemy_prev_movement_speed, desired_speed, enemy_accel_speed);
+
+		if (!current_level.path_nodes.empty()) {
+			// start chasing player
+			if (player->pos.x > pos.x)
+				enemy_direction = ENEMY_DIRECTION_RIGHT;
+			else
+				enemy_direction = ENEMY_DIRECTION_LEFT;
+
+			spr->colour = (enemy_direction == ENEMY_DIRECTION_LEFT) ? colour::green : colour::red;
+
+			if (enemy_direction == ENEMY_DIRECTION_LEFT)
+				vel.x = -1;
+			else if (enemy_direction == ENEMY_DIRECTION_RIGHT)
+				vel.x = 1;
+
+			vel *= movement_speed;
+			vel *= dt;
+
+			col->pos = pos + vel;
+			if (collision::check_box_collision(col))
+				return;
+
+			pos += vel;
+		}
+
+		enemy_prev_movement_speed = movement_speed;
+	}
 }
 
 void enemy_entity::take_damage(int damage_points) {
+	if (enemy_state == ENEMY_DEAD)
+		return;
+
 	current_health_points -= damage_points;
-	stagger(); // TODO: enemy is not getting staggered
+	stagger();
+
+	printf("Hit Enemy\n");
 
 	if (current_health_points <= 0) {
 		enemy_state = ENEMY_DEAD;
@@ -142,8 +149,9 @@ void enemy_entity::take_damage(int damage_points) {
 }
 
 void enemy_entity::stagger() {
-	// stagger for a certain amount of time then go back
-	// to normal state
+	if (enemy_state == ENEMY_DEAD)
+		return;
+
 	printf("Enemy is staggered\n");
 
 	start_stagger_time = SDL_GetTicks() + max_stagger_time;
