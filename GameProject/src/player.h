@@ -26,9 +26,11 @@ struct player_entity : public entity {
 
 	enum {
 		PLAYER_IDLE,
+		PLAYER_RUNNING,
 		PLAYER_AIMING,
 		PLAYER_RELOADING,
 		PLAYER_STAGGERED,
+		PLAYER_SLIDING,
 		PLAYER_DEAD
 	} player_state;
 

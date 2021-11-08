@@ -80,6 +80,7 @@ const float walk_speed = 0.1f;
 const float run_speed = 0.5f;
 const float crouch_speed = 0.05f;
 const float aim_speed = 0.025f;
+const float slide_speed = 0.6f;
 
 float prev_movement_speed;
 
@@ -87,28 +88,33 @@ uint32_t start_aiming_time;
 uint32_t aiming_time = 2000;
 
 uint32_t start_grab_time;
-uint32_t time_until_next_grab = 1000;
+uint32_t time_until_next_grab = 500;
+
+uint32_t start_slide_time;
+uint32_t slide_time = 500;
 
 void player_entity::update(double dt) {
-	camera::set_camera("Player");
+	printf("current state %i\n", player_state);
 
-	// printf("current state: %i; prev state: %i;\n", player_state, player_prev_state);
+	camera::set_camera("Player");
 
 	if(player_state == PLAYER_DEAD)
 		return;
 
 	// change player direction
 	float x_vel = 0;
-	if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) {
-		x_vel = 0;
-	}
-	else if (input::button_pressed("MoveLeft")) {
-		player_direction = PLAYER_DIRECTION_LEFT;
-		x_vel = -1;
-	}
-	else if (input::button_pressed("MoveRight")) {
-		player_direction = PLAYER_DIRECTION_RIGHT;
-		x_vel = 1;
+	if (player_state != PLAYER_SLIDING) {
+		if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) {
+			x_vel = 0;
+		}
+		else if (input::button_pressed("MoveLeft")) {
+			player_direction = PLAYER_DIRECTION_LEFT;
+			x_vel = -1;
+		}
+		else if (input::button_pressed("MoveRight")) {
+			player_direction = PLAYER_DIRECTION_RIGHT;
+			x_vel = 1;
+		}
 	}
 
 	// set move speed
@@ -123,56 +129,85 @@ void player_entity::update(double dt) {
 		}
 	}
 
-	if (input::button_pressed("Run") && x_vel != 0) {
-		desired_speed = run_speed;
+	if (input::button_down("Run") && x_vel != 0) {
 		if (player_stance == PLAYER_STANCE_CROUCHED) {
 			if (!collision::check_box_collision({ pos.x, pos.y + spr->size.y }, spr->size)) {
 				player_stance = PLAYER_STANCE_STANDING;
-				player_state = PLAYER_IDLE;
+				player_state = PLAYER_RUNNING;
 			}
 		}
 		else {
 			player_stance = PLAYER_STANCE_STANDING;
-			player_state = PLAYER_IDLE;
+			player_state = PLAYER_RUNNING;
 		}
 	}
-	
-	if (player_stance == PLAYER_STANCE_CROUCHED) {
-		if(player_state == PLAYER_IDLE)
-			desired_speed = crouch_speed;
 
-		renderer::debug::draw_box_wireframe({ pos.x, pos.y + spr->size.y }, spr->size, colour::blue);
-	}
+	if (input::button_released("Run") && player_state == PLAYER_RUNNING)
+		player_state = PLAYER_IDLE;
+
+	if (player_state == PLAYER_RUNNING)
+		desired_speed = run_speed;
 	
 	// change player state to crouched or standing
-	if (input::button_down("MoveDown"))
+	if (input::button_down("MoveDown")) {
+		if (player_state == PLAYER_RUNNING && player_stance != PLAYER_STANCE_CROUCHED) {
+			start_slide_time = SDL_GetTicks() + slide_time;
+			start_aiming_time = 0;
+			player_state = PLAYER_SLIDING;
+		}
+
 		player_stance = PLAYER_STANCE_CROUCHED;
+	}
 	else if (input::button_down("MoveUp"))
 		if (!collision::check_box_collision({ pos.x, pos.y + spr->size.y }, spr->size))
 			player_stance = PLAYER_STANCE_STANDING;
 
+	if (player_stance == PLAYER_STANCE_CROUCHED) {
+		if (player_state == PLAYER_RUNNING)
+			player_state = PLAYER_IDLE;
+
+		if (player_state == PLAYER_IDLE)
+			desired_speed = crouch_speed;
+
+		renderer::debug::draw_box_wireframe({ pos.x, pos.y + spr->size.y }, spr->size, colour::blue);
+	}
+
 	if (input::button_down("Shoot")) {
+		if (input::button_pressed("Run"))
+			player_state = PLAYER_AIMING;
+
 		if (player_state == PLAYER_AIMING) {
 			printf("Shoot\n");
 
 			collision::ray_data hit;
-			glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y / 2) };
+			glm::vec2 ray_origin = { pos.x + (spr->size.x / 2), pos.y + (spr->size.y - 30 / 2) };
 			float shoot_dir = 500 * ((player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1);
 
 			renderer::debug::draw_line(ray_origin, { ray_origin.x + shoot_dir,ray_origin.y }, colour::green);
 			for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
 				if (collision::line_vs_collider(hit, ray_origin, { shoot_dir,0 }, enemy->col)) {
 					renderer::debug::draw_circle(hit.point, 5, colour::purple);
-					printf("Hit Enemy\n");
 					enemy->take_damage(1);
 					break;
 				}
 			}
-
 		}
 
 		start_aiming_time = SDL_GetTicks() + aiming_time;
 		player_state = PLAYER_AIMING;
+	}
+
+	if (player_state == PLAYER_SLIDING) {
+		if (start_slide_time < SDL_GetTicks()) {
+			if (input::button_pressed("Run"))
+				player_state = PLAYER_RUNNING;
+			else
+				player_state = PLAYER_IDLE;
+		}
+
+		player_stance = PLAYER_STANCE_CROUCHED;
+		x_vel = (player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1;
+		desired_speed = slide_speed;
 	}
 
 	// change player sprite colour based on direction
@@ -190,10 +225,6 @@ void player_entity::update(double dt) {
 		spr->size.y = 40;
 	}
 
-	// TODO: implement momentum build up for player.
-	// As the player moves their momuntum builds up and
-	// makes them go faster until hitting some max speed.
-	// Player also doesnt stop instantly, instead their momentum slows down until zero.
 	if (current_level.path_nodes.empty())
 		return;
 
@@ -206,21 +237,24 @@ void player_entity::update(double dt) {
 			if (start_grab_time < SDL_GetTicks()) {
 				printf("Grab\n");
 				for (auto& enemy : current_level.path_nodes[current_node]->enemies) {
-					float grab_pos_x = (player_direction == PLAYER_DIRECTION_LEFT) ? pos.x - spr->size.x : pos.x + spr->size.x;
-					if (collision::box_vs_box({ grab_pos_x, pos.y }, spr->size, enemy->col->pos, enemy->col->size)) {
-						enemy->pos.x = pos.x + (50 * ((player_direction == PLAYER_DIRECTION_LEFT) ? 1 : -1));
+					if (enemy->enemy_state != enemy->ENEMY_DEAD) {
+						float grab_pos_x = (player_direction == PLAYER_DIRECTION_LEFT) ? pos.x - spr->size.x : pos.x + spr->size.x;
+						if (collision::box_vs_box({ grab_pos_x, pos.y }, spr->size, enemy->col->pos, enemy->col->size)) {
+							enemy->pos.x = pos.x + (50 * ((player_direction == PLAYER_DIRECTION_LEFT) ? 1 : -1));
 
-						if (player_direction == PLAYER_DIRECTION_LEFT)
-							player_direction = PLAYER_DIRECTION_RIGHT;
-						else
-							player_direction = PLAYER_DIRECTION_LEFT;
+							if (player_direction == PLAYER_DIRECTION_LEFT)
+								player_direction = PLAYER_DIRECTION_RIGHT;
+							else
+								player_direction = PLAYER_DIRECTION_LEFT;
 
-						enemy->stagger();
+							enemy->stagger();
 
-						start_grab_time = SDL_GetTicks() + time_until_next_grab;
-						break;
+							break;
+						}
 					}
 				}
+
+				start_grab_time = SDL_GetTicks() + time_until_next_grab;
 			}
 		}
 	}
