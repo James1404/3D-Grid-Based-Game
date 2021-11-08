@@ -219,8 +219,8 @@ void level::load(std::string level_name) {
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
-				int node;
-				ss >> position.x >> position.y >> node;
+				// int node;
+				ss >> position.x >> position.y; // >> node;
 
 				auto e = std::make_shared<enemy_entity>();
 				e->pos = position;
