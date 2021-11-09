@@ -74,16 +74,25 @@ player_entity::~player_entity() {
 	collision::delete_collider(col);
 }
 
-const float accel_speed = 0.01f;
-
+// Movement properties
 const float walk_speed = 0.1f;
+const float walk_accel_speed = 0.01f;
+
 const float run_speed = 0.5f;
+const float run_accel_speed = 0.0005f;
+
 const float crouch_speed = 0.05f;
+const float crouch_accel_speed = 0.001f;
+
 const float aim_speed = 0.025f;
-const float slide_speed = 0.6f;
+const float aim_accel_speed = 0.025f;
+
+const float slide_speed = 0.75f;
+const float slide_accel_speed = 0.0005f;
 
 float prev_movement_speed;
 
+// Timing properties
 uint32_t start_aiming_time;
 uint32_t aiming_time = 2000;
 
@@ -94,8 +103,6 @@ uint32_t start_slide_time;
 uint32_t slide_time = 500;
 
 void player_entity::update(double dt) {
-	printf("current state %i\n", player_state);
-
 	camera::set_camera("Player");
 
 	if(player_state == PLAYER_DEAD)
@@ -117,13 +124,7 @@ void player_entity::update(double dt) {
 		}
 	}
 
-	// set move speed
-	float desired_speed = 0.0f;
-	if (player_state == PLAYER_STANCE_STANDING && player_state == PLAYER_IDLE)
-		desired_speed = walk_speed;
-
 	if (player_state == PLAYER_AIMING) {
-		desired_speed = aim_speed;
 		if (start_aiming_time < SDL_GetTicks()) {
 			player_state = PLAYER_IDLE;
 		}
@@ -145,9 +146,6 @@ void player_entity::update(double dt) {
 	if (input::button_released("Run") && player_state == PLAYER_RUNNING)
 		player_state = PLAYER_IDLE;
 
-	if (player_state == PLAYER_RUNNING)
-		desired_speed = run_speed;
-	
 	// change player state to crouched or standing
 	if (input::button_down("MoveDown")) {
 		if (player_state == PLAYER_RUNNING && player_stance != PLAYER_STANCE_CROUCHED) {
@@ -165,9 +163,6 @@ void player_entity::update(double dt) {
 	if (player_stance == PLAYER_STANCE_CROUCHED) {
 		if (player_state == PLAYER_RUNNING)
 			player_state = PLAYER_IDLE;
-
-		if (player_state == PLAYER_IDLE)
-			desired_speed = crouch_speed;
 
 		renderer::debug::draw_box_wireframe({ pos.x, pos.y + spr->size.y }, spr->size, colour::blue);
 	}
@@ -207,7 +202,6 @@ void player_entity::update(double dt) {
 
 		player_stance = PLAYER_STANCE_CROUCHED;
 		x_vel = (player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1;
-		desired_speed = slide_speed;
 	}
 
 	// change player sprite colour based on direction
@@ -259,7 +253,34 @@ void player_entity::update(double dt) {
 		}
 	}
 
-	float movementSpeed = lerp(prev_movement_speed, desired_speed, accel_speed);
+	// set move / accel speed
+	float desired_speed = 0.0f;
+	float final_accel_speed = 0.0f;
+
+	if (player_state == PLAYER_IDLE) {
+		desired_speed = walk_speed;
+		final_accel_speed = walk_accel_speed;
+
+		if (player_stance == PLAYER_STANCE_CROUCHED) {
+			desired_speed = crouch_speed;
+			final_accel_speed = crouch_accel_speed;
+		}
+	}
+	if (player_state == PLAYER_RUNNING) {
+		desired_speed = run_speed;
+		final_accel_speed = run_accel_speed;
+	}
+	if (player_state == PLAYER_AIMING) {
+		desired_speed = aim_speed;
+		final_accel_speed = aim_accel_speed;
+	}
+	if (player_state == PLAYER_SLIDING) {
+		desired_speed = slide_speed;
+		final_accel_speed = slide_accel_speed;
+	}
+
+	printf("current state %i | move speed %f | accel speed %f\n", player_state, desired_speed, final_accel_speed);
+	float movementSpeed = lerp(prev_movement_speed, desired_speed, final_accel_speed);
 
 	if (x_vel > 0) {
 		if (current_node != current_level.path_nodes.size() - 1) {

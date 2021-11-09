@@ -14,6 +14,9 @@ struct player_entity : public entity {
 	const int max_health_points = 3;
 	int current_health_points;
 
+	const int max_ammo = 8;
+	int current_ammo;
+
 	enum {
 		PLAYER_DIRECTION_LEFT,
 		PLAYER_DIRECTION_RIGHT
@@ -28,9 +31,9 @@ struct player_entity : public entity {
 		PLAYER_IDLE,
 		PLAYER_RUNNING,
 		PLAYER_AIMING,
+		PLAYER_SLIDING,
 		PLAYER_RELOADING,
 		PLAYER_STAGGERED,
-		PLAYER_SLIDING,
 		PLAYER_DEAD
 	} player_state;
 
