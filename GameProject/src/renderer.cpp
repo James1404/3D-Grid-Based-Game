@@ -163,7 +163,6 @@ void renderer::draw_sprites() {
 }
 
 void renderer::stop_draw() {
-	// Swap buffer
 	SDL_GL_SwapWindow(window);
 }
 

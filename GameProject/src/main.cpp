@@ -51,7 +51,6 @@ int main(int argc, char* args[]) {
 				isRunning = false;
 				break;
 			case SDL_WINDOWEVENT:
-				// TODO: Screen doesnt scale properly.
 				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 					renderer::screen_width = event.window.data1;
 					renderer::screen_height = event.window.data2;
