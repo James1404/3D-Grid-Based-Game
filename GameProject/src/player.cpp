@@ -78,7 +78,7 @@ player_entity::~player_entity() {
 const float walk_speed = 0.1f;
 const float walk_accel_speed = 0.01f;
 
-const float run_speed = 0.5f;
+const float run_speed = 0.3f;
 const float run_accel_speed = 0.0005f;
 
 const float crouch_speed = 0.05f;
@@ -87,8 +87,8 @@ const float crouch_accel_speed = 0.001f;
 const float aim_speed = 0.025f;
 const float aim_accel_speed = 0.025f;
 
-const float slide_speed = 0.75f;
-const float slide_accel_speed = 0.0005f;
+float dodge_speed = 0.5f;
+const float dodge_accel_speed = 0.0005f;
 
 float prev_movement_speed;
 
@@ -99,8 +99,8 @@ uint32_t aiming_time = 2000;
 uint32_t start_grab_time;
 uint32_t time_until_next_grab = 500;
 
-uint32_t start_slide_time;
-uint32_t slide_time = 500;
+uint32_t start_dodge_time;
+uint32_t dodge_time = 500;
 
 void player_entity::update(double dt) {
 	camera::set_camera("Player");
@@ -110,7 +110,7 @@ void player_entity::update(double dt) {
 
 	// change player direction
 	float x_vel = 0;
-	if (player_state != PLAYER_SLIDING) {
+	if (player_state != PLAYER_DODGING) {
 		if (input::button_pressed("MoveLeft") && input::button_pressed("MoveRight")) {
 			x_vel = 0;
 		}
@@ -146,14 +146,17 @@ void player_entity::update(double dt) {
 	if (input::button_released("Run") && player_state == PLAYER_RUNNING)
 		player_state = PLAYER_IDLE;
 
+	if (input::button_down("Dodge") && player_state != PLAYER_DODGING) {
+		if (x_vel != 0) {
+			start_dodge_time = SDL_GetTicks() + dodge_time;
+			start_aiming_time = 0;
+			player_state = PLAYER_DODGING;
+			dodge_speed = prev_movement_speed;
+		}
+	}
+
 	// change player state to crouched or standing
 	if (input::button_down("MoveDown")) {
-		if (player_state == PLAYER_RUNNING && player_stance != PLAYER_STANCE_CROUCHED) {
-			start_slide_time = SDL_GetTicks() + slide_time;
-			start_aiming_time = 0;
-			player_state = PLAYER_SLIDING;
-		}
-
 		player_stance = PLAYER_STANCE_CROUCHED;
 	}
 	else if (input::button_down("MoveUp"))
@@ -192,16 +195,18 @@ void player_entity::update(double dt) {
 		player_state = PLAYER_AIMING;
 	}
 
-	if (player_state == PLAYER_SLIDING) {
-		if (start_slide_time < SDL_GetTicks()) {
+	if (player_state == PLAYER_DODGING) {
+		player_stance = PLAYER_STANCE_CROUCHED;
+		x_vel = (player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1;
+
+		if (start_dodge_time < SDL_GetTicks()) {
+			player_stance = PLAYER_STANCE_STANDING;
+
 			if (input::button_pressed("Run"))
 				player_state = PLAYER_RUNNING;
 			else
 				player_state = PLAYER_IDLE;
 		}
-
-		player_stance = PLAYER_STANCE_CROUCHED;
-		x_vel = (player_direction == PLAYER_DIRECTION_LEFT) ? -1 : 1;
 	}
 
 	// change player sprite colour based on direction
@@ -274,12 +279,13 @@ void player_entity::update(double dt) {
 		desired_speed = aim_speed;
 		final_accel_speed = aim_accel_speed;
 	}
-	if (player_state == PLAYER_SLIDING) {
-		desired_speed = slide_speed;
-		final_accel_speed = slide_accel_speed;
+	if (player_state == PLAYER_DODGING) {
+		desired_speed = dodge_speed;
+		final_accel_speed = dodge_accel_speed;
 	}
 
-	printf("current state %i | move speed %f | accel speed %f\n", player_state, desired_speed, final_accel_speed);
+	// printf("current state %i | move speed %f | accel speed %f\n", player_state, desired_speed, final_accel_speed);
+
 	float movementSpeed = lerp(prev_movement_speed, desired_speed, final_accel_speed);
 
 	if (x_vel > 0) {

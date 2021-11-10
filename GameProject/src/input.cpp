@@ -270,6 +270,8 @@ void input::load() {
 
 		MAPPED_INPUTS.insert({ "Run", INPUT(SDL_SCANCODE_LSHIFT, KEYBOARD) });
 
+		MAPPED_INPUTS.insert({ "Dodge", INPUT(SDL_SCANCODE_Q , KEYBOARD) });
+
 		//
 		// -- COMBAT INPUT --
 		//
