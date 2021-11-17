@@ -19,7 +19,7 @@ struct entity {
 	uint32_t id;
 	ENTITY_FLAGS flags = 0;
 
-	glm::vec2 pos;
+	glm::ivec2 pos;
 
 	entity() : id(current_id++), pos(0,0) {
 		printf("INITIALIZED ENTITY %p\n", this);
@@ -28,12 +28,20 @@ struct entity {
 	virtual ~entity() {
 		printf("DESTROYED ENTITY %p\n", this);
 	}
+
 	virtual void update(double dt) {}
 };
 
+//
+// Commands
+//
+
+// 
+// Entities
+//
+
 struct obstacle_entity : public entity {
 	renderer::sprite* spr;
-	collision::box_collider* col;
 
 	obstacle_entity();
 	~obstacle_entity();
@@ -52,33 +60,13 @@ struct sprite_entity : public entity{
 
 struct enemy_entity : public entity {
 	renderer::sprite* spr;
-	collision::box_collider* col;
 
 	const int max_health_points = 3;
 	int current_health_points;
 
-	glm::vec2 vel;
-
-	enum {
-		ENEMY_DIRECTION_LEFT,
-		ENEMY_DIRECTION_RIGHT
-	} enemy_direction;
-
-	enum {
-		ENEMY_STANCE_STANDING,
-		ENEMY_STANCE_CROUCHED
-	} enemy_stance;
-
-	enum {
-		ENEMY_IDLE,
-		ENEMY_STAGGERED,
-		ENEMY_DEAD
-	} enemy_state;
+	bool is_dead = false;
 
 	enemy_entity();
 	~enemy_entity();
 	virtual void update(double dt);
-
-	void take_damage(int damage_points);
-	void stagger();
 };
