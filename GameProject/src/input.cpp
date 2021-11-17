@@ -268,21 +268,11 @@ void input::load() {
 		MAPPED_INPUTS.insert({ "MoveLeft", INPUT(SDL_SCANCODE_A, KEYBOARD) });
 		MAPPED_INPUTS.insert({ "MoveRight", INPUT(SDL_SCANCODE_D, KEYBOARD) });
 
-		MAPPED_INPUTS.insert({ "Run", INPUT(SDL_SCANCODE_LSHIFT, KEYBOARD) });
-
-		MAPPED_INPUTS.insert({ "Dodge", INPUT(SDL_SCANCODE_Q , KEYBOARD) });
-
 		//
 		// -- COMBAT INPUT --
 		//
 
-		MAPPED_INPUTS.insert({ "Aim", INPUT(SDL_SCANCODE_LCTRL, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "Aim", INPUT(MOUSE_RIGHT, MOUSE) });
-
-		MAPPED_INPUTS.insert({"Shoot", INPUT(SDL_SCANCODE_SPACE, KEYBOARD)});
-		MAPPED_INPUTS.insert({"Shoot", INPUT(MOUSE_LEFT, MOUSE)});
-
-		MAPPED_INPUTS.insert({ "Grab", INPUT(SDL_SCANCODE_E, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "Shoot", INPUT(SDL_SCANCODE_F, KEYBOARD) });
 
 		//
 		// -- MISC INPUT --
