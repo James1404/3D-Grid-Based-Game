@@ -8,6 +8,14 @@
 struct player_entity : public entity {
 	renderer::sprite* spr;
 
+	enum {
+		DIRECTION_UP,
+		DIRECTION_DOWN,
+		DIRECTION_LEFT,
+		DIRECTION_RIGHT
+	} direction;
+
+	glm::ivec2 previous_pos;
 	glm::vec2 target_pos;
 	glm::vec2 vel;
 

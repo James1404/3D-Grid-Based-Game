@@ -38,8 +38,12 @@ static glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const
 struct player_camera : public camera::camera_interface {
 	glm::vec2 offset = { 20,10 };
 
+	glm::vec2 pos = { 0,0 };
+	const float camera_speed = 0.01f;
 	void update(double dt) override {
-		glm::vec2 pos = (glm::vec2)player->pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2);
+		// glm::vec2 pos = (glm::vec2)player->pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2);
+		pos = lerp(pos, (glm::vec2)player->previous_pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2), dt * camera_speed);
+		// pos = move_towards(pos, (glm::vec2)player->pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2), dt * camera_speed);
 
 		view = glm::translate(glm::mat4(1.0f),
 			glm::vec3(pos.x - (renderer::screen_resolution_x / 2),
@@ -60,8 +64,11 @@ player_entity::player_entity() {
 	spr->colour = { 0,0,1 };
 
 	pos = { 0,0 };
+	previous_pos = { 0,0 };
 	target_pos = { 0,0 };
 	vel = { 0,0 };
+
+	direction = DIRECTION_UP;
 
 	is_dead = false;
 	current_health_points = max_health_points;
@@ -83,6 +90,27 @@ void player_entity::update(double dt) {
 
 	glm::vec2 new_pos = target_pos;
 
+	if (input::button_down("MoveUp"))
+		direction = DIRECTION_UP;
+	else if (input::button_down("MoveDown"))
+		direction = DIRECTION_DOWN;
+	else if (input::button_down("MoveLeft"))
+		direction = DIRECTION_LEFT;
+	else if (input::button_down("MoveRight"))
+		direction = DIRECTION_RIGHT;
+
+	glm::ivec2 look_dir = { 0,0 };
+	if (direction == DIRECTION_UP)
+		look_dir = { 0,1 };
+	else if (direction == DIRECTION_DOWN)
+		look_dir = { 0,-1 };
+	else if (direction == DIRECTION_LEFT)
+		look_dir = { -1, 0 };
+	else if (direction == DIRECTION_RIGHT)
+		look_dir = { 1, 0 };
+
+	renderer::debug::draw_box_wireframe(pos * glm::ivec2(renderer::cell_size) + look_dir * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
+
 	if (vel == glm::vec2(0)) {
 		if (input::button_down("MoveUp"))
 			new_pos.y++;
@@ -96,8 +124,10 @@ void player_entity::update(double dt) {
 	}
 
 	if (vel.x == 0) {
-		if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))
+		if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown")) {
 			vel.y = 0;
+			new_pos.y = (int)new_pos.y + 0.5f;
+		}
 		else if (input::button_pressed("MoveUp") && !input::button_down("MoveUp"))
 			vel.y = 1;
 		else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown"))
@@ -109,8 +139,10 @@ void player_entity::update(double dt) {
 	}
 
 	if (vel.y == 0) {
-		if (input::button_pressed("MoveRight") && input::button_pressed("MoveLeft"))
+		if (input::button_pressed("MoveRight") && input::button_pressed("MoveLeft")) {
 			vel.x = 0;
+			new_pos.x = (int)new_pos.x + 0.5f;
+		}
 		else if (input::button_pressed("MoveRight") && !input::button_down("MoveRight"))
 			vel.x = 1;
 		else if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft"))
@@ -128,7 +160,7 @@ void player_entity::update(double dt) {
 
 	printf("%f %f;\n", new_pos.x, new_pos.y);
 
-	renderer::debug::draw_circle(target_pos * glm::vec2(renderer::cell_size), renderer::cell_size, colour::green);
+	//renderer::debug::draw_circle(target_pos * glm::vec2(renderer::cell_size), renderer::cell_size, colour::green);
 
 	for (auto& obstacle : current_level.obstacles) {
 		if (obstacle->pos == (glm::ivec2)new_pos) {
@@ -143,6 +175,7 @@ void player_entity::update(double dt) {
 	}
 
 	target_pos = new_pos;
+	previous_pos = pos;
 	pos = target_pos;
 
 }
