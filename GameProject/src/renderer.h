@@ -24,6 +24,8 @@ namespace colour {
 };
 
 namespace renderer {
+	const int cell_size = 16;
+
 	extern SDL_Window* window;
 	extern SDL_GLContext context;
 
@@ -51,8 +53,7 @@ namespace renderer {
 
 		// void set_sprite_path(std::string sprite_name);
 
-		glm::vec2* position;
-		glm::ivec2 size;
+		glm::ivec2* position;
 		int layer;
 
 		glm::vec3 colour;

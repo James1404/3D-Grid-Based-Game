@@ -74,8 +74,8 @@ int main(int argc, char* args[]) {
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
-			player->update(dt);
 			current_level.update(dt);
+			player->update(dt);
 		}
 
 		camera::update(dt);

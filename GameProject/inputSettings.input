@@ -1,12 +1,6 @@
-Aim 0 224
-Aim 1 1
-Dodge 0 20
 Exit 0 41
-Grab 0 8
 MoveDown 0 22
 MoveLeft 0 4
 MoveRight 0 7
 MoveUp 0 26
-Run 0 225
-Shoot 0 44
-Shoot 1 0
+Shoot 0 9
