@@ -8,12 +8,14 @@ namespace collision {
     struct box_collider {
         uint32_t id;
 
-        glm::vec2 pos;
+        glm::vec2* pos;
         glm::ivec2 size;
     };
 
     box_collider* create_collider();
     void delete_collider(box_collider* _collider);
+
+    void draw_debug();
 
     struct ray_data {
         glm::vec2 point;
@@ -28,8 +30,10 @@ namespace collision {
     bool line_vs_collider(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction, box_collider* _col);
 
     bool check_box_collision(box_collider* _collider);
-    bool check_box_collision(glm::vec2 _pos, glm::ivec2 _size);
+    bool check_box_collision(glm::vec2 _pos, glm::ivec2 _size, uint32_t ignore_collision = -100);
 
     bool check_linecast_collision(ray_data& _hit, glm::vec2 _origin, glm::vec2 _direction);
     bool check_point_collision(const glm::vec2& _point);
+
+    bool detect_and_resolve_collision(box_collider* _col, glm::vec2& _old_pos, glm::vec2& _pos, glm::vec2& _vel);
 }
