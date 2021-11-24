@@ -8,10 +8,8 @@
 #include <imgui_stdlib.h>
 #include <string>
 
-#include "scene.h"
 #include "input.h"
 #include "renderer.h"
-#include "scene.h"
 #include "entity.h"
 #include "player.h"
 #include "camera.h"
@@ -38,6 +36,8 @@ struct editor_camera : public camera::camera_interface {
 	}
 };
 
+entity_manager* manager;
+
 void editor::init() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -47,7 +47,7 @@ void editor::init() {
 	ImGui_ImplSDL2_InitForOpenGL(renderer::window, renderer::context);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
-	current_level.init();
+	manager->init();
 
 	camera::register_camera("Editor", std::make_shared<editor_camera>());
 }
@@ -55,16 +55,10 @@ void editor::init() {
 glm::vec2 velocity;
 float speed = 2;
 
-static std::shared_ptr<obstacle_entity> current_obstacle = nullptr;
-static std::shared_ptr<enemy_entity> current_enemy = nullptr;
-static std::shared_ptr<sprite_entity> current_sprite = nullptr;
-static std::shared_ptr<cutscene> current_cutscene = nullptr;
+static std::shared_ptr<entity> current_entity = nullptr;
 
 void editor::clear_selected() {
-	current_obstacle = nullptr;
-	current_sprite = nullptr;
-	current_enemy = nullptr;
-	current_cutscene = nullptr;
+	current_entity = nullptr;
 }
 
 void editor::draw() {
@@ -95,9 +89,7 @@ void editor::draw() {
 			
 			ImGui::Separator();
 			ImGui::Text("Number of:");
-			ImGui::Text(" - Sprites %i", current_level.sprites.size());
-			ImGui::Text(" - Obstacles %i", current_level.obstacles.size());
-			ImGui::Text(" - Enemies %i", current_level.enemies.size());
+			ImGui::Text(" - Entities %i", manager->entities.size());
 
 			ImGui::End();
 		}
@@ -117,11 +109,11 @@ void editor::draw() {
 		ImGui::SetNextWindowSize(ImVec2(300.0f, work_size.y), ImGuiCond_Always);
 
 		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
-			ImGui::InputText("Level Name", &current_level.name);
+			ImGui::InputText("Level Name", &manager->name);
 
 			if (ImGui::Button("Save")) {
-				if (!current_level.name.empty()) {
-					current_level.save();
+				if (!manager->name.empty()) {
+					manager->save();
 				}
 				else {
 					printf("Name Empty\n");
@@ -131,9 +123,9 @@ void editor::draw() {
 			ImGui::SameLine();
 
 			if (ImGui::Button("Load")) {
-				if (!current_level.name.empty()) {
+				if (!manager->name.empty()) {
 					clear_selected();
-					current_level.load(current_level.name);
+					manager->load(manager->name);
 				}
 				else {
 					printf("Name Empty\n");
@@ -144,259 +136,10 @@ void editor::draw() {
 
 			if (ImGui::Button("Clear")) {
 				clear_selected();
-				current_level.clean();
+				manager->clean();
 			}
 
 			ImGui::Separator();
-
-			static const char* entity_types[] = { "obstacles", "enemies", "sprites", "cutscene"};
-			static const char* current_entity_type = entity_types[0];
-
-			if(ImGui::BeginCombo("Types", current_entity_type)) {
-				for (size_t i = 0; i < IM_ARRAYSIZE(entity_types); i++) {
-					bool is_selected = (current_entity_type == entity_types[i]);
-					if (ImGui::Selectable(entity_types[i], is_selected))
-						current_entity_type = entity_types[i];
-					if (is_selected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
-
-			if (current_entity_type != NULL) {
-
-				ImGui::Separator();
-
-				/* OBSTACLES */if (current_entity_type == entity_types[0]) {
-					ImGui::PushID(&current_level.enemies);
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& obstacle : current_level.obstacles) {
-							const bool is_selected = (current_obstacle != nullptr) && (current_obstacle == obstacle);
-
-							std::string label = "Obstacle";
-
-							ImGui::PushID(&obstacle);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_obstacle = obstacle;
-							}
-
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-
-							ImGui::PopID();
-						}
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto o = std::make_shared<obstacle_entity>();
-						o->pos = { 0,0 };
-						current_level.obstacles.push_back(o);
-						current_obstacle = o;
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.obstacles.erase(
-							std::remove(current_level.obstacles.begin(),
-							current_level.obstacles.end(), current_obstacle),
-							current_level.obstacles.end());
-
-						if (!current_level.obstacles.empty())
-							current_obstacle = current_level.obstacles.back();
-						else
-							current_obstacle = nullptr;
-					}
-
-					if (current_obstacle != nullptr) {
-						ImGui::PushID(current_obstacle.get());
-
-						ImGui::DragFloat2("Position", (float*)&current_obstacle->pos);
-
-						ImGui::PopID();
-					}
-					ImGui::PopID();
-				}
-				/* ENEMIES */if (current_entity_type == entity_types[1]) {
-					ImGui::PushID(&current_level.enemies);
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& enemy : current_level.enemies) {
-							const bool is_selected = (current_enemy != nullptr) && (current_enemy == enemy);
-
-							std::string label = "Enemy";
-
-							ImGui::PushID(&enemy);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_enemy = enemy;
-							}
-
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-
-							ImGui::PopID();
-						}
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto e = std::make_shared<enemy_entity>();
-						e->pos = { 0,0 };
-						current_level.enemies.push_back(e);
-						current_enemy = e;
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.enemies.erase(
-							std::remove(current_level.enemies.begin(),
-							current_level.enemies.end(), current_enemy),
-							current_level.enemies.end());
-
-						if (!current_level.enemies.empty())
-							current_enemy = current_level.enemies.back();
-						else
-							current_enemy = nullptr;
-					}
-
-					if (current_enemy != nullptr) {
-						ImGui::PushID(current_enemy.get());
-
-						ImGui::DragFloat2("Position", (float*)&current_enemy->pos);
-
-						ImGui::PopID();
-					}
-					ImGui::PopID();
-				}
-				/* SPRITES */if (current_entity_type == entity_types[2]) {
-					// TODO: finally implement sprite creation
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& sprite : current_level.sprites) {
-							const bool is_selected = (current_sprite != nullptr) && (current_sprite == sprite);
-
-							std::string label = "Sprite";
-
-							ImGui::PushID(&sprite);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_sprite = sprite;
-							}
-
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-
-							ImGui::PopID();
-						}
-
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto s = std::make_shared<sprite_entity>();
-
-						current_level.sprites.push_back(s);
-						current_sprite = current_level.sprites.back();
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.sprites.erase(
-							std::remove(current_level.sprites.begin(),
-							current_level.sprites.end(), current_sprite),
-							current_level.sprites.end());
-
-						if (!current_level.sprites.empty())
-							current_sprite = current_level.sprites.back();
-						else
-							current_sprite = nullptr;
-					}
-
-					ImGui::Separator();
-
-					if (current_sprite != nullptr) {
-						ImGui::PushID(&current_sprite->pos);
-						ImGui::DragFloat2("Position", (float*)&current_sprite->pos);
-						ImGui::PopID();
-
-						ImGui::PushID(&current_sprite->spr->layer);
-						ImGui::DragInt("Layer", &current_sprite->spr->layer);
-						ImGui::PopID();
-
-						ImGui::PushID(&current_sprite->spr->colour);
-						float color[3] = { current_sprite->spr->colour.x,
-										   current_sprite->spr->colour.y,
-										   current_sprite->spr->colour.z };
-						ImGui::ColorEdit3("Colour", color);
-						current_sprite->spr->colour = { color[0], color[1], color[2] };
-						ImGui::PopID();
-
-						/*
-						std::string name;
-
-						ImGui::InputText("Path", &name, ImGuiInputTextFlags_EnterReturnsTrue);
-
-						if (ImGui::Button("Set Path")) {
-							current_sprite->sprite_path = name;
-							current_sprite->spr->set_sprite_path(name.c_str());
-						}
-						*/
-					}
-				}
-				/* CUTSCENES */if (current_entity_type == entity_types[3]) {
-					if (ImGui::ListBoxHeader("", { -1,0 })) {
-						for (auto& cutscene : current_level.cutscenes) {
-							const bool is_selected = (current_cutscene != nullptr) && (current_cutscene == cutscene);
-
-							std::string label = "Cutscene";
-
-							ImGui::PushID(&cutscene);
-							if (ImGui::Selectable(label.c_str(), is_selected)) {
-								current_cutscene = cutscene;
-							}
-
-							if (is_selected) {
-								ImGui::SetItemDefaultFocus();
-							}
-
-							ImGui::PopID();
-						}
-
-						ImGui::ListBoxFooter();
-					}
-
-					if (ImGui::Button("+")) {
-						auto c = std::make_shared<cutscene>();
-
-						current_level.cutscenes.push_back(c);
-						current_cutscene = current_level.cutscenes.back();
-					}
-
-					ImGui::SameLine();
-					if (ImGui::Button("-")) {
-						current_level.cutscenes.erase(
-							std::remove(current_level.cutscenes.begin(),
-							current_level.cutscenes.end(), current_cutscene),
-							current_level.cutscenes.end());
-
-						if (!current_level.cutscenes.empty())
-							current_cutscene = current_level.cutscenes.back();
-						else
-							current_cutscene = nullptr;
-					}
-
-					ImGui::Separator();
-
-					if (current_cutscene != nullptr) {
-						ImGui::PushID(&current_cutscene);
-
-						ImGui::InputText("event name", &current_cutscene->event_name, ImGuiInputTextFlags_CharsNoBlank);
-
-						ImGui::PopID();
-					}
-				}
-			}
 
 			ImGui::End();
 		}
@@ -409,7 +152,7 @@ void editor::draw() {
 void editor::clean() {
 	clear_selected();
 
-	current_level.clean();
+	manager->clean();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();

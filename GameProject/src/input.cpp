@@ -272,6 +272,7 @@ void input::load() {
 		// -- COMBAT INPUT --
 		//
 
+		MAPPED_INPUTS.insert({ "Attack", INPUT(SDL_SCANCODE_SPACE, KEYBOARD) });
 		MAPPED_INPUTS.insert({ "Shoot", INPUT(SDL_SCANCODE_F, KEYBOARD) });
 
 		//

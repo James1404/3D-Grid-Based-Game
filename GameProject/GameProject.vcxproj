@@ -170,7 +170,6 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClCompile Include="includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\collision.cpp" />
-    <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
@@ -189,7 +188,6 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\editor.h" />
-    <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\collision.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\entity.h" />

@@ -1,7 +1,5 @@
 #include <SDL.h>
 
-#include "scene.h"
-
 #include "renderer.h"
 #include "input.h"
 
@@ -19,6 +17,8 @@ enum class GAME_STATE {
 	MENU
 } static CurrentState;
 
+entity_manager manager;
+
 uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
 int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
@@ -34,12 +34,9 @@ int main(int argc, char* args[]) {
 		// LEVEL NAMES :
 		// combattestlevel
 		// newtestlevel
-
-		current_level.load("combattestlevel");
-		current_level.init();
+		manager.load("combattestlevel");
+		manager.init();
 		
-		player = std::make_shared<player_entity>();
-
 		isRunning = true;
 	}
 
@@ -65,17 +62,13 @@ int main(int argc, char* args[]) {
 		/* ----- UPDATE GAME ----- */
 		renderer::debug::clear_debug_list();
 
-		renderer::debug::draw_circle({ 100, 75 }, 5, colour::pink);
-		renderer::debug::draw_line({ 0,0 }, { 100,75 }, colour::pink);
-
 		// calculate delta time;
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
-			current_level.update(dt);
-			player->update(dt);
+			manager.update(dt);
 		}
 
 		camera::update(dt);
@@ -96,7 +89,7 @@ int main(int argc, char* args[]) {
 	printf("----------------\n");
 	printf("STARTING CLEANUP\n");
 
-	current_level.clean();
+	manager.clean();
 
 	renderer::debug::clean_debug();
 	renderer::clean();
