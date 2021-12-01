@@ -185,6 +185,7 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClInclude Include="includes\imgui\imstb_textedit.h" />
     <ClInclude Include="includes\imgui\imstb_truetype.h" />
     <ClInclude Include="includes\nlohmann\json.hpp" />
+    <ClInclude Include="src\pathfinding.h" />
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\editor.h" />
