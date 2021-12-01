@@ -61,8 +61,6 @@ player_entity::~player_entity() {
 	renderer::delete_sprite(spr);
 }
 
-const int shoot_range = 5;
-const float movement_speed = 0.005f;
 void player_entity::update(double dt) {
 	camera::set_camera("Player");
 
@@ -114,25 +112,28 @@ void player_entity::update(double dt) {
 	renderer::debug::draw_box_wireframe(pos * glm::ivec2(renderer::cell_size) + direction * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
 
 	if (input::button_down("Attack")) {
-		entity* hit_entity = manager->get_collisions(pos + direction, "enemy");
-		if (hit_entity != nullptr) {
+		if (auto hit_entity = manager->get_collisions(pos + direction, "enemy").lock()) {
+			hit_entity->do_damage(1);
 			printf("Attack\n");
 		}
 	}
 
 	if (input::button_down("Shoot")) {
-		for (int i = 0; i < shoot_range + 1; i++) {
-			entity* hit_entity = manager->get_collisions(pos + (direction * i), "enemy");
-			if (hit_entity != nullptr) {
-				printf("Hit enemy\n");
-				hit_entity->do_damage(1);
-				hit_entity->knockback(direction, 1);
-				break;
+		if (shoot_end_time < SDL_GetTicks()) {
+			for (int i = 0; i < shoot_range + 1; i++) {
+				if (auto hit_entity = manager->get_collisions(pos + (direction * i), "enemy").lock()) {
+					hit_entity->do_damage(1);
+					hit_entity->knockback(direction, 1);
+					break;
+				}
 			}
+
+			printf("Shoot\n");
+			shoot_end_time = SDL_GetTicks() + shoot_cooldown_duration;
 		}
 	}
 
-	if (manager->check_collisions(this, new_pos)) {
+	if (manager->check_collisions(new_pos, this)) {
 		return;
 	}
 
