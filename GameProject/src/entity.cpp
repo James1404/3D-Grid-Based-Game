@@ -1,9 +1,10 @@
 #include "entity.h"
 
-#include "player.h"
-
 #include <fstream>
 #include <sstream>
+
+#include "player.h"
+#include "pathfinding.h"
 
 //
 // EVENTS
@@ -43,6 +44,12 @@ void entity_manager::init() {
 }
 
 void entity_manager::update(double dt) {
+	entities_position_lookup.clear();
+
+	for (auto& _entity : entities) {
+		entities_position_lookup.emplace(_entity->pos, _entity);
+	}
+
 	for (auto& _entity : entities) {
 		_entity->update(dt);
 	}
@@ -52,7 +59,8 @@ void entity_manager::clean() {
 	game_event_manager.clear();
 
 	entities.clear();
-	entities_quick_tag_lookup.clear();
+	entities_tag_lookup.clear();
+	entities_position_lookup.clear();
 
 	name.clear();
 
@@ -123,7 +131,7 @@ void entity_manager::load(std::string level_name) {
 				p->pos = position;
 
 				entities.push_back(p);
-				entities_quick_tag_lookup.emplace(p->tag, p.get());
+				entities_tag_lookup.emplace(p->tag, p);
 			}
 			else if (type == "ENEMY") {
 				glm::ivec2 position;
@@ -134,7 +142,7 @@ void entity_manager::load(std::string level_name) {
 				e->pos = position;
 
 				entities.push_back(e);
-				entities_quick_tag_lookup.emplace(e->tag, e.get());
+				entities_tag_lookup.emplace(e->tag, e);
 			}
 		}
 
@@ -150,120 +158,187 @@ void entity_manager::load(std::string level_name) {
 	ifs.close();
 }
 
+bool entity_manager::is_walkable(glm::ivec2 _pos) const {
+	for (auto& entity : entities) {
+		if (entity->pos == _pos)
+			return false;
+	}
+
+	return true;
+}
+
+std::vector<glm::ivec2> entity_manager::neighbors(glm::ivec2 _pos) const {
+	std::vector<glm::ivec2> results;
+
+	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0} };
+	for (auto dir : DIRS) {
+		glm::ivec2 next{ _pos.x + dir.x, _pos.y + dir.y };
+		
+		results.push_back(next);
+	}
+
+	if ((_pos.x + _pos.y) % 2 == 0)
+		std::reverse(results.begin(), results.end());
+
+	return results;
+}
+
+std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const {
+	auto range = entities_tag_lookup.equal_range(_tag);
+
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->tag == _tag)
+			return i->second;
+	}
+
+	return std::weak_ptr<entity>();
+}
+
+//
+// CHECK COLLISIONS
+//
+
+bool entity_manager::check_collisions(glm::vec2 _pos) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
+
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second.get() == _ignored_entity)
+			continue;
+
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
+
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) {
-	if (_tag.empty()) {
-		for (const auto& entity : entities) {
-			if (entity->flags & ENTITY_NO_COLLISION)
-				continue;
+	// TODO: remove !tag.empty() it probaly isnt needed because
+	// it just wont find any entites with empty _tag.
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->tag != _tag)
+			continue;
 
-			if (entity->pos == common::vec_to_ivec(_pos)) {
-				return true;
-			}
-		}
-	}
-	else {
-		auto range = entities_quick_tag_lookup.equal_range(_tag);
-		for (auto i = range.first; i != range.second; ++i) {
-			if (i->second->flags & ENTITY_NO_COLLISION)
-				continue;
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
 
-			if (i->second->pos == common::vec_to_ivec(_pos)) {
-				return true;
-			}
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return true;
 		}
 	}
 
 	return false;
 }
 
-bool entity_manager::check_collisions(entity* _owner, glm::vec2 _pos, std::string _tag) {
-	if (_tag.empty()) {
-		for (const auto& entity : entities) {
-			if (entity.get() == _owner)
-				continue;
+bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->tag != _tag)
+			continue;
 
-			if (entity->flags & ENTITY_NO_COLLISION)
-				continue;
+		if (i->second.get() == _ignored_entity)
+			continue;
 
-			if (entity->pos == common::vec_to_ivec(_pos)) {
-				return true;
-			}
-		}
-	}
-	else {
-		auto range = entities_quick_tag_lookup.equal_range(_tag);
-		for (auto i = range.first; i != range.second; ++i) {
-			if (i->second == _owner)
-				continue;
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
 
-			if (i->second->flags & ENTITY_NO_COLLISION)
-				continue;
-
-			if (i->second->pos == common::vec_to_ivec(_pos)) {
-				return true;
-			}
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return true;
 		}
 	}
 
 	return false;
 }
 
-entity* entity_manager::get_collisions(glm::vec2 _pos, std::string _tag) {
-	if (_tag.empty()) {
-		for (const auto& entity : entities) {
-			if (entity->flags & ENTITY_NO_COLLISION)
-				continue;
+//
+// GET COLLISIONS
+//
 
-			if (entity->pos == common::vec_to_ivec(_pos)) {
-				return entity.get();
-			}
-		}
-	}
-	else {
-		auto range = entities_quick_tag_lookup.equal_range(_tag);
-		for (auto i = range.first; i != range.second; ++i) {
-			if (i->second->flags & ENTITY_NO_COLLISION)
-				continue;
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
 
-			if (i->second->pos == common::vec_to_ivec(_pos)) {
-				return i->second;
-			}
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return i->second;
 		}
 	}
 
-	return nullptr;
+	return std::weak_ptr<entity>();
 }
 
-entity* entity_manager::get_collisions(entity* _owner, glm::vec2 _pos, std::string _tag) {
-	if (_tag.empty()) {
-		for (const auto& entity : entities) {
-			if (entity.get() == _owner)
-				continue;
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second.get() == _ignored_entity)
+			continue;
 
-			if (entity->flags & ENTITY_NO_COLLISION)
-				continue;
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
 
-			if (entity->pos == common::vec_to_ivec(_pos)) {
-				return entity.get();
-			}
-		}
-	}
-	else {
-		auto range = entities_quick_tag_lookup.equal_range(_tag);
-		for (auto i = range.first; i != range.second; ++i) {
-			if (i->second == _owner)
-				continue;
-
-			if (i->second->flags & ENTITY_NO_COLLISION)
-				continue;
-
-			if (i->second->pos == common::vec_to_ivec(_pos)) {
-				return i->second;
-			}
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return i->second;
 		}
 	}
 
-	return nullptr;
+	return std::weak_ptr<entity>();
+}
+
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, std::string _tag) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->tag != _tag)
+			continue;
+
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
+
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return i->second;
+		}
+	}
+
+	return std::weak_ptr<entity>();
+}
+
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) {
+	auto range = entities_position_lookup.equal_range(_pos);
+	for (auto i = range.first; i != range.second; ++i) {
+		if (i->second->tag != _tag)
+			continue;
+
+		if (i->second.get() == _ignored_entity)
+			continue;
+
+		if (i->second->flags & ENTITY_NO_COLLISION)
+			continue;
+
+		if (i->second->pos == common::vec_to_ivec(_pos)) {
+			return i->second;
+		}
+	}
+
+
+	return std::weak_ptr<entity>();
 }
 
 //
@@ -289,6 +364,20 @@ enemy_entity::~enemy_entity() {
 }
 
 void enemy_entity::update(double dt) {
-	if (is_dead)
+	if (is_dead) {
+		spr->colour = { 1, .5f, 0 };
+		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
 		return;
+	}
+
+	if (auto player_ref = manager->find_entity_by_tag("player").lock()) {
+		std::unordered_map<glm::ivec2, glm::ivec2> came_from;
+		std::unordered_map<glm::ivec2, int> cost_so_far;
+
+		a_star_search(*manager, pos, player_ref->pos, came_from, cost_so_far);
+		auto path = reconstruct_path(pos, player_ref->pos, came_from);
+		for (auto i : path) {
+			renderer::debug::draw_circle((glm::vec2)i * (float)renderer::cell_size + (float)renderer::cell_size / 2, 5, colour::green);
+		}
+	}
 }

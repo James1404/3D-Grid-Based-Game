@@ -1,5 +1,6 @@
 #pragma once
 #include <glm.hpp>
+#include <gtx/hash.hpp>
 #include <memory>
 #include <vector>
 #include <string>
@@ -41,28 +42,7 @@ namespace common {
 	inline glm::ivec2 vec_to_ivec(glm::vec2 vec) {
 		return (glm::ivec2)vec_floor(vec);
 	}
-
-	/*
-	inline bool check_collisions(entity_manager* _manager, glm::vec2 _pos, std::string _tag = "", entity* _hit_entity = nullptr) {
-		for (const auto& entity : _manager->entities) {
-			if (!_tag.empty() && entity->tag != _tag)
-				continue;
-
-			if (entity->flags & ENTITY_NO_COLLISION)
-				continue;
-
-			if (entity->pos == vec_to_ivec(_pos)) {
-				_hit_entity = entity.get();
-				return true;
-			}
-		}
-
-		return false;
-	}
-	*/
 }
-
-struct entity;
 
 //
 // EVENTS
@@ -86,13 +66,16 @@ struct event_manager {
 // EVENT MANAGER
 //
 
+struct entity;
+
 struct entity_manager {
 	std::string name;
 
 	event_manager game_event_manager;
 
 	std::vector<std::shared_ptr<entity>> entities;
-	std::multimap<std::string, entity*> entities_quick_tag_lookup;
+	std::multimap<std::string, std::shared_ptr<entity>> entities_tag_lookup;
+	std::unordered_multimap<glm::ivec2, std::shared_ptr<entity>> entities_position_lookup;
 
 	void init();
 	void update(double dt);
@@ -101,12 +84,21 @@ struct entity_manager {
 	void save();
 	void load(std::string level_name);
 
-	// collisions
-	bool check_collisions(glm::vec2 _pos, std::string _tag = "");
-	bool check_collisions(entity* _owner, glm::vec2 _pos, std::string _tag = "");
+	bool is_walkable(glm::ivec2 _pos) const;
+	std::vector<glm::ivec2> neighbors(glm::ivec2 _pos) const;
 
-	entity* get_collisions(glm::vec2 _pos, std::string _tag = "");
-	entity* get_collisions(entity* _owner, glm::vec2 _pos, std::string _tag = "");
+	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
+
+	// collisions
+	bool check_collisions(glm::vec2 _pos);
+	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity);
+	bool check_collisions(glm::vec2 _pos, std::string _tag);
+	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag);
+
+	std::weak_ptr<entity> get_collisions(glm::vec2 _pos);
+	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity);
+	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, std::string _tag);
+	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag);
 };
 
 // 
@@ -120,9 +112,9 @@ enum ENTITY_FLAGS_ {
 	ENTITY_NO_DAMAGE = 1 << 1,
 	ENTITY_NO_COLLISION = 1 << 2
 };
-inline void ENTITY_FLAG_SET(ENTITY_FLAGS* x, ENTITY_FLAGS_ mask) { *x |= mask; }
-inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS* x, ENTITY_FLAGS_ mask) { *x &= ~mask; }
-inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS* x, ENTITY_FLAGS_ mask) { *x ^= mask; }
+inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
+inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
+inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x ^= mask; }
 
 static uint32_t current_id = 0;
 struct entity {
@@ -167,8 +159,8 @@ struct entity {
 			return;
 
 		for (int i = 0; i < _range + 1; i++) {
-			if (manager->check_collisions(pos + (_direction * i))) {
-				pos += _direction * i;
+			if (manager->check_collisions(pos + (_direction * i), this)) {
+				pos += _direction * (i - 1);
 				return;
 			}
 		}
