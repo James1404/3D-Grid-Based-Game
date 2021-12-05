@@ -75,7 +75,6 @@ struct entity_manager {
 
 	std::vector<std::shared_ptr<entity>> entities;
 	std::multimap<std::string, std::shared_ptr<entity>> entities_tag_lookup;
-	std::unordered_multimap<glm::ivec2, std::shared_ptr<entity>> entities_position_lookup;
 
 	void init();
 	void update(double dt);
@@ -84,16 +83,17 @@ struct entity_manager {
 	void save();
 	void load(std::string level_name);
 
+	// helper functions
 	bool is_walkable(glm::ivec2 _pos) const;
 	std::vector<glm::ivec2> neighbors(glm::ivec2 _pos) const;
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
 
 	// collisions
-	bool check_collisions(glm::vec2 _pos);
-	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity);
-	bool check_collisions(glm::vec2 _pos, std::string _tag);
-	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag);
+	bool check_collisions(glm::vec2 _pos) const;
+	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity) const;
+	bool check_collisions(glm::vec2 _pos, std::string _tag) const;
+	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) const;
 
 	std::weak_ptr<entity> get_collisions(glm::vec2 _pos);
 	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity);
@@ -116,22 +116,21 @@ inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
 inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
 inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x ^= mask; }
 
-static uint32_t current_id = 0;
 struct entity {
-	uint32_t id;
 	ENTITY_FLAGS flags;
 	std::string tag;
 
 	entity_manager* manager;
 
-	glm::ivec2 pos;
+	glm::ivec2 grid_pos;
+	glm::vec2 visual_pos;
 
 	int max_health_points = 3;
 	int current_health_points;
 
 	bool is_dead = false;
 
-	entity() : id(current_id++), flags(0), tag(""), pos(0, 0), current_health_points(3), is_dead(false) {
+	entity() : flags(0), tag(""), grid_pos(0, 0), visual_pos(0, 0), current_health_points(3), is_dead(false) {
 		printf("INITIALIZED ENTITY %p\n", this);
 	}
 
@@ -159,18 +158,27 @@ struct entity {
 			return;
 
 		for (int i = 0; i < _range + 1; i++) {
-			if (manager->check_collisions(pos + (_direction * i), this)) {
-				pos += _direction * (i - 1);
+			if (manager->check_collisions(grid_pos + (_direction * i), this)) {
+				grid_pos += _direction * (i - 1);
 				return;
 			}
 		}
 
-		pos += _direction * _range;
+		grid_pos += _direction * _range;
 	}
 };
 
 struct enemy_entity : public entity {
-	renderer::sprite* spr;
+	renderer::sprite spr;
+
+	glm::vec2 vel;
+	glm::ivec2 direction;
+
+	const float movement_speed = 0.0025f;
+
+	glm::ivec2 player_path_position;
+	int current_path_waypoint = 0;
+	std::vector<glm::ivec2> path;
 
 	enemy_entity();
 	~enemy_entity();

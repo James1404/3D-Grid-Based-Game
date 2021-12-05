@@ -36,7 +36,7 @@ inline int heuristic(glm::ivec2 a, glm::ivec2 b) {
 	return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
-void a_star_search(entity_manager& _graph, glm::ivec2 _start, glm::ivec2 _goal,
+inline void a_star_search(entity_manager& _graph, glm::ivec2 _start, glm::ivec2 _goal,
 	std::unordered_map<glm::ivec2, glm::ivec2>& came_from,
 	std::unordered_map<glm::ivec2, int>& cost_so_far) {
 	PriorityQueue<glm::ivec2, int> frontier;
@@ -51,7 +51,7 @@ void a_star_search(entity_manager& _graph, glm::ivec2 _start, glm::ivec2 _goal,
 		if (current == _goal)
 			break;
 
-		for (glm::ivec2 next : _graph.neighbors(current)) {
+		for (auto next : _graph.neighbors(current)) {
 			int new_cost = cost_so_far[current] + 1;
 			if (cost_so_far.find(next) == cost_so_far.end() || new_cost < cost_so_far[next]) {
 				cost_so_far[next] = new_cost;
@@ -63,7 +63,7 @@ void a_star_search(entity_manager& _graph, glm::ivec2 _start, glm::ivec2 _goal,
 	}
 }
 
-std::vector<glm::ivec2> reconstruct_path(glm::ivec2 _start, glm::ivec2 _goal,
+inline std::vector<glm::ivec2> reconstruct_path(glm::ivec2 _start, glm::ivec2 _goal,
 	std::unordered_map<glm::ivec2, glm::ivec2> came_from) {
 	std::vector<glm::ivec2> path;
 	glm::ivec2 current = _goal;
@@ -71,7 +71,7 @@ std::vector<glm::ivec2> reconstruct_path(glm::ivec2 _start, glm::ivec2 _goal,
 		path.push_back(current);
 		current = came_from[current];
 	}
-	path.push_back(_start); // optional
+	//path.push_back(_start); // optional
 	std::reverse(path.begin(), path.end());
 	return path;
 }

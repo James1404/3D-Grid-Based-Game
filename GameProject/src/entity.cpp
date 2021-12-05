@@ -44,12 +44,6 @@ void entity_manager::init() {
 }
 
 void entity_manager::update(double dt) {
-	entities_position_lookup.clear();
-
-	for (auto& _entity : entities) {
-		entities_position_lookup.emplace(_entity->pos, _entity);
-	}
-
 	for (auto& _entity : entities) {
 		_entity->update(dt);
 	}
@@ -60,7 +54,6 @@ void entity_manager::clean() {
 
 	entities.clear();
 	entities_tag_lookup.clear();
-	entities_position_lookup.clear();
 
 	name.clear();
 
@@ -80,7 +73,7 @@ void entity_manager::save() {
 		if (!entities.empty()) {
 			for (auto& _entity : entities) {
 				if (_entity->tag == "enemy") {
-					ofs << "ENEMY" << " " << (int)_entity->pos.x << " " << (int)_entity->pos.y << std::endl;
+					ofs << "ENEMY" << " " << (int)_entity->grid_pos.x << " " << (int)_entity->grid_pos.y << std::endl;
 				}
 			}
 
@@ -92,7 +85,6 @@ void entity_manager::save() {
 }
 
 void entity_manager::load(std::string level_name) {
-	printf("---------------------\n");
 	printf("RETRIEVING SCENE FILE\n");
 
 	clean();
@@ -128,7 +120,7 @@ void entity_manager::load(std::string level_name) {
 
 				auto p = std::make_shared<player_entity>();
 				p->manager = this;
-				p->pos = position;
+				p->grid_pos = position;
 
 				entities.push_back(p);
 				entities_tag_lookup.emplace(p->tag, p);
@@ -139,7 +131,7 @@ void entity_manager::load(std::string level_name) {
 
 				auto e = std::make_shared<enemy_entity>();
 				e->manager = this;
-				e->pos = position;
+				e->grid_pos = position;
 
 				entities.push_back(e);
 				entities_tag_lookup.emplace(e->tag, e);
@@ -149,7 +141,6 @@ void entity_manager::load(std::string level_name) {
 		name = level_name;
 
 		printf("FINISHED LOADING SCENE DATA\n");
-		printf("---------------------------\n");
 	}
 	else {
 		printf("CANNOT FIND SCENE FILE\n");
@@ -159,10 +150,8 @@ void entity_manager::load(std::string level_name) {
 }
 
 bool entity_manager::is_walkable(glm::ivec2 _pos) const {
-	for (auto& entity : entities) {
-		if (entity->pos == _pos)
-			return false;
-	}
+	if (check_collisions(_pos))
+		return false;
 
 	return true;
 }
@@ -172,7 +161,7 @@ std::vector<glm::ivec2> entity_manager::neighbors(glm::ivec2 _pos) const {
 
 	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0} };
 	for (auto dir : DIRS) {
-		glm::ivec2 next{ _pos.x + dir.x, _pos.y + dir.y };
+		glm::ivec2 next = _pos + dir;
 		
 		results.push_back(next);
 	}
@@ -198,13 +187,12 @@ std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const
 // CHECK COLLISIONS
 //
 
-bool entity_manager::check_collisions(glm::vec2 _pos) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->flags & ENTITY_NO_COLLISION)
+bool entity_manager::check_collisions(glm::vec2 _pos) const {
+	for(auto& entity : entities) {
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -212,16 +200,15 @@ bool entity_manager::check_collisions(glm::vec2 _pos) {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second.get() == _ignored_entity)
+bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) const {
+	for (auto& entity : entities) {
+		if (entity.get() == _ignored_entity)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -229,18 +216,17 @@ bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) {
+bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) const {
 	// TODO: remove !tag.empty() it probaly isnt needed because
 	// it just wont find any entites with empty _tag.
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->tag != _tag)
+	for (auto& entity : entities) {
+		if (entity->tag != _tag)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -248,19 +234,18 @@ bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->tag != _tag)
+bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) const {
+	for (auto& entity : entities) {
+		if (entity->tag != _tag)
 			continue;
 
-		if (i->second.get() == _ignored_entity)
+		if (entity.get() == _ignored_entity)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -273,13 +258,12 @@ bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, s
 //
 
 std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->flags & ENTITY_NO_COLLISION)
+	for (auto& entity : entities) {
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
-			return i->second;
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return entity;
 		}
 	}
 
@@ -287,16 +271,15 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos) {
 }
 
 std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second.get() == _ignored_entity)
+	for (auto& entity : entities) {
+		if (entity.get() == _ignored_entity)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
-			return i->second;
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return entity;
 		}
 	}
 
@@ -304,16 +287,15 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ig
 }
 
 std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, std::string _tag) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->tag != _tag)
+	for (auto& entity : entities) {
+		if (entity->tag != _tag)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
-			return i->second;
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return entity;
 		}
 	}
 
@@ -321,19 +303,18 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, std::string
 }
 
 std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) {
-	auto range = entities_position_lookup.equal_range(_pos);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->tag != _tag)
+	for (auto& entity : entities) {
+		if (entity->tag != _tag)
 			continue;
 
-		if (i->second.get() == _ignored_entity)
+		if (entity.get() == _ignored_entity)
 			continue;
 
-		if (i->second->flags & ENTITY_NO_COLLISION)
+		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (i->second->pos == common::vec_to_ivec(_pos)) {
-			return i->second;
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return entity;
 		}
 	}
 
@@ -348,11 +329,12 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ig
 enemy_entity::enemy_entity() {
 	tag = "enemy";
 
-	spr = renderer::create_sprite();
-	spr->position = &pos;
-	spr->layer = -1;
+	spr.position = &visual_pos;
+	spr.layer = -1;
 	//spr->set_sprite_path("player.png");
-	spr->colour = { 1,0,0 };
+	spr.colour = { 1,0,0 };
+
+	vel = { 0,0 };
 
 	is_dead = false;
 
@@ -360,24 +342,51 @@ enemy_entity::enemy_entity() {
 }
 
 enemy_entity::~enemy_entity() {
-	renderer::delete_sprite(spr);
+
 }
 
 void enemy_entity::update(double dt) {
 	if (is_dead) {
-		spr->colour = { 1, .5f, 0 };
+		spr.colour = { 1, .5f, 0 };
 		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
 		return;
 	}
 
 	if (auto player_ref = manager->find_entity_by_tag("player").lock()) {
-		std::unordered_map<glm::ivec2, glm::ivec2> came_from;
-		std::unordered_map<glm::ivec2, int> cost_so_far;
+		if (player_ref->grid_pos != player_path_position) {
+			std::unordered_map<glm::ivec2, glm::ivec2> came_from;
+			std::unordered_map<glm::ivec2, int> cost_so_far;
 
-		a_star_search(*manager, pos, player_ref->pos, came_from, cost_so_far);
-		auto path = reconstruct_path(pos, player_ref->pos, came_from);
-		for (auto i : path) {
-			renderer::debug::draw_circle((glm::vec2)i * (float)renderer::cell_size + (float)renderer::cell_size / 2, 5, colour::green);
+			a_star_search(*manager, grid_pos, player_ref->grid_pos, came_from, cost_so_far);
+			path = reconstruct_path(grid_pos, player_ref->grid_pos, came_from);
+			
+			player_path_position = player_ref->grid_pos;
+			current_path_waypoint = 0;
 		}
 	}
+
+	if (path.empty())
+		return;
+
+	if (grid_pos == path[current_path_waypoint] && current_path_waypoint + 1 < path.size())
+		current_path_waypoint++;
+
+	for (auto i : path) {
+		renderer::debug::draw_circle((glm::vec2)i * (float)renderer::cell_size + (float)renderer::cell_size / 2, 5, colour::green);
+	}
+
+	if (vel == glm::vec2(0))
+		visual_pos = grid_pos;
+
+	visual_pos = common::move_towards(visual_pos, grid_pos, movement_speed * dt);
+	if (visual_pos != (glm::vec2)grid_pos)
+		return;
+
+	vel = path[current_path_waypoint] - grid_pos;
+	vel = glm::normalize(vel);
+
+	if (manager->check_collisions(grid_pos + (glm::ivec2)vel, this))
+		return;
+
+	grid_pos += vel;
 }
