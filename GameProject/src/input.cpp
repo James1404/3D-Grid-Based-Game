@@ -21,7 +21,6 @@ void input::init() {
 	previous_keyboard_state = new Uint8[keyboard_state_size];
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 
-	printf("-----------------\n");
 	printf("INITIALIZED INPUT\n");
 }
 
@@ -234,7 +233,6 @@ void input::save() {
 void input::load() {
 	MAPPED_INPUTS.clear();
 
-	printf("---------------------\n");
 	printf("RETRIEVING INPUT FILE\n");
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {

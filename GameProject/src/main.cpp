@@ -86,7 +86,6 @@ int main(int argc, char* args[]) {
 	}
 
 	/* ----- CLEAN GAME ----- */
-	printf("----------------\n");
 	printf("STARTING CLEANUP\n");
 
 	manager.clean();
