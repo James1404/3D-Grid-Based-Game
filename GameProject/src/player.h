@@ -6,12 +6,9 @@
 #include "collision.h"
 
 struct player_entity : public entity {
-	renderer::sprite* spr;
+	renderer::sprite spr;
 
-	glm::ivec2 previous_pos;
-	glm::vec2 target_pos;
 	glm::vec2 vel;
-
 	glm::ivec2 direction;
 
 	const int shoot_range = 5;
