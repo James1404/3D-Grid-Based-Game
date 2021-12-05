@@ -91,12 +91,11 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 int renderer::screen_width = 1280, renderer::screen_height = 720;
 const int renderer::screen_resolution_x = 320, renderer::screen_resolution_y = 200;
 
-std::vector<std::unique_ptr<renderer::sprite>> render_list;
+static std::vector<renderer::sprite*> render_list;
 
 unsigned int sprite_shader;
 
 void renderer::init() {
-	printf("--------------------------------\n");
 	printf("STARTING RENDERER INITIALIZATION\n");
 	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -154,7 +153,7 @@ void renderer::start_draw() {
 void renderer::draw_sprites() {
 	std::multimap <int, sprite*> render_order;
 	for (auto& i : render_list) {
-		render_order.insert({ i->layer, i.get() });
+		render_order.insert({ i->layer, i });
 	}
 
 	for (auto& i : render_order) {
@@ -223,18 +222,27 @@ renderer::sprite::sprite() {
 	// Set projection matrix attribute
 	glUseProgram(sprite_shader);
 	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "projection"), 1, false, glm::value_ptr(projection));
+
+	render_list.push_back(this);
 }
 
 renderer::sprite::~sprite() {
 	// glDeleteTextures(1, &texture);
 	glDeleteVertexArrays(1, &vao);
+
+	for (auto it = render_list.begin(); it != render_list.end();) {
+		if (*it == this)
+			it = render_list.erase(it);
+		else
+			++it;
+	}
 }
 
 void renderer::sprite::draw() {
 	glUseProgram(sprite_shader);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(*position * cell_size, 0));
+	model = glm::translate(model, glm::vec3(*position * (float)cell_size, 0));
 	model = glm::scale(model, glm::vec3(cell_size, cell_size, 1.0f));
 
 	glUniform3fv(glGetUniformLocation(sprite_shader, "colour"), 1, glm::value_ptr(colour));
@@ -274,34 +282,6 @@ void renderer::sprite::set_sprite_path(std::string sprite_name) {
 	stbi_image_free(data);
 }
 */
-
-renderer::sprite* renderer::create_sprite() {
-	auto s = std::make_unique<sprite>();
-	auto pointer = s.get();
-
-	// TODO: allow dynamic layer changing
-	render_list.push_back(std::move(s));
-
-	printf(" - SPRITE CREATED\n");
-
-	return pointer;
-}
-
-void renderer::delete_sprite(renderer::sprite* _sprite) {
-	// TODO: replace delete sprite code with cleaner code
-	//printf(" - DELETED SPRITE LOC: %p\n", _sprite);
-	//render_list.erase(std::remove(render_list.begin(), render_list.end(), _sprite), render_list.end());
-
-	for (auto it = render_list.begin(); it != render_list.end();) {
-		if (it->get() == _sprite) {
-			printf(" - DELETED SPRITE LOC: %p\n", it->get());
-			it = render_list.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-}
 
 #ifdef _DEBUG
 //

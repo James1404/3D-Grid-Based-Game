@@ -53,7 +53,7 @@ namespace renderer {
 
 		// void set_sprite_path(std::string sprite_name);
 
-		glm::ivec2* position;
+		glm::vec2* position;
 		int layer;
 
 		glm::vec3 colour;
@@ -62,9 +62,6 @@ namespace renderer {
 		// lets keep things simple squares for now
 		// unsigned int texture;
 	};
-
-	sprite* create_sprite();
-	void delete_sprite(sprite* _sprite);
 
 #ifdef _DEBUG
 	namespace debug {
