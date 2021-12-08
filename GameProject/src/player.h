@@ -15,9 +15,19 @@ struct player_entity : public entity {
 	uint32_t shoot_end_time = 0;
 	const uint32_t shoot_cooldown_duration = 1000;
 
-	const float movement_speed = 0.005f;
+	enum player_states {
+		IDLE = 0,
+		MOVE_UP,
+		MOVE_DOWN,
+		MOVE_LEFT,
+		MOVE_RIGHT,
+		ATTACK,
+		SHOOT
+	} player_state;
 
 	player_entity();
 	~player_entity();
-	void update(double dt) override;
+	void update_input(double dt) override;
+	void update_logic(int steps) override;
+	void update_visuals(double dt) override;
 };

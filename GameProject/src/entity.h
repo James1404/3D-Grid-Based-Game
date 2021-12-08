@@ -130,7 +130,14 @@ struct entity {
 
 	bool is_dead = false;
 
-	entity() : flags(0), tag(""), grid_pos(0, 0), visual_pos(0, 0), current_health_points(3), is_dead(false) {
+	int steps_per_update;
+
+	float visual_interp_speed;
+
+	entity()
+		: flags(0), tag(""), grid_pos(0, 0), visual_pos(0, 0),
+		current_health_points(3), is_dead(false), steps_per_update(1), visual_interp_speed(0.02f)
+	{
 		printf("INITIALIZED ENTITY %p\n", this);
 	}
 
@@ -138,7 +145,9 @@ struct entity {
 		printf("DESTROYED ENTITY %p\n", this);
 	}
 
-	virtual void update(double dt) {}
+	virtual void update_input(double dt) {}
+	virtual void update_logic(int steps) {}
+	virtual void update_visuals(double dt) {}
 
 	void do_damage(int _damage) {
 		if (flags & ENTITY_NO_DAMAGE)
@@ -174,13 +183,13 @@ struct enemy_entity : public entity {
 	glm::vec2 vel;
 	glm::ivec2 direction;
 
-	const float movement_speed = 0.0025f;
-
 	glm::ivec2 player_path_position;
 	int current_path_waypoint = 0;
 	std::vector<glm::ivec2> path;
 
 	enemy_entity();
 	~enemy_entity();
-	virtual void update(double dt);
+	void update_input(double dt) override;
+	void update_logic(int steps) override;
+	void update_visuals(double dt) override;
 };

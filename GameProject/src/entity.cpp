@@ -43,9 +43,39 @@ void entity_manager::init() {
 
 }
 
+float currentTime = SDL_GetTicks() / 1000.0f;
+float accumulator = 0.0f;
+float tick_rate = 1.0f / 5.0f;
+
+int steps = 0;
 void entity_manager::update(double dt) {
 	for (auto& _entity : entities) {
-		_entity->update(dt);
+		_entity->update_input(dt);
+	}
+
+	const float new_time = SDL_GetTicks() / 1000.0f;
+	float frame_time = new_time - currentTime;
+
+	if (frame_time > 0.25)
+		frame_time = 0.25;
+
+	currentTime = new_time;
+	accumulator += frame_time;
+
+	while (accumulator >= tick_rate) {
+		steps++;
+		for (auto& _entity : entities) {
+			if (steps % _entity->steps_per_update != 0)
+				continue;
+
+			_entity->update_logic(steps);
+		}
+
+		accumulator -= tick_rate;
+	}
+
+	for (auto& _entity : entities) {
+		_entity->update_visuals(dt);
 	}
 }
 
@@ -338,6 +368,10 @@ enemy_entity::enemy_entity() {
 
 	is_dead = false;
 
+	current_path_waypoint = 0;
+
+	steps_per_update = 4;
+
 	current_health_points = max_health_points;
 }
 
@@ -345,13 +379,7 @@ enemy_entity::~enemy_entity() {
 
 }
 
-void enemy_entity::update(double dt) {
-	if (is_dead) {
-		spr.colour = { 1, .5f, 0 };
-		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
-		return;
-	}
-
+void enemy_entity::update_input(double dt) {
 	if (auto player_ref = manager->find_entity_by_tag("player").lock()) {
 		if (player_ref->grid_pos != player_path_position) {
 			std::unordered_map<glm::ivec2, glm::ivec2> came_from;
@@ -359,34 +387,46 @@ void enemy_entity::update(double dt) {
 
 			a_star_search(*manager, grid_pos, player_ref->grid_pos, came_from, cost_so_far);
 			path = reconstruct_path(grid_pos, player_ref->grid_pos, came_from);
-			
+
 			player_path_position = player_ref->grid_pos;
 			current_path_waypoint = 0;
 		}
 	}
 
-	if (path.empty())
+	if (path.empty()) {
+		vel = { 0,0 };
 		return;
+	}
 
 	if (grid_pos == path[current_path_waypoint] && current_path_waypoint + 1 < path.size())
 		current_path_waypoint++;
 
-	for (auto i : path) {
-		renderer::debug::draw_circle((glm::vec2)i * (float)renderer::cell_size + (float)renderer::cell_size / 2, 5, colour::green);
-	}
-
-	if (vel == glm::vec2(0))
-		visual_pos = grid_pos;
-
-	visual_pos = common::move_towards(visual_pos, grid_pos, movement_speed * dt);
-	if (visual_pos != (glm::vec2)grid_pos)
-		return;
-
 	vel = path[current_path_waypoint] - grid_pos;
 	vel = glm::normalize(vel);
+}
+
+void enemy_entity::update_logic(int steps) {
+	if (is_dead) {
+		spr.colour = { 1, .5f, 0 };
+		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
+		return;
+	}
 
 	if (manager->check_collisions(grid_pos + (glm::ivec2)vel, this))
 		return;
 
 	grid_pos += vel;
+}
+
+void enemy_entity::update_visuals(double dt) {
+	if (!path.empty()) {
+		for (auto i : path) {
+			renderer::debug::draw_circle((glm::vec2)i * (float)renderer::cell_size + (float)renderer::cell_size / 2, 5, colour::green);
+		}
+	}
+
+	if (vel == glm::vec2(0))
+		visual_pos = grid_pos;
+
+	visual_pos = common::move_towards(visual_pos, grid_pos, visual_interp_speed * dt);
 }

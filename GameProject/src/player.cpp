@@ -11,9 +11,7 @@
 #include <SDL.h>
 
 struct player_camera : public camera::camera_interface {
-	glm::vec2 offset = { 20,10 };
-
-	glm::vec2 pos = { 0,0 };
+	glm::vec2 pos{ 0 };
 	const float camera_speed = 0.01f;
 
 	player_entity* owner;
@@ -22,12 +20,11 @@ struct player_camera : public camera::camera_interface {
 	~player_camera() { }
 
 	void update(double dt) override {
-		pos = common::lerp(pos, (glm::vec2)owner->grid_pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2), dt * camera_speed);
+		pos = common::lerp(pos, (glm::vec2)owner->grid_pos * (float)renderer::cell_size + ((float)renderer::cell_size / 2), camera_speed * dt);
 	
 		view = glm::translate(glm::mat4(1.0f),
 			glm::vec3(pos.x - (renderer::screen_resolution_x / 2),
-				pos.y - (renderer::screen_resolution_y / 2),
-				0.0f));
+			pos.y - (renderer::screen_resolution_y / 2), 0.0f));
 	
 		view = glm::inverse(view);
 	}
@@ -48,6 +45,10 @@ player_entity::player_entity() {
 	is_dead = false;
 	current_health_points = max_health_points;
 
+	steps_per_update = 5;
+
+	player_state = IDLE;
+
 	camera::register_camera("Player", std::make_shared<player_camera>(this));
 }
 
@@ -55,76 +56,105 @@ player_entity::~player_entity() {
 
 }
 
-void player_entity::update(double dt) {
-	camera::set_camera("Player");
-
-	if (is_dead)
-		return;
-
-	renderer::debug::draw_circle(glm::vec2(grid_pos * renderer::cell_size) + ((float)renderer::cell_size / 2), 1, colour::green);
-	renderer::debug::draw_box_wireframe(grid_pos * renderer::cell_size + direction * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
-	
-	if (vel == glm::vec2(0))
-		visual_pos = grid_pos;
-
-	visual_pos = common::move_towards(visual_pos, grid_pos, movement_speed * dt);
-	if (visual_pos != (glm::vec2)grid_pos)
-		return;
-
-	if (vel.x == 0) {
-		if (input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))
-			vel.y = 0;
-		else if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
-			direction = { 0,1 };
-			vel.y = 1;
+void player_entity::update_input(double dt) {
+	if (!(player_state == ATTACK || player_state == SHOOT)) {
+		if (input::button_pressed("MoveUp") || input::button_pressed("MoveDown")) {
+			if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+				if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
+					direction = { 0,1 };
+					player_state = MOVE_UP;
+				}
+				else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
+					direction = { 0,-1 };
+					player_state = MOVE_DOWN;
+				}
+			}
+			else
+				player_state = IDLE;
 		}
-		else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
-			direction = { 0,-1 };
-			vel.y = -1;
-		}
-		else
-			vel.y = 0;
-	}
-
-	if (vel.y == 0) {
-		if (input::button_pressed("MoveRight") && input::button_pressed("MoveLeft"))
-			vel.x = 0;
-		else if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
-			direction = { 1,0 };
-			vel.x = 1;
-		}
-		else if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
-			direction = { -1,0 };
-			vel.x = -1;
+		else if (input::button_pressed("MoveRight") || input::button_pressed("MoveLeft")) {
+			if (!(input::button_pressed("MoveRight") && input::button_pressed("MoveLeft"))) {
+				if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
+					direction = { 1,0 };
+					player_state = MOVE_RIGHT;
+				}
+				else if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
+					direction = { -1,0 };
+					player_state = MOVE_LEFT;
+				}
+			}
+			else
+				player_state = IDLE;
 		}
 		else
-			vel.x = 0;
+			player_state = IDLE;
 	}
 
-	if (input::button_down("Attack")) {
+	if (input::button_down("Attack"))
+		player_state = ATTACK;
+
+	if (input::button_down("Shoot"))
+		player_state = SHOOT;
+}
+
+void player_entity::update_logic(int steps) {
+	if (is_dead) {
+		spr.colour = { 1, .5f, 0 };
+		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
+		return;
+	}
+
+	switch (player_state) {
+	case player_entity::IDLE:
+		vel = { 0,0 };
+		break;
+	case player_entity::MOVE_UP:
+		vel = { 0,1 };
+		break;
+	case player_entity::MOVE_DOWN:
+		vel = { 0,-1 };
+		break;
+	case player_entity::MOVE_LEFT:
+		vel = { -1,0 };
+		break;
+	case player_entity::MOVE_RIGHT:
+		vel = { 1,0 };
+		break;
+	case player_entity::ATTACK:
 		if (auto hit_entity = manager->get_collisions(grid_pos + direction, "enemy").lock()) {
 			hit_entity->do_damage(1);
 			printf("Attack\n");
 		}
-	}
-
-	if (input::button_down("Shoot")) {
-		if (shoot_end_time < SDL_GetTicks()) {
-			for (int i = 0; i < shoot_range + 1; i++) {
-				if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
-					hit_entity->do_damage(1);
-					hit_entity->knockback(direction, 1);
-					break;
-				}
+		player_state = IDLE;
+		break;
+	case player_entity::SHOOT:
+		for (int i = 0; i < shoot_range + 1; i++) {
+			if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
+				hit_entity->do_damage(1);
+				hit_entity->knockback(direction, 1);
+				break;
 			}
-
-			printf("Shoot\n");
-			shoot_end_time = SDL_GetTicks() + shoot_cooldown_duration;
 		}
+
+		printf("Shoot\n");
+		player_state = IDLE;
+		break;
 	}
 
 	if (manager->check_collisions(grid_pos + (glm::ivec2)vel, this))
 		return;
 
 	grid_pos += vel;
+}
+
+void player_entity::update_visuals(double dt) {
+	camera::set_camera("Player");
+
+	renderer::debug::draw_circle(glm::vec2(grid_pos * renderer::cell_size) + ((float)renderer::cell_size / 2), 1, colour::green);
+	renderer::debug::draw_box_wireframe(grid_pos * renderer::cell_size + direction * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
+
+	if (vel == glm::vec2(0))
+		visual_pos = grid_pos;
+
+	visual_pos = common::move_towards(visual_pos, grid_pos, visual_interp_speed * dt);
 }
