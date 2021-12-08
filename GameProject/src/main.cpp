@@ -20,6 +20,7 @@ enum class GAME_STATE {
 entity_manager manager;
 
 uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
+
 int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
