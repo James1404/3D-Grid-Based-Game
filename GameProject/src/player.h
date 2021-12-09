@@ -5,6 +5,16 @@
 #include "renderer.h"
 #include "collision.h"
 
+enum class player_states {
+	IDLE = 0,
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+	ATTACK,
+	SHOOT
+};
+
 struct player_entity : public entity {
 	renderer::sprite spr;
 
@@ -15,15 +25,7 @@ struct player_entity : public entity {
 	uint32_t shoot_end_time = 0;
 	const uint32_t shoot_cooldown_duration = 1000;
 
-	enum player_states {
-		IDLE = 0,
-		MOVE_UP,
-		MOVE_DOWN,
-		MOVE_LEFT,
-		MOVE_RIGHT,
-		ATTACK,
-		SHOOT
-	} player_state;
+	common::Limited_Queue<player_states, 2> state_queue;
 
 	player_entity();
 	~player_entity();
