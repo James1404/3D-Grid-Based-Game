@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+#include <queue>
 
 #include "renderer.h"
 #include "collision.h"
@@ -42,6 +43,52 @@ namespace common {
 	inline glm::ivec2 vec_to_ivec(glm::vec2 vec) {
 		return (glm::ivec2)vec_floor(vec);
 	}
+
+	template<typename T, int Size>
+	class Limited_Queue {
+	public:
+		void push(T _item) {
+			if (size() >= Size)
+				return;
+
+			queue.push(_item);
+		}
+
+		void push_only_to_front(T _item) {
+			if (size() != 0)
+				return;
+
+			queue.push(_item);
+		}
+
+		T get() {
+			if (empty())
+				return T();
+
+			T _item = queue.front();
+			queue.pop();
+			return _item;
+		}
+
+		T front() const {
+			if (empty())
+				return T();
+
+			return queue.front();
+		}
+
+		bool front_equals(T _item) const {
+			if (empty())
+				return false;
+
+			return front() == _item;
+		}
+
+		bool empty() const { return queue.empty(); }
+		int size() const { return queue.size(); }
+	private:
+		std::queue<T> queue;
+	};
 }
 
 //
