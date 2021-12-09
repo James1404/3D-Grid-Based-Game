@@ -47,8 +47,6 @@ player_entity::player_entity() {
 
 	steps_per_update = 5;
 
-	player_state = IDLE;
-
 	camera::register_camera("Player", std::make_shared<player_camera>(this));
 }
 
@@ -57,44 +55,60 @@ player_entity::~player_entity() {
 }
 
 void player_entity::update_input(double dt) {
-	if (!(player_state == ATTACK || player_state == SHOOT)) {
-		if (input::button_pressed("MoveUp") || input::button_pressed("MoveDown")) {
-			if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
-				if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
-					direction = { 0,1 };
-					player_state = MOVE_UP;
-				}
-				else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
-					direction = { 0,-1 };
-					player_state = MOVE_DOWN;
-				}
+	if (input::button_down("MoveUp")) {
+		direction = { 0,1 };
+		state_queue.push(player_states::MOVE_UP);
+	}
+	else if (input::button_down("MoveDown")) {
+		direction = { 0,-1 };
+		state_queue.push(player_states::MOVE_DOWN);
+	}
+	else if (input::button_down("MoveLeft")) {
+		direction = { -1,0 };
+		state_queue.push(player_states::MOVE_LEFT);
+	}
+	else if (input::button_down("MoveRight")) {
+		direction = { 1,0 };
+		state_queue.push(player_states::MOVE_RIGHT);
+	}
+	
+	if (input::button_pressed("MoveUp") || input::button_pressed("MoveDown")) {
+		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+			if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
+				state_queue.push_only_to_front(player_states::MOVE_UP);
 			}
-			else
-				player_state = IDLE;
-		}
-		else if (input::button_pressed("MoveRight") || input::button_pressed("MoveLeft")) {
-			if (!(input::button_pressed("MoveRight") && input::button_pressed("MoveLeft"))) {
-				if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
-					direction = { 1,0 };
-					player_state = MOVE_RIGHT;
-				}
-				else if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
-					direction = { -1,0 };
-					player_state = MOVE_LEFT;
-				}
+			else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
+				state_queue.push_only_to_front(player_states::MOVE_DOWN);
 			}
-			else
-				player_state = IDLE;
 		}
-		else
-			player_state = IDLE;
+	}
+	else if (input::button_pressed("MoveLeft") || input::button_pressed("MoveRight")) {
+		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
+			if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
+				state_queue.push_only_to_front(player_states::MOVE_LEFT);
+			}
+			else if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
+				state_queue.push_only_to_front(player_states::MOVE_RIGHT);
+			}
+		}
 	}
 
 	if (input::button_down("Attack"))
-		player_state = ATTACK;
+		state_queue.push(player_states::ATTACK);
 
 	if (input::button_down("Shoot"))
-		player_state = SHOOT;
+		state_queue.push(player_states::SHOOT);
+
+	if (input::button_pressed("Run") // check if is moving before increasing steps_per_update
+		&& (state_queue.front_equals(player_states::MOVE_UP)
+		|| state_queue.front_equals(player_states::MOVE_DOWN)
+		|| state_queue.front_equals(player_states::MOVE_LEFT)
+		|| state_queue.front_equals(player_states::MOVE_RIGHT))) {
+		steps_per_update = 1;
+	}
+	else {
+		steps_per_update = 3;
+	}
 }
 
 void player_entity::update_logic(int steps) {
@@ -104,30 +118,29 @@ void player_entity::update_logic(int steps) {
 		return;
 	}
 
-	switch (player_state) {
-	case player_entity::IDLE:
+	switch (state_queue.get()) {
+	case player_states::IDLE:
 		vel = { 0,0 };
 		break;
-	case player_entity::MOVE_UP:
+	case player_states::MOVE_UP:
 		vel = { 0,1 };
 		break;
-	case player_entity::MOVE_DOWN:
+	case player_states::MOVE_DOWN:
 		vel = { 0,-1 };
 		break;
-	case player_entity::MOVE_LEFT:
+	case player_states::MOVE_LEFT:
 		vel = { -1,0 };
 		break;
-	case player_entity::MOVE_RIGHT:
+	case player_states::MOVE_RIGHT:
 		vel = { 1,0 };
 		break;
-	case player_entity::ATTACK:
+	case player_states::ATTACK:
 		if (auto hit_entity = manager->get_collisions(grid_pos + direction, "enemy").lock()) {
 			hit_entity->do_damage(1);
 			printf("Attack\n");
 		}
-		player_state = IDLE;
 		break;
-	case player_entity::SHOOT:
+	case player_states::SHOOT:
 		for (int i = 0; i < shoot_range + 1; i++) {
 			if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
 				hit_entity->do_damage(1);
@@ -137,7 +150,6 @@ void player_entity::update_logic(int steps) {
 		}
 
 		printf("Shoot\n");
-		player_state = IDLE;
 		break;
 	}
 
