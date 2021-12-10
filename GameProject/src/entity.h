@@ -6,90 +6,9 @@
 #include <string>
 #include <unordered_map>
 #include <map>
-#include <queue>
 
 #include "renderer.h"
 #include "collision.h"
-
-//
-// COMMON FUNCTIONS
-//
-
-namespace common {
-	inline float lerp(const float a, const float b, const float t) {
-		return (a * (1.0f - t) + (b * t));
-	}
-
-	inline glm::vec2 lerp(const glm::vec2 a, const glm::vec2 b, const float t) {
-		return glm::vec2(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
-	}
-
-	inline glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step) {
-		const glm::vec2 delta = target - pos;
-		const float len2 = glm::dot(delta, delta);
-
-		if (len2 < step * step)
-			return target;
-
-		const glm::vec2 direction = delta / glm::sqrt(len2);
-
-		return pos + step * direction;
-	}
-
-	inline glm::vec2 vec_floor(glm::vec2 vec) {
-		return glm::vec2(floorf(vec.x), floorf(vec.y));
-	}
-
-	inline glm::ivec2 vec_to_ivec(glm::vec2 vec) {
-		return (glm::ivec2)vec_floor(vec);
-	}
-
-	template<typename T, int Size>
-	class Limited_Queue {
-	public:
-		void push(T _item) {
-			if (size() >= Size)
-				return;
-
-			queue.push(_item);
-		}
-
-		void push_only_to_front(T _item) {
-			if (size() != 0)
-				return;
-
-			queue.push(_item);
-		}
-
-		T get() {
-			if (empty())
-				return T();
-
-			T _item = queue.front();
-			queue.pop();
-			return _item;
-		}
-
-		T front() const {
-			if (empty())
-				return T();
-
-			return queue.front();
-		}
-
-		bool front_equals(T _item) const {
-			if (empty())
-				return false;
-
-			return front() == _item;
-		}
-
-		bool empty() const { return queue.empty(); }
-		int size() const { return queue.size(); }
-	private:
-		std::queue<T> queue;
-	};
-}
 
 //
 // EVENTS
@@ -110,13 +29,15 @@ struct event_manager {
 };
 
 //
-// EVENT MANAGER
+// ENTITY MANAGER
 //
 
 struct entity;
 
 struct entity_manager {
 	std::string name;
+
+	int step_accumulator = 0;
 
 	event_manager game_event_manager;
 
@@ -146,6 +67,11 @@ struct entity_manager {
 	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity);
 	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, std::string _tag);
 	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag);
+
+	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius);
+	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity);
+	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, std::string _tag);
+	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity, std::string _tag);
 };
 
 // 
@@ -157,7 +83,9 @@ enum ENTITY_FLAGS_ {
 	ENTITY_NONE = 0,
 	ENTITY_DISABLED = 1 << 0,
 	ENTITY_NO_DAMAGE = 1 << 1,
-	ENTITY_NO_COLLISION = 1 << 2
+	ENTITY_NO_COLLISION = 1 << 2,
+	ENTITY_NO_KNOCKBACK = 1 << 3,
+	ENTITY_NO_STAGGER = 1 << 4
 };
 inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
 inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
@@ -193,7 +121,7 @@ struct entity {
 	}
 
 	virtual void update_input(double dt) {}
-	virtual void update_logic(int steps) {}
+	virtual void update_logic() {}
 	virtual void update_visuals(double dt) {}
 
 	void do_damage(int _damage) {
@@ -209,8 +137,17 @@ struct entity {
 			is_dead = true;
 	}
 
+	void stagger() {
+		if (flags & ENTITY_NO_STAGGER)
+			return;
+
+		if (is_dead)
+			return;
+
+	}
+
 	void knockback(glm::ivec2 _direction, int _range) {
-		if (flags & ENTITY_NO_DAMAGE)
+		if (flags & ENTITY_NO_KNOCKBACK)
 			return;
 
 		for (int i = 0; i < _range + 1; i++) {
@@ -222,21 +159,4 @@ struct entity {
 
 		grid_pos += _direction * _range;
 	}
-};
-
-struct enemy_entity : public entity {
-	renderer::sprite spr;
-
-	glm::vec2 vel;
-	glm::ivec2 direction;
-
-	glm::ivec2 player_path_position;
-	int current_path_waypoint = 0;
-	std::vector<glm::ivec2> path;
-
-	enemy_entity();
-	~enemy_entity();
-	void update_input(double dt) override;
-	void update_logic(int steps) override;
-	void update_visuals(double dt) override;
 };
