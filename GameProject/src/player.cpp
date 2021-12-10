@@ -7,8 +7,6 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <memory>
-#include <cmath>
-#include <SDL.h>
 
 struct player_camera : public camera::camera_interface {
 	glm::vec2 pos{ 0 };
@@ -56,62 +54,58 @@ player_entity::~player_entity() {
 
 void player_entity::update_input(double dt) {
 	if (input::button_down("MoveUp")) {
-		direction = { 0,1 };
-		state_queue.push(player_states::MOVE_UP);
+		state_queue.push(MOVE_UP);
 	}
 	else if (input::button_down("MoveDown")) {
-		direction = { 0,-1 };
-		state_queue.push(player_states::MOVE_DOWN);
+		state_queue.push(MOVE_DOWN);
 	}
 	else if (input::button_down("MoveLeft")) {
-		direction = { -1,0 };
-		state_queue.push(player_states::MOVE_LEFT);
+		state_queue.push(MOVE_LEFT);
 	}
 	else if (input::button_down("MoveRight")) {
-		direction = { 1,0 };
-		state_queue.push(player_states::MOVE_RIGHT);
+		state_queue.push(MOVE_RIGHT);
 	}
 	
 	if (input::button_pressed("MoveUp") || input::button_pressed("MoveDown")) {
 		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
 			if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
-				state_queue.push_only_to_front(player_states::MOVE_UP);
+				state_queue.push_at_front(MOVE_UP);
 			}
 			else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
-				state_queue.push_only_to_front(player_states::MOVE_DOWN);
+				state_queue.push_at_front(MOVE_DOWN);
 			}
 		}
 	}
 	else if (input::button_pressed("MoveLeft") || input::button_pressed("MoveRight")) {
 		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
 			if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
-				state_queue.push_only_to_front(player_states::MOVE_LEFT);
+				state_queue.push_at_front(MOVE_LEFT);
 			}
 			else if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
-				state_queue.push_only_to_front(player_states::MOVE_RIGHT);
+				state_queue.push_at_front(MOVE_RIGHT);
 			}
 		}
 	}
 
 	if (input::button_down("Attack"))
-		state_queue.push(player_states::ATTACK);
+		state_queue.push(ATTACK);
 
 	if (input::button_down("Shoot"))
-		state_queue.push(player_states::SHOOT);
+		state_queue.push(SHOOT);
 
 	if (input::button_pressed("Run") // check if is moving before increasing steps_per_update
-		&& (state_queue.front_equals(player_states::MOVE_UP)
-		|| state_queue.front_equals(player_states::MOVE_DOWN)
-		|| state_queue.front_equals(player_states::MOVE_LEFT)
-		|| state_queue.front_equals(player_states::MOVE_RIGHT))) {
-		steps_per_update = 1;
+		&& (state_queue.front_equals(MOVE_UP)
+		|| state_queue.front_equals(MOVE_DOWN)
+		|| state_queue.front_equals(MOVE_LEFT)
+		|| state_queue.front_equals(MOVE_RIGHT))) {
+		steps_per_update = 2;
 	}
 	else {
-		steps_per_update = 3;
+		steps_per_update = 4;
 	}
 }
 
-void player_entity::update_logic(int steps) {
+void player_entity::update_logic() {
 	if (is_dead) {
 		spr.colour = { 1, .5f, 0 };
 		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
@@ -123,15 +117,19 @@ void player_entity::update_logic(int steps) {
 		vel = { 0,0 };
 		break;
 	case player_states::MOVE_UP:
+		direction = { 0,1 };
 		vel = { 0,1 };
 		break;
 	case player_states::MOVE_DOWN:
+		direction = { 0,-1 };
 		vel = { 0,-1 };
 		break;
 	case player_states::MOVE_LEFT:
+		direction = { -1,0 };
 		vel = { -1,0 };
 		break;
 	case player_states::MOVE_RIGHT:
+		direction = { 1,0 };
 		vel = { 1,0 };
 		break;
 	case player_states::ATTACK:
