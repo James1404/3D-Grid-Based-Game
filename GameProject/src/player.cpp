@@ -53,37 +53,26 @@ player_entity::~player_entity() {
 }
 
 void player_entity::update_input(double dt) {
-	if (input::button_down("MoveUp")) {
-		state_queue.push(MOVE_UP);
+	if (stagger_end_step > internal_step_accum) {
+		steps_per_update = walk_speed;
+		return;
 	}
-	else if (input::button_down("MoveDown")) {
-		state_queue.push(MOVE_DOWN);
-	}
-	else if (input::button_down("MoveLeft")) {
-		state_queue.push(MOVE_LEFT);
-	}
-	else if (input::button_down("MoveRight")) {
-		state_queue.push(MOVE_RIGHT);
-	}
-	
-	if (input::button_pressed("MoveUp") || input::button_pressed("MoveDown")) {
-		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
-			if (input::button_pressed("MoveUp") && !input::button_down("MoveUp")) {
-				state_queue.push_at_front(MOVE_UP);
-			}
-			else if (input::button_pressed("MoveDown") && !input::button_down("MoveDown")) {
-				state_queue.push_at_front(MOVE_DOWN);
-			}
+
+	if(!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+		if (input::button_pressed("MoveUp")) {
+			state_queue.push_at_front(MOVE_UP);
+		}
+		else if (input::button_pressed("MoveDown")) {
+			state_queue.push_at_front(MOVE_DOWN);
 		}
 	}
-	else if (input::button_pressed("MoveLeft") || input::button_pressed("MoveRight")) {
-		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
-			if (input::button_pressed("MoveLeft") && !input::button_down("MoveLeft")) {
-				state_queue.push_at_front(MOVE_LEFT);
-			}
-			else if (input::button_pressed("MoveRight") && !input::button_down("MoveRight")) {
-				state_queue.push_at_front(MOVE_RIGHT);
-			}
+	
+	if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
+		if (input::button_pressed("MoveLeft")) {
+			state_queue.push_at_front(MOVE_LEFT);
+		}
+		else if (input::button_pressed("MoveRight")) {
+			state_queue.push_at_front(MOVE_RIGHT);
 		}
 	}
 
@@ -98,10 +87,10 @@ void player_entity::update_input(double dt) {
 		|| state_queue.front_equals(MOVE_DOWN)
 		|| state_queue.front_equals(MOVE_LEFT)
 		|| state_queue.front_equals(MOVE_RIGHT))) {
-		steps_per_update = 2;
+		steps_per_update = run_speed;
 	}
 	else {
-		steps_per_update = 4;
+		steps_per_update = walk_speed;
 	}
 }
 
@@ -135,6 +124,7 @@ void player_entity::update_logic() {
 	case player_states::ATTACK:
 		if (auto hit_entity = manager->get_collisions(grid_pos + direction, "enemy").lock()) {
 			hit_entity->do_damage(1);
+			hit_entity->stagger(2);
 			printf("Attack\n");
 		}
 		break;
@@ -143,6 +133,7 @@ void player_entity::update_logic() {
 			if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
 				hit_entity->do_damage(1);
 				hit_entity->knockback(direction, 1);
+				hit_entity->stagger(5);
 				break;
 			}
 		}

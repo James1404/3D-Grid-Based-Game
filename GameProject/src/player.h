@@ -12,6 +12,9 @@ struct player_entity : public entity {
 	glm::vec2 vel;
 	glm::ivec2 direction;
 
+	const int walk_speed = 6;
+	const int run_speed = 4;
+	
 	const int shoot_range = 5;
 	uint32_t shoot_end_time = 0;
 	const uint32_t shoot_cooldown_duration = 1000;
