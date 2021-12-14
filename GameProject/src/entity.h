@@ -54,6 +54,7 @@ struct entity_manager {
 	// helper functions
 	bool is_walkable(glm::ivec2 _pos) const;
 	std::vector<glm::ivec2> neighbors(glm::ivec2 _pos) const;
+	std::vector<glm::ivec2> diagonal_neighbors(glm::ivec2 _pos) const;
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
 
@@ -137,13 +138,17 @@ struct entity {
 			is_dead = true;
 	}
 
-	void stagger() {
+	int internal_step_accum = 0;
+	int stagger_end_step = 0;
+
+	void stagger(int stagger_duration) {
 		if (flags & ENTITY_NO_STAGGER)
 			return;
 
 		if (is_dead)
 			return;
 
+		stagger_end_step = internal_step_accum + stagger_duration;
 	}
 
 	void knockback(glm::ivec2 _direction, int _range) {

@@ -45,7 +45,7 @@ void entity_manager::init() {
 
 float currentTime = SDL_GetTicks() / 1000.0f;
 float accumulator = 0.0f;
-float tick_rate = 1.0f / 12.0f;
+float tick_rate = 1.0f / 24.0f;
 
 void entity_manager::update(double dt) {
 	for (auto& _entity : entities) {
@@ -65,6 +65,10 @@ void entity_manager::update(double dt) {
 		step_accumulator++;
 		for (auto& _entity : entities) {
 			if (step_accumulator % _entity->steps_per_update != 0)
+				continue;
+
+			_entity->internal_step_accum++;
+			if (_entity->stagger_end_step > _entity->internal_step_accum)
 				continue;
 
 			_entity->update_logic();
@@ -159,7 +163,7 @@ void entity_manager::load(std::string level_name) {
 				glm::ivec2 position;
 				ss >> position.x >> position.y;
 
-				auto e = std::make_shared<enemy_entity>();
+				auto e = std::make_shared<pusher_enemy_entity>();
 				e->manager = this;
 				e->grid_pos = position;
 
@@ -193,6 +197,22 @@ std::vector<glm::ivec2> entity_manager::neighbors(glm::ivec2 _pos) const {
 	for (auto dir : DIRS) {
 		glm::ivec2 next = _pos + dir;
 		
+		results.push_back(next);
+	}
+
+	if ((_pos.x + _pos.y) % 2 == 0)
+		std::reverse(results.begin(), results.end());
+
+	return results;
+}
+
+std::vector<glm::ivec2> entity_manager::diagonal_neighbors(glm::ivec2 _pos) const {
+	std::vector<glm::ivec2> results;
+
+	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} };
+	for (auto dir : DIRS) {
+		glm::ivec2 next = _pos + dir;
+
 		results.push_back(next);
 	}
 
