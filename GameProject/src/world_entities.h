@@ -3,7 +3,10 @@
 #include "entity.h"
 #include "pathfinding.h"
 
-struct enemy_entity : public entity {
+//
+// ENEMIES
+//
+struct pusher_enemy_entity : public entity {
 	renderer::sprite spr;
 
 	glm::vec2 vel;
@@ -13,7 +16,7 @@ struct enemy_entity : public entity {
 	int current_path_waypoint = 0;
 	std::vector<glm::ivec2> path;
 
-	enemy_entity() {
+	pusher_enemy_entity() {
 		tag = "enemy";
 
 		spr.position = &visual_pos;
@@ -31,7 +34,7 @@ struct enemy_entity : public entity {
 		current_health_points = max_health_points;
 	}
 
-	~enemy_entity() {
+	~pusher_enemy_entity() {
 
 	}
 
@@ -68,6 +71,16 @@ struct enemy_entity : public entity {
 			return;
 		}
 
+		for (auto neighbour : manager->neighbors(grid_pos)) {
+			if (auto hit_player = manager->get_collisions(neighbour, "player").lock()) {
+				glm::ivec2 dir = glm::normalize((glm::vec2)(hit_player->grid_pos - grid_pos));
+				hit_player->knockback(dir, 3);
+				hit_player->stagger(2);
+				printf("push\n");
+				return;
+			}
+		}
+
 		if (manager->check_collisions(grid_pos + (glm::ivec2)vel, this))
 			return;
 
@@ -75,6 +88,10 @@ struct enemy_entity : public entity {
 	}
 
 	void update_visuals(double dt) override {
+		for (auto neighbour : manager->neighbors(grid_pos)) {
+			renderer::debug::draw_box_wireframe(neighbour * renderer::cell_size, glm::vec2(renderer::cell_size), colour::purple);
+		}
+
 		if (vel == glm::vec2(0))
 			visual_pos = grid_pos;
 
