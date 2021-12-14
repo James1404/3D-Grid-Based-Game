@@ -51,7 +51,7 @@ namespace common {
 		}
 
 		void push_at_front(_Ty type) {
-			if (!queue.empty())
+			if (!queue.empty() || queue.size() >= _TSize)
 				return;
 
 			queue.push(type);
