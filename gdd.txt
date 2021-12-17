@@ -1,7 +1,12 @@
 ----- DESIGN STUFF -----
-Should the game use delta time or fixed time-step?
-3d or 2d?
-Should the game have bosses?
+Should the game use delta time or fixed time-step? delta_time.
+To improve input wait until moving is dont to query input.
+Also we should probaly lerp for consistent speed across distances.
+
+------REDUNDANT QUESTIONS------
+- 3d or 2d?
+- Should the game have bosses?
+-------------------------------
 
 ----- ENEMIES -----
 
