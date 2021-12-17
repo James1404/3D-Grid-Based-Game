@@ -49,36 +49,10 @@ float tick_rate = 1.0f / 24.0f;
 
 void entity_manager::update(double dt) {
 	for (auto& _entity : entities) {
-		_entity->update_input(dt);
-	}
+		if (_entity->stagger_end_time > SDL_GetTicks())
+			continue;
 
-	const float new_time = SDL_GetTicks() / 1000.0f;
-	float frame_time = new_time - currentTime;
-
-	if (frame_time > 0.25)
-		frame_time = 0.25;
-
-	currentTime = new_time;
-	accumulator += frame_time;
-
-	while (accumulator >= tick_rate) {
-		step_accumulator++;
-		for (auto& _entity : entities) {
-			if (step_accumulator % _entity->steps_per_update != 0)
-				continue;
-
-			_entity->internal_step_accum++;
-			if (_entity->stagger_end_step > _entity->internal_step_accum)
-				continue;
-
-			_entity->update_logic();
-		}
-
-		accumulator -= tick_rate;
-	}
-
-	for (auto& _entity : entities) {
-		_entity->update_visuals(dt);
+		_entity->update(dt);
 	}
 }
 
