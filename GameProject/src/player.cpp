@@ -36,14 +36,9 @@ player_entity::player_entity() {
 	spr.layer = 1;
 	spr.colour = { 0,0,1 };
 
-	vel = { 0,0 };
-
 	direction = { 0,1 };
 
-	is_dead = false;
-	current_health_points = max_health_points;
-
-	steps_per_update = 5;
+	interp_speed = walk_speed;
 
 	camera::register_camera("Player", std::make_shared<player_camera>(this));
 }
@@ -52,110 +47,82 @@ player_entity::~player_entity() {
 
 }
 
-void player_entity::update_input(double dt) {
-	if (stagger_end_step > internal_step_accum) {
-		steps_per_update = walk_speed;
-		return;
-	}
-
-	if(!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
-		if (input::button_pressed("MoveUp")) {
-			state_queue.push_at_front(MOVE_UP);
-		}
-		else if (input::button_pressed("MoveDown")) {
-			state_queue.push_at_front(MOVE_DOWN);
-		}
-	}
-	
-	if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
-		if (input::button_pressed("MoveLeft")) {
-			state_queue.push_at_front(MOVE_LEFT);
-		}
-		else if (input::button_pressed("MoveRight")) {
-			state_queue.push_at_front(MOVE_RIGHT);
-		}
-	}
-
-	if (input::button_down("Attack"))
-		state_queue.push(ATTACK);
-
-	if (input::button_down("Shoot"))
-		state_queue.push(SHOOT);
-
-	if (input::button_pressed("Run") // check if is moving before increasing steps_per_update
-		&& (state_queue.front_equals(MOVE_UP)
-		|| state_queue.front_equals(MOVE_DOWN)
-		|| state_queue.front_equals(MOVE_LEFT)
-		|| state_queue.front_equals(MOVE_RIGHT))) {
-		steps_per_update = run_speed;
-	}
-	else {
-		steps_per_update = walk_speed;
-	}
-}
-
-void player_entity::update_logic() {
+void player_entity::update(double dt) {
 	if (is_dead) {
 		spr.colour = { 1, .5f, 0 };
 		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
 		return;
 	}
 
-	switch (state_queue.get()) {
-	case player_states::IDLE:
-		vel = { 0,0 };
-		break;
-	case player_states::MOVE_UP:
-		direction = { 0,1 };
-		vel = { 0,1 };
-		break;
-	case player_states::MOVE_DOWN:
-		direction = { 0,-1 };
-		vel = { 0,-1 };
-		break;
-	case player_states::MOVE_LEFT:
-		direction = { -1,0 };
-		vel = { -1,0 };
-		break;
-	case player_states::MOVE_RIGHT:
-		direction = { 1,0 };
-		vel = { 1,0 };
-		break;
-	case player_states::ATTACK:
-		if (auto hit_entity = manager->get_collisions(grid_pos + direction, "enemy").lock()) {
-			hit_entity->do_damage(1);
-			hit_entity->stagger(2);
-			printf("Attack\n");
-		}
-		break;
-	case player_states::SHOOT:
-		for (int i = 0; i < shoot_range + 1; i++) {
-			if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
-				hit_entity->do_damage(1);
-				hit_entity->knockback(direction, 1);
-				hit_entity->stagger(5);
-				break;
-			}
-		}
+	if (input::button_down("Shoot"))
+		state_queue.push(SHOOT);
 
-		printf("Shoot\n");
-		break;
-	}
+	if (input::button_down("Attack"))
+		state_queue.push(ATTACK);
 
-	if (manager->check_collisions(grid_pos + (glm::ivec2)vel, this))
-		return;
-
-	grid_pos += vel;
-}
-
-void player_entity::update_visuals(double dt) {
+	// visuals
 	camera::set_camera("Player");
 
 	renderer::debug::draw_circle(glm::vec2(grid_pos * renderer::cell_size) + ((float)renderer::cell_size / 2), 1, colour::green);
 	renderer::debug::draw_box_wireframe(grid_pos * renderer::cell_size + direction * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
 
-	if (vel == glm::vec2(0))
-		visual_pos = grid_pos;
+	if (!is_moving) {
+		vel = { 0,0 };
 
-	visual_pos = common::move_towards(visual_pos, grid_pos, visual_interp_speed * dt);
+		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+			if (input::button_pressed("MoveUp")) {
+				direction = { 0,1 };
+				vel = { 0,1 };
+			}
+			else if (input::button_pressed("MoveDown")) {
+				direction = { 0,-1 };
+				vel = { 0,-1 };
+			}
+		}
+
+		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
+			if (input::button_pressed("MoveLeft")) {
+				direction = { -1,0 };
+				vel = { -1,0 };
+			}
+			else if (input::button_pressed("MoveRight")) {
+				direction = { 1,0 };
+				vel = { 1,0 };
+			}
+		}
+
+		if (input::button_pressed("Run")) {
+			interp_speed = run_speed;
+		}
+
+		if (move_grid_pos(vel))
+			state_queue.clear();
+
+		switch (state_queue.get()) {
+		case player_actions::IDLE:
+			break;
+		case player_actions::ATTACK:
+			if (auto hit_entity = manager->get_collisions(grid_pos + direction, "enemy").lock()) {
+				hit_entity->do_damage(1);
+				hit_entity->stagger(2);
+			}
+
+			printf("Attack\n");
+			break;
+		case player_actions::SHOOT:
+			for (int i = 0; i < shoot_range + 1; i++) {
+				if (auto hit_entity = manager->get_collisions(grid_pos + (direction * i), "enemy").lock()) {
+					hit_entity->do_damage(1);
+					hit_entity->knockback(direction, 1);
+					hit_entity->stagger(5);
+					break;
+				}
+			}
+
+			printf("Shoot\n");
+			break;
+		}
+	}
+
+	interp_visuals(dt, interp_speed);
 }

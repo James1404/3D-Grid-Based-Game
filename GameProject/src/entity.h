@@ -6,9 +6,11 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+#include <SDL.h>
 
 #include "renderer.h"
 #include "collision.h"
+#include "common.h"
 
 //
 // EVENTS
@@ -98,21 +100,20 @@ struct entity {
 
 	entity_manager* manager;
 
-	glm::ivec2 grid_pos;
+	glm::ivec2 grid_pos, previous_grid_pos;
 	glm::vec2 visual_pos;
+	glm::vec2 vel;
 
 	int max_health_points = 3;
 	int current_health_points;
 
 	bool is_dead = false;
-
-	int steps_per_update;
-
-	float visual_interp_speed;
+	bool is_moving = false;
 
 	entity()
-		: flags(0), tag(""), grid_pos(0, 0), visual_pos(0, 0),
-		current_health_points(3), is_dead(false), steps_per_update(1), visual_interp_speed(0.02f)
+		: flags(0), tag(""),
+		grid_pos(0, 0), previous_grid_pos(0, 0), visual_pos(0, 0), vel(0, 0),
+		current_health_points(3), is_dead(false), is_moving(true)
 	{
 		printf("INITIALIZED ENTITY %p\n", this);
 	}
@@ -121,9 +122,50 @@ struct entity {
 		printf("DESTROYED ENTITY %p\n", this);
 	}
 
-	virtual void update_input(double dt) {}
-	virtual void update_logic() {}
-	virtual void update_visuals(double dt) {}
+	virtual void update(double dt) {}
+
+	bool move_grid_pos(glm::ivec2 _dir, int _distance = 1) {
+		if (_dir == glm::ivec2(0))
+			return false;
+
+		glm::ivec2 new_pos = grid_pos + (_dir * _distance);
+		if (!(flags & ENTITY_NO_COLLISION)) {
+			if (_distance > 1) {
+				for (int i = 0; i < _distance + 1; i++) {
+					if (manager->check_collisions(grid_pos + (_distance * i), this)) {
+						new_pos = grid_pos + (_distance * (i - 1));
+					}
+				}
+			}
+			else {
+				if (manager->check_collisions(new_pos, this)) {
+					return false;
+				}
+			}
+		}
+
+		previous_grid_pos = grid_pos;
+		grid_pos = new_pos;
+		return true;
+	}
+
+	void move_with_collision(glm::ivec2 _dir, int _distance = 1) {
+		glm::ivec2 new_pos = grid_pos + (_dir * _distance);
+		if (manager->check_collisions(new_pos, this))
+			return;
+
+		previous_grid_pos = grid_pos;
+		grid_pos = new_pos;
+	}
+
+	void interp_visuals(double dt, float interp_speed) {
+		if (vel == glm::vec2(0))
+			visual_pos = grid_pos;
+		
+		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
+
+		is_moving = (visual_pos != (glm::vec2)grid_pos);
+	}
 
 	void do_damage(int _damage) {
 		if (flags & ENTITY_NO_DAMAGE)
@@ -138,30 +180,22 @@ struct entity {
 			is_dead = true;
 	}
 
-	int internal_step_accum = 0;
-	int stagger_end_step = 0;
+	int stagger_end_time = 0;
 
-	void stagger(int stagger_duration) {
+	void stagger(int _seconds) {
 		if (flags & ENTITY_NO_STAGGER)
 			return;
 
 		if (is_dead)
 			return;
 
-		stagger_end_step = internal_step_accum + stagger_duration;
+		stagger_end_time = SDL_GetTicks() + (_seconds);
 	}
 
 	void knockback(glm::ivec2 _direction, int _range) {
 		if (flags & ENTITY_NO_KNOCKBACK)
 			return;
 
-		for (int i = 0; i < _range + 1; i++) {
-			if (manager->check_collisions(grid_pos + (_direction * i), this)) {
-				grid_pos += _direction * (i - 1);
-				return;
-			}
-		}
-
-		grid_pos += _direction * _range;
+		move_grid_pos(_direction, _range);
 	}
 };
