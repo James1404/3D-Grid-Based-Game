@@ -11,6 +11,7 @@
 #include "renderer.h"
 #include "collision.h"
 #include "common.h"
+#include "log.h"
 
 //
 // EVENTS
@@ -115,11 +116,11 @@ struct entity {
 		grid_pos(0, 0), previous_grid_pos(0, 0), visual_pos(0, 0), vel(0, 0),
 		current_health_points(3), is_dead(false), is_moving(true)
 	{
-		printf("INITIALIZED ENTITY %p\n", this);
+		logger::info("INITIALIZED ENTITY ", this);
 	}
 
 	virtual ~entity() {
-		printf("DESTROYED ENTITY %p\n", this);
+		logger::info("DESTROYED ENTITY ", this);
 	}
 
 	virtual void update(double dt) {}

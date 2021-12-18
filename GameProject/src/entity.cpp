@@ -64,7 +64,7 @@ void entity_manager::clean() {
 
 	name.clear();
 
-	printf("CLEANED LEVEL DATA\n");
+	logger::info("CLEANED LEVEL DATA");
 }
 
 uint32_t fileVersion = 8;
@@ -93,7 +93,7 @@ void entity_manager::save() {
 }
 
 void entity_manager::load(std::string level_name) {
-	printf("RETRIEVING SCENE FILE\n");
+	logger::info("RETRIEVING SCENE FILE");
 
 	clean();
 
@@ -103,7 +103,7 @@ void entity_manager::load(std::string level_name) {
 
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open()) {
-		printf("PARSING SCENE FILE\n");
+		logger::info("PARSING SCENE FILE");
 
 		std::string line;
 		while (std::getline(ifs, line)) {
@@ -117,7 +117,8 @@ void entity_manager::load(std::string level_name) {
 				ss >> file_version;
 
 				if (file_version != fileVersion) {
-					printf("OUTDATED LEVEL FILE\n");
+					logger::warning("OUTDATED LEVEL FILE");
+					// TODO: maybe remove the return and just let it attempt to parse it.
 					return;
 				}
 			}
@@ -148,10 +149,10 @@ void entity_manager::load(std::string level_name) {
 
 		name = level_name;
 
-		printf("FINISHED LOADING SCENE DATA\n");
+		logger::info("FINISHED LOADING SCENE DATA");
 	}
 	else {
-		printf("CANNOT FIND SCENE FILE\n");
+		logger::error("CANNOT FIND SCENE FILE");
 	}
 
 	ifs.close();

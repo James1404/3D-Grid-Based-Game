@@ -2,6 +2,7 @@
 
 #include "renderer.h"
 #include "input.h"
+#include "log.h"
 
 #include "player.h"
 #include "camera.h"
@@ -55,8 +56,6 @@ int main(int argc, char* args[]) {
 					SDL_SetWindowSize(renderer::window, renderer::screen_width, renderer::screen_height);
 				}
 				break;
-			default:
-				break;
 			}
 		}
 
@@ -87,14 +86,14 @@ int main(int argc, char* args[]) {
 	}
 
 	/* ----- CLEAN GAME ----- */
-	printf("STARTING CLEANUP\n");
+	logger::info("STARTING CLEANUP");
 
 	manager.clean();
 
 	renderer::debug::clean_debug();
 	renderer::clean();
 
-	printf("CLEANUP FINISHED\n");
+	logger::info("CLEANUP FINISHED");
 
 	return 0;
 }

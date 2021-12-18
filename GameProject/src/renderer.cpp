@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "stb_image.h"
+#include "log.h"
 
 //
 // ----- SHADERS -----
@@ -19,7 +20,7 @@ void check_shader_compiler_errors(unsigned int shader) {
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::COMPILATION_FAILED%.4s\n", infoLog);
+		logger::error("SHADER COMPILATION FAILED ", infoLog);
 	}
 }
 
@@ -45,7 +46,7 @@ unsigned int create_shader(const char* vertexSource, const char* fragmentSource)
 		fShaderCode = fShaderStream.str();
 	}
 	catch (std::ifstream::failure e) {
-		printf("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n");
+		logger::error("SHADER FILE NOT SUCCESFULLY READ");
 	}
 
 	const char* vertexShader = vShaderCode.c_str();
@@ -96,7 +97,7 @@ static std::vector<renderer::sprite*> render_list;
 unsigned int sprite_shader;
 
 void renderer::init() {
-	printf("STARTING RENDERER INITIALIZATION\n");
+	logger::info("STARTING RENDERER INITIALIZATION");
 	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -112,7 +113,7 @@ void renderer::init() {
 		glewExperimental = GL_TRUE;
 		GLenum glewError = glewInit();
 		if (glewError != GLEW_OK) {
-			printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+			logger::error("Error initializing GLEW! ", glewGetErrorString(glewError));
 		}
 	}
 
@@ -120,7 +121,7 @@ void renderer::init() {
 
 	sprite_shader = create_shader("data/shaders/core.vs", "data/shaders/core.fs");
 
-	printf("SUCCESFULY COMPLETED RENDERER INITIALIZATION\n");
+	logger::info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 }
 
 void renderer::clean() {

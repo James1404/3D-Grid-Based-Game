@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "renderer.h"
+#include "log.h"
 
 const Uint8* keyboard_state;
 Uint8* previous_keyboard_state;
@@ -21,7 +22,7 @@ void input::init() {
 	previous_keyboard_state = new Uint8[keyboard_state_size];
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 
-	printf("INITIALIZED INPUT\n");
+	logger::info("INITIALIZED INPUT");
 }
 
 void input::update() {
@@ -227,16 +228,16 @@ void input::save() {
 	}
 
 	ofs.close();
-	printf("SAVED INPUT\n");
+	logger::info("SAVED INPUT");
 }
 
 void input::load() {
 	MAPPED_INPUTS.clear();
 
-	printf("RETRIEVING INPUT FILE\n");
+	logger::info("RETRIEVING INPUT FILE");
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {
-		printf("PARSING INPUT FILE\n");
+		logger::info("PARSING INPUT FILE");
 
 		std::string line;
 		while (std::getline(ifs, line)) {
@@ -248,14 +249,14 @@ void input::load() {
 			if (!(iss >> key >> type >> value)) { break; }
 
 			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (input_type)type)));
-			printf(" - %s : %u\n", key.c_str(), value);
+			logger::info(" - ", key.c_str(), " ", value);
 		}
-		printf("FINISHED LOADING INPUT DATA\n");
+		logger::info("FINISHED LOADING INPUT DATA");
 	}
 	else {
 		// THIS IS CALLED IF NOT INPUT FILE EXISTS AND IT MAKES ONE.
 
-		printf("CANNOT FIND INPUT FILE\n");
+		logger::warning("CANNOT FIND INPUT FILE");
 
 		//
 		// -- MOVEMENT INPUT --
