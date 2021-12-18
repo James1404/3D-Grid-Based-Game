@@ -1,15 +1,13 @@
 ----- DESIGN STUFF -----
-Should the game use delta time or fixed time-step? delta_time.
-To improve input wait until moving is dont to query input.
+Should the game use delta time or fixed time-step? delta_time. 		DONE
+To improve input wait until moving is dont to query input. 			DONE
 Also we should probaly lerp for consistent speed across distances.
 
-------REDUNDANT QUESTIONS------
-- 3d or 2d?
-- Should the game have bosses?
--------------------------------
+----- REDUNDANT QUESTIONS -----
+3d or 2d?
+Should the game have bosses?
 
 ----- ENEMIES -----
-
 Pusher:
 	Enemies that pileup and work together to push the player of the map.
 	Low health (dies in 1 or 2 hits).
@@ -40,6 +38,18 @@ Dasher:
 	Charges into friendly enemies and knocks them out of the path.
 
 ----- PLAYER ABILITIES -----
+Melee:
+	inflict knockback, and stagger on the enemy in the direction your facing.
+	Lowish damage
+	Short cooldown.
+
+Shoot:
+	Ranged attack that inflicts hight knockback and stagger.
+	Long cooldown.
+
+Running:
+	When running you move at a higher speed.
+	If you run into an enemy you will do knockback and stagger them, while also doing a small amount of damage.
 
 Jump:
 	Player can jump into the air over enemies and obstacles.
@@ -47,6 +57,5 @@ Jump:
 	Can chain jumps.
 	No air movement.
 
-Running:
-	When running you move at a higher speed.
-	If you run into an enemy you will do knockback and stagger them, while also doing a small amount of damage.
+----- CORE GAME LOOP -----
+Player needs to constantly be making tough decisions, and needs to be challenged.
