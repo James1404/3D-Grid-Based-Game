@@ -32,8 +32,7 @@ namespace renderer {
 	extern glm::mat4 projection;
 	extern glm::mat4 view;
 
-	extern int screen_width, screen_height;
-	extern const int screen_resolution_x, screen_resolution_y;
+	extern int screen_resolution_x, screen_resolution_y;
 
 	void init();
 	void clean();
@@ -45,22 +44,28 @@ namespace renderer {
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering
 
-	struct sprite {
-		sprite();
-		~sprite();
+	struct renderable {
+		virtual void draw() {}
+		virtual ~renderable() {}
 
-		void draw();
-
-		// void set_sprite_path(std::string sprite_name);
-
-		glm::vec2* position;
-		int layer;
+		glm::vec3* position;
 
 		glm::vec3 colour;
 		unsigned int vao;
+	};
 
-		// lets keep things simple squares for now
-		// unsigned int texture;
+	struct sprite : public renderable {
+		sprite();
+		~sprite();
+
+		void draw() override;
+	};
+
+	struct cube : public renderable {
+		cube();
+		~cube();
+
+		void draw() override;
 	};
 
 #ifdef _DEBUG
