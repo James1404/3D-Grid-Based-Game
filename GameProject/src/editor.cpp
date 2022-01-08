@@ -1,6 +1,5 @@
 #include "editor.h"
 
-#ifdef _DEBUG
 #include <SDL.h>
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
@@ -14,31 +13,7 @@
 #include "player.h"
 #include "camera.h"
 
-float camera_zoom_speed = .001f;
-struct editor_camera : public camera::camera_interface {
-	void update(double dt) override {
-		view = renderer::view;
-
-		if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
-			//  TODO: convert mouse position to world space
-			//	which will fix panning speed.
-			glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
-			view = glm::translate(view, { mouseDelta, 0.0f });
-		}
-
-		// TODO: it zooms into the center of the game, not the center of the camera
-		// TODO: use mouse wheel not buttons
-		float zoom = 1;
-		if (input::key_pressed(SDL_SCANCODE_Q)) { zoom -= camera_zoom_speed * dt; }
-		if (input::key_pressed(SDL_SCANCODE_E)) { zoom += camera_zoom_speed * dt; }
-
-		view = glm::scale(view, { zoom, zoom, 0 });
-	}
-};
-
-entity_manager* manager;
-
-void editor::init() {
+editor::editor(entity_manager& _manager) : manager(&_manager) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
@@ -49,21 +24,43 @@ void editor::init() {
 
 	manager->init();
 
-	camera::register_camera("Editor", std::make_shared<editor_camera>());
+	//manager->cameras.add_camera("Editor");
 }
 
-glm::vec2 velocity;
-float speed = 2;
+editor::~editor() {
+	manager->clean();
 
-static std::shared_ptr<entity> current_entity = nullptr;
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
-void editor::clear_selected() {
-	current_entity = nullptr;
+	printf("-----------------\n");
+	printf("EDITOR CLEANED UP\n");
+}
+
+static void clear_selected(editor* _editor) {
+	_editor->current_entity = nullptr;
+}
+
+void editor::update(double dt) {
+	manager->cameras.set_camera("Editor");
+	/* TODO: reimplemented camera code
+	if (input::mouse_button_pressed(input::MOUSE_RIGHT)) {
+		//  TODO: convert mouse position to world space
+		//	which will fix panning speed.
+		glm::vec2 mouseDelta = { -input::get_mouse_delta().x, input::get_mouse_delta().y };
+		//view = glm::translate(view, { mouseDelta, 0.0f });
+	}
+
+	// TODO: it zooms into the center of the game, not the center of the camera
+	// TODO: use mouse wheel not buttons
+	float zoom = 1;
+	if (input::key_pressed(SDL_SCANCODE_Q)) { zoom -= camera_zoom_speed * dt; }
+	if (input::key_pressed(SDL_SCANCODE_E)) { zoom += camera_zoom_speed * dt; }
+	*/
 }
 
 void editor::draw() {
-	camera::set_camera("Editor");
-
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
 	ImGui::NewFrame();
@@ -85,7 +82,7 @@ void editor::draw() {
 			ImGui::Text("Game Stats");
 
 			ImGui::Separator();
-			ImGui::Text("Screen Size: (%i, %i)", renderer::screen_width, renderer::screen_height);
+			ImGui::Text("Resolution: %i / %i", renderer::screen_resolution_x, renderer::screen_resolution_y);
 			
 			ImGui::Separator();
 			ImGui::Text("Number of:");
@@ -124,7 +121,7 @@ void editor::draw() {
 
 			if (ImGui::Button("Load")) {
 				if (!manager->name.empty()) {
-					clear_selected();
+					clear_selected(this);
 					manager->load(manager->name);
 				}
 				else {
@@ -135,7 +132,7 @@ void editor::draw() {
 			ImGui::SameLine();
 
 			if (ImGui::Button("Clear")) {
-				clear_selected();
+				clear_selected(this);
 				manager->clean();
 			}
 
@@ -148,18 +145,3 @@ void editor::draw() {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-
-void editor::clean() {
-	clear_selected();
-
-	manager->clean();
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
-
-	printf("-----------------\n");
-	printf("EDITOR CLEANED UP\n");
-}
-
-#endif // _DEBUG

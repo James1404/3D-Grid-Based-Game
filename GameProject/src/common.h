@@ -11,6 +11,10 @@ namespace common {
 		return glm::vec2(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
 	}
 
+	inline glm::vec3 lerp(const glm::vec3 a, const glm::vec3 b, const float t) {
+		return glm::vec3(lerp(a.x, b.x, t), lerp(a.y, b.y, t), lerp(a.z, b.z, t));
+	}
+
 	inline glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step) {
 		const glm::vec2 delta = target - pos;
 		const float len2 = glm::dot(delta, delta);
@@ -23,12 +27,32 @@ namespace common {
 		return pos + step * direction;
 	}
 
+	inline glm::vec3 move_towards(const glm::vec3 pos, const glm::vec3 target, const float step) {
+		const glm::vec3 delta = target - pos;
+		const float len2 = glm::dot(delta, delta);
+
+		if (len2 < step * step)
+			return target;
+
+		const glm::vec3 direction = delta / glm::sqrt(len2);
+
+		return pos + step * direction;
+	}
+
 	inline glm::vec2 vec_floor(glm::vec2 vec) {
 		return glm::vec2(floorf(vec.x), floorf(vec.y));
 	}
 
+	inline glm::vec3 vec_floor(glm::vec3 vec) {
+		return glm::vec3(floorf(vec.x), floorf(vec.y), floorf(vec.z));
+	}
+
 	inline glm::ivec2 vec_to_ivec(glm::vec2 vec) {
 		return (glm::ivec2)vec_floor(vec);
+	}
+
+	inline glm::ivec3 vec_to_ivec(glm::vec3 vec) {
+		return (glm::ivec3)vec_floor(vec);
 	}
 
 	template<class _Ty, int _TSize>

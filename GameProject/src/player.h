@@ -22,11 +22,12 @@ struct player_entity : public entity {
 
 	enum player_actions {
 		IDLE = 0,
-		ATTACK,
-		SHOOT
 	};
 
 	common::Limited_Queue<player_actions, 1> state_queue;
+
+	glm::vec3 cam_original_pos;
+	const float camera_speed = 0.01f;
 
 	player_entity();
 	~player_entity();

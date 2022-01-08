@@ -54,6 +54,8 @@ void entity_manager::update(double dt) {
 
 		_entity->update(dt);
 	}
+
+	cameras.update(dt);
 }
 
 void entity_manager::clean() {
@@ -79,12 +81,7 @@ void entity_manager::save() {
 
 		if (!entities.empty()) {
 			for (auto& _entity : entities) {
-				ofs << _entity->tag << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << std::endl;
-				/*
-				if (_entity->tag == "enemy") {
-					ofs << "ENEMY" << " " << (int)_entity->grid_pos.x << " " << (int)_entity->grid_pos.y << std::endl;
-				}
-				*/
+				ofs << _entity->tag << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
 			}
 		}
 	}
@@ -123,9 +120,9 @@ void entity_manager::load(std::string level_name) {
 				}
 			}
 
-			if (type == "PLAYER") {
-				glm::ivec2 position;
-				ss >> position.x >> position.y;
+			if (type == "player") {
+				glm::ivec3 position;
+				ss >> position.x >> position.y >> position.z;
 
 				auto p = std::make_shared<player_entity>();
 				p->manager = this;
@@ -134,16 +131,16 @@ void entity_manager::load(std::string level_name) {
 				entities.push_back(p);
 				entities_tag_lookup.emplace(p->tag, p);
 			}
-			else if (type == "ENEMY") {
-				glm::ivec2 position;
-				ss >> position.x >> position.y;
+			else if (type == "block") {
+				glm::ivec3 position;
+				ss >> position.x >> position.y >> position.z;
 
-				auto e = std::make_shared<pusher_enemy_entity>();
-				e->manager = this;
-				e->grid_pos = position;
+				auto b = std::make_shared<block_entity>();
+				b->manager = this;
+				b->grid_pos = position;
 
-				entities.push_back(e);
-				entities_tag_lookup.emplace(e->tag, e);
+				entities.push_back(b);
+				entities_tag_lookup.emplace(b->tag, b);
 			}
 		}
 
@@ -158,19 +155,19 @@ void entity_manager::load(std::string level_name) {
 	ifs.close();
 }
 
-bool entity_manager::is_walkable(glm::ivec2 _pos) const {
+bool entity_manager::is_walkable(glm::ivec3 _pos) const {
 	if (check_collisions(_pos))
 		return false;
 
 	return true;
 }
 
-std::vector<glm::ivec2> entity_manager::neighbors(glm::ivec2 _pos) const {
-	std::vector<glm::ivec2> results;
+std::vector<glm::ivec3> entity_manager::neighbors(glm::ivec3 _pos) const {
+	std::vector<glm::ivec3> results;
 
 	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0} };
 	for (auto dir : DIRS) {
-		glm::ivec2 next = _pos + dir;
+		glm::ivec3 next = _pos + glm::ivec3(dir,0);
 		
 		results.push_back(next);
 	}
@@ -181,12 +178,13 @@ std::vector<glm::ivec2> entity_manager::neighbors(glm::ivec2 _pos) const {
 	return results;
 }
 
-std::vector<glm::ivec2> entity_manager::diagonal_neighbors(glm::ivec2 _pos) const {
-	std::vector<glm::ivec2> results;
+std::vector<glm::ivec3> entity_manager::diagonal_neighbors(glm::ivec3 _pos) const {
+	std::vector<glm::ivec3> results;
 
+	// TODO: change directions to 3D
 	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} };
 	for (auto dir : DIRS) {
-		glm::ivec2 next = _pos + dir;
+		glm::ivec3 next = _pos + glm::ivec3(dir, 0);
 
 		results.push_back(next);
 	}
@@ -212,7 +210,7 @@ std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const
 // CHECK COLLISIONS
 //
 
-bool entity_manager::check_collisions(glm::vec2 _pos) const {
+bool entity_manager::check_collisions(glm::vec3 _pos) const {
 	for(auto& entity : entities) {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
@@ -225,7 +223,7 @@ bool entity_manager::check_collisions(glm::vec2 _pos) const {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) const {
+bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity) const {
 	for (auto& entity : entities) {
 		if (entity.get() == _ignored_entity)
 			continue;
@@ -241,7 +239,7 @@ bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity) c
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) const {
+bool entity_manager::check_collisions(glm::vec3 _pos, std::string _tag) const {
 	for (auto& entity : entities) {
 		if (entity->tag != _tag)
 			continue;
@@ -257,7 +255,7 @@ bool entity_manager::check_collisions(glm::vec2 _pos, std::string _tag) const {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) const {
+bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) const {
 	for (auto& entity : entities) {
 		if (entity->tag != _tag)
 			continue;
@@ -280,7 +278,7 @@ bool entity_manager::check_collisions(glm::vec2 _pos, entity* _ignored_entity, s
 // GET COLLISIONS
 //
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos) {
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos) {
 	for (auto& entity : entities) {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
@@ -293,7 +291,7 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos) {
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity) {
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, entity* _ignored_entity) {
 	for (auto& entity : entities) {
 		if (entity.get() == _ignored_entity)
 			continue;
@@ -309,7 +307,7 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ig
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, std::string _tag) {
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, std::string _tag) {
 	for (auto& entity : entities) {
 		if (entity->tag != _tag)
 			continue;
@@ -325,7 +323,7 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, std::string
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) {
+std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) {
 	for (auto& entity : entities) {
 		if (entity->tag != _tag)
 			continue;
@@ -343,140 +341,4 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec2 _pos, entity* _ig
 
 
 	return std::weak_ptr<entity>();
-}
-
-//
-// Circle Collisions
-//
-
-std::vector<std::weak_ptr<entity>> entity_manager::get_circle_collision(glm::vec2 _pos, float _radius) {
-	std::vector<std::weak_ptr<entity>> results;
-
-	glm::ivec2 center = common::vec_to_ivec(_pos);
-	int top = center.y - _radius,
-		bottom = center.y + _radius;
-
-	for (auto& entity : entities) {
-		if (entity->flags & ENTITY_NO_COLLISION)
-			continue;
-
-		for (int y = top; y <= bottom; y++) {
-			int dy = y - center.y;
-			float dx = sqrt(_radius * _radius - dy * dy);
-			int left = ceil(center.x - dx),
-				right = floor(center.x + dx);
-
-			for (int x = left; x <= right; x++) {
-				glm::ivec2 d = center - entity->grid_pos;
-				int distance = d.x * d.x + d.y * d.y;
-				if (distance <= _radius * _radius) {
-					results.push_back(entity);
-				}
-			}
-		}
-	}
-
-	return results;
-}
-
-std::vector<std::weak_ptr<entity>> entity_manager::get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity) {
-	std::vector<std::weak_ptr<entity>> results;
-
-	glm::ivec2 center = common::vec_to_ivec(_pos);
-	int top = center.y - _radius,
-		bottom = center.y + _radius;
-
-	for (auto& entity : entities) {
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags & ENTITY_NO_COLLISION)
-			continue;
-
-		for (int y = top; y <= bottom; y++) {
-			int dy = y - center.y;
-			float dx = sqrt(_radius * _radius - dy * dy);
-			int left = ceil(center.x - dx),
-				right = floor(center.x + dx);
-
-			for (int x = left; x <= right; x++) {
-				glm::ivec2 d = center - entity->grid_pos;
-				int distance = d.x * d.x + d.y * d.y;
-				if (distance <= _radius * _radius) {
-					results.push_back(entity);
-				}
-			}
-		}
-	}
-
-	return results;
-}
-
-std::vector<std::weak_ptr<entity>> entity_manager::get_circle_collision(glm::vec2 _pos, float _radius, std::string _tag) {
-	std::vector<std::weak_ptr<entity>> results;
-
-	glm::ivec2 center = common::vec_to_ivec(_pos);
-	int top = center.y - _radius,
-		bottom = center.y + _radius;
-
-	for (auto& entity : entities) {
-		if (entity->tag != _tag)
-			continue;
-
-		if (entity->flags & ENTITY_NO_COLLISION)
-			continue;
-
-		for (int y = top; y <= bottom; y++) {
-			int dy = y - center.y;
-			float dx = sqrt(_radius * _radius - dy * dy);
-			int left = ceil(center.x - dx),
-				right = floor(center.x + dx);
-
-			for (int x = left; x <= right; x++) {
-				glm::ivec2 d = center - entity->grid_pos;
-				int distance = d.x * d.x + d.y * d.y;
-				if (distance <= _radius * _radius) {
-					results.push_back(entity);
-				}
-			}
-		}
-	}
-
-	return results;
-}
-
-std::vector<std::weak_ptr<entity>> entity_manager::get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity, std::string _tag) {
-	std::vector<std::weak_ptr<entity>> results;
-
-	glm::ivec2 center = common::vec_to_ivec(_pos);
-	int top = center.y - _radius,
-		bottom = center.y + _radius;
-
-	for (auto& entity : entities) {
-		if (entity->tag != _tag)
-			continue;
-
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags & ENTITY_NO_COLLISION)
-			continue;
-
-		for (int y = top; y <= bottom; y++) {
-			int dy = y - center.y;
-			float dx = sqrt(_radius * _radius - dy * dy);
-			int left = ceil(center.x - dx),
-				right = floor(center.x + dx);
-
-			for (int x = left; x <= right; x++) {
-				glm::ivec2 d = center - entity->grid_pos;
-				int distance = d.x * d.x + d.y * d.y;
-				if (distance <= _radius * _radius) {
-					results.push_back(entity);
-				}
-			}
-		}
-	}
-
-	return results;
 }

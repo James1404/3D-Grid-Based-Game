@@ -12,6 +12,7 @@
 #include "collision.h"
 #include "common.h"
 #include "log.h"
+#include "camera.h"
 
 //
 // EVENTS
@@ -43,6 +44,7 @@ struct entity_manager {
 	int step_accumulator = 0;
 
 	event_manager game_event_manager;
+	camera_manager cameras;
 
 	std::vector<std::shared_ptr<entity>> entities;
 	std::multimap<std::string, std::shared_ptr<entity>> entities_tag_lookup;
@@ -55,27 +57,22 @@ struct entity_manager {
 	void load(std::string level_name);
 
 	// helper functions
-	bool is_walkable(glm::ivec2 _pos) const;
-	std::vector<glm::ivec2> neighbors(glm::ivec2 _pos) const;
-	std::vector<glm::ivec2> diagonal_neighbors(glm::ivec2 _pos) const;
+	bool is_walkable(glm::ivec3 _pos) const;
+	std::vector<glm::ivec3> neighbors(glm::ivec3 _pos) const;
+	std::vector<glm::ivec3> diagonal_neighbors(glm::ivec3 _pos) const;
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
 
 	// collisions
-	bool check_collisions(glm::vec2 _pos) const;
-	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity) const;
-	bool check_collisions(glm::vec2 _pos, std::string _tag) const;
-	bool check_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag) const;
+	bool check_collisions(glm::vec3 _pos) const;
+	bool check_collisions(glm::vec3 _pos, entity* _ignored_entity) const;
+	bool check_collisions(glm::vec3 _pos, std::string _tag) const;
+	bool check_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) const;
 
-	std::weak_ptr<entity> get_collisions(glm::vec2 _pos);
-	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity);
-	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, std::string _tag);
-	std::weak_ptr<entity> get_collisions(glm::vec2 _pos, entity* _ignored_entity, std::string _tag);
-
-	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius);
-	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity);
-	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, std::string _tag);
-	std::vector<std::weak_ptr<entity>> get_circle_collision(glm::vec2 _pos, float _radius, entity* _ignored_entity, std::string _tag);
+	std::weak_ptr<entity> get_collisions(glm::vec3 _pos);
+	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, entity* _ignored_entity);
+	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, std::string _tag);
+	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag);
 };
 
 // 
@@ -101,9 +98,9 @@ struct entity {
 
 	entity_manager* manager;
 
-	glm::ivec2 grid_pos, previous_grid_pos;
-	glm::vec2 visual_pos;
-	glm::vec2 vel;
+	glm::ivec3 grid_pos, previous_grid_pos;
+	glm::vec3 visual_pos;
+	glm::vec3 vel;
 
 	int max_health_points = 3;
 	int current_health_points;
@@ -113,7 +110,7 @@ struct entity {
 
 	entity()
 		: flags(0), tag(""),
-		grid_pos(0, 0), previous_grid_pos(0, 0), visual_pos(0, 0), vel(0, 0),
+		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0),
 		current_health_points(3), is_dead(false), is_moving(true)
 	{
 		logger::info("INITIALIZED ENTITY ", this);
@@ -125,11 +122,11 @@ struct entity {
 
 	virtual void update(double dt) {}
 
-	bool move_grid_pos(glm::ivec2 _dir, int _distance = 1) {
-		if (_dir == glm::ivec2(0))
+	bool move_grid_pos(glm::ivec3 _dir, int _distance = 1) {
+		if (_dir == glm::ivec3(0))
 			return false;
 
-		glm::ivec2 new_pos = grid_pos + (_dir * _distance);
+		glm::ivec3 new_pos = grid_pos + (_dir * _distance);
 		if (!(flags & ENTITY_NO_COLLISION)) {
 			if (_distance > 1) {
 				for (int i = 0; i < _distance + 1; i++) {
@@ -150,8 +147,8 @@ struct entity {
 		return true;
 	}
 
-	void move_with_collision(glm::ivec2 _dir, int _distance = 1) {
-		glm::ivec2 new_pos = grid_pos + (_dir * _distance);
+	void move_with_collision(glm::ivec3 _dir, int _distance = 1) {
+		glm::ivec3 new_pos = grid_pos + (_dir * _distance);
 		if (manager->check_collisions(new_pos, this))
 			return;
 
@@ -160,12 +157,12 @@ struct entity {
 	}
 
 	void interp_visuals(double dt, float interp_speed) {
-		if (vel == glm::vec2(0))
+		if (vel == glm::vec3(0))
 			visual_pos = grid_pos;
 		
 		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
 
-		is_moving = (visual_pos != (glm::vec2)grid_pos);
+		is_moving = (visual_pos != (glm::vec3)grid_pos);
 	}
 
 	void do_damage(int _damage) {
@@ -193,7 +190,7 @@ struct entity {
 		stagger_end_time = SDL_GetTicks() + (_seconds);
 	}
 
-	void knockback(glm::ivec2 _direction, int _range) {
+	void knockback(glm::ivec3 _direction, int _range) {
 		if (flags & ENTITY_NO_KNOCKBACK)
 			return;
 

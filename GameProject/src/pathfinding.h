@@ -32,6 +32,7 @@ struct PriorityQueue {
 	}
 };
 
+/* CONVERT PATHINDING TO 3D
 inline int heuristic(glm::ivec2 a, glm::ivec2 b) {
 	return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
@@ -75,3 +76,4 @@ inline std::vector<glm::ivec2> reconstruct_path(glm::ivec2 _start, glm::ivec2 _g
 	std::reverse(path.begin(), path.end());
 	return path;
 }
+*/

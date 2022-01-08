@@ -49,6 +49,7 @@ int main(int argc, char* args[]) {
 			case SDL_QUIT:
 				isRunning = false;
 				break;
+			/*
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 					renderer::screen_width = event.window.data1;
@@ -56,6 +57,7 @@ int main(int argc, char* args[]) {
 					SDL_SetWindowSize(renderer::window, renderer::screen_width, renderer::screen_height);
 				}
 				break;
+			*/
 			}
 		}
 
@@ -70,8 +72,6 @@ int main(int argc, char* args[]) {
 		if (CurrentState == GAME_STATE::GAMEPLAY) {
 			manager.update(dt);
 		}
-
-		camera::update(dt);
 
 		input::update();
 
