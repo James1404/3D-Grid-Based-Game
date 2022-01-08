@@ -7,21 +7,27 @@
 #include <string>
 #include <memory>
 
-namespace camera {
-	struct camera_interface {
-		glm::mat4 view;
-		virtual void update(double dt) {};
-	};
+struct camera{
+	glm::vec3 position;
+	glm::vec3 rotation;
 
-	struct camera_data {
-		std::map<std::string, std::shared_ptr<camera_interface>> cameras;
-		std::shared_ptr<camera_interface> current_camera;
-	};
+	glm::vec3 front;
+	glm::vec3 right;
+	glm::vec3 up;
+	
+	glm::mat4 getViewMatrix();
 
-	extern camera_data data;
+	camera();
+	~camera();
+};
 
-	void register_camera(std::string id, std::shared_ptr<camera_interface> camera);
-	void set_camera(std::string id);
+struct camera_manager {
+	// TODO: change from shared to weak ptr
+	std::map<std::string, std::shared_ptr<camera>> cameras;
+	std::weak_ptr<camera> current_camera;
+
+	void set_camera(std::string _id);
+	std::weak_ptr<camera> get_camera(std::string _id);
 
 	void update(double dt);
-}
+};
