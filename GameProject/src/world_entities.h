@@ -3,15 +3,35 @@
 #include "entity.h"
 #include "pathfinding.h"
 
+struct block_entity : public entity {
+	renderer::cube cb;
+
+	block_entity() {
+		tag = "block";
+
+		cb.position = &visual_pos;
+		cb.colour = { 1,0,0 };
+	}
+
+	~block_entity() {
+
+	}
+
+	void update(double dt) override {
+		visual_pos = grid_pos;
+	}
+};
+
 //
 // ENEMIES
 //
+/*
 struct pusher_enemy_entity : public entity {
 	renderer::sprite spr;
 
-	glm::ivec2 direction;
+	glm::ivec3 direction;
 
-	glm::ivec2 player_path_position;
+	glm::ivec3 player_path_position;
 	int current_path_waypoint = 0;
 	std::vector<glm::ivec2> path;
 
@@ -21,7 +41,6 @@ struct pusher_enemy_entity : public entity {
 		tag = "enemy";
 
 		spr.position = &visual_pos;
-		spr.layer = -1;
 		spr.colour = { 1,0,0 };
 
 		current_path_waypoint = 0;
@@ -85,3 +104,4 @@ struct pusher_enemy_entity : public entity {
 		interp_visuals(dt, visual_interp_speed);
 	}
 };
+*/
