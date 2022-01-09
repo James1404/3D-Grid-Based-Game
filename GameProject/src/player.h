@@ -20,12 +20,6 @@ struct player_entity : public entity {
 	uint32_t shoot_end_time = 0;
 	const uint32_t shoot_cooldown_duration = 1000;
 
-	enum player_actions {
-		IDLE = 0,
-	};
-
-	common::Limited_Queue<player_actions, 1> state_queue;
-
 	glm::vec3 cam_original_pos;
 	const float camera_speed = 0.01f;
 

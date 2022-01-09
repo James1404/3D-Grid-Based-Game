@@ -49,9 +49,6 @@ float tick_rate = 1.0f / 24.0f;
 
 void entity_manager::update(double dt) {
 	for (auto& _entity : entities) {
-		if (_entity->stagger_end_time > SDL_GetTicks())
-			continue;
-
 		_entity->update(dt);
 	}
 
@@ -153,13 +150,6 @@ void entity_manager::load(std::string level_name) {
 	}
 
 	ifs.close();
-}
-
-bool entity_manager::is_walkable(glm::ivec3 _pos) const {
-	if (check_collisions(_pos))
-		return false;
-
-	return true;
 }
 
 std::vector<glm::ivec3> entity_manager::neighbors(glm::ivec3 _pos) const {

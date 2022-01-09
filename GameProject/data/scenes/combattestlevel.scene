@@ -1,4 +1,19 @@
 FILE_VERSION 8
 
 player 0 0 0
-block 1 0 0
+
+block 1 -1 0
+block 0 -1 0
+block -1 -1 0
+block -1 0 -1
+block 2 -10 0
+block 3 -9 0
+block 4 -8 0
+block 5 -7 0
+block 6 -6 0
+block 6 -6 1
+block 5 -5 1
+block 4 -4 1
+block 3 -3 1
+block 2 -2 1
+block 1 -1 1

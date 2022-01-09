@@ -34,19 +34,18 @@ void player_entity::update(double dt) {
 	manager->cameras.set_camera("Player");
 
 	if (auto player_cam = manager->cameras.get_camera("Player").lock()) {
-		glm::vec3 offset = glm::vec3(0, 5, 5);
+		glm::vec3 offset = glm::vec3(0, 6, 5);
 		
-		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset) * (float)renderer::cell_size + ((float)renderer::cell_size / 2);
+		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset + 0.5f);
 		player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
-
 
 		player_cam->rotation.x = 20;
 	}
 
-	//renderer::debug::draw_circle(glm::vec2(grid_pos * renderer::cell_size) + ((float)renderer::cell_size / 2), 1, colour::green);
-	//renderer::debug::draw_box_wireframe(glm::ivec2(grid_pos) * renderer::cell_size + direction * glm::ivec2(renderer::cell_size), glm::ivec2(renderer::cell_size), colour::pink);
+	//renderer::debug::draw_circle(glm::vec2(grid_pos) + 0.5f, 0.1f, colour::green);
+	//renderer::debug::draw_box_wireframe(glm::vec2(grid_pos + glm::ivec3(direction.x, 0, direction.y)), glm::vec2(1), colour::pink);
 
-	if (!is_moving) {
+	if (!is_moving()) {
 		vel = { 0,0,0 };
 
 		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
@@ -80,13 +79,7 @@ void player_entity::update(double dt) {
 			vel.y = 1;
 		}
 
-		if (move_grid_pos(vel))
-			state_queue.clear();
-		
-		switch (state_queue.get()) {
-		case player_actions::IDLE:
-			break;
-		}
+		move_grid_pos(vel);
 	}
 
 	interp_visuals(dt, interp_speed);

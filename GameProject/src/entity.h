@@ -57,7 +57,6 @@ struct entity_manager {
 	void load(std::string level_name);
 
 	// helper functions
-	bool is_walkable(glm::ivec3 _pos) const;
 	std::vector<glm::ivec3> neighbors(glm::ivec3 _pos) const;
 	std::vector<glm::ivec3> diagonal_neighbors(glm::ivec3 _pos) const;
 
@@ -83,10 +82,8 @@ typedef uint32_t ENTITY_FLAGS;
 enum ENTITY_FLAGS_ {
 	ENTITY_NONE = 0,
 	ENTITY_DISABLED = 1 << 0,
-	ENTITY_NO_DAMAGE = 1 << 1,
-	ENTITY_NO_COLLISION = 1 << 2,
-	ENTITY_NO_KNOCKBACK = 1 << 3,
-	ENTITY_NO_STAGGER = 1 << 4
+	ENTITY_NO_COLLISION = 1 << 1,
+	ENTITY_NO_CLIMB = 1 << 2
 };
 inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
 inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
@@ -106,12 +103,11 @@ struct entity {
 	int current_health_points;
 
 	bool is_dead = false;
-	bool is_moving = false;
 
 	entity()
 		: flags(0), tag(""),
 		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0),
-		current_health_points(3), is_dead(false), is_moving(true)
+		current_health_points(3), is_dead(false)
 	{
 		logger::info("INITIALIZED ENTITY ", this);
 	}
@@ -122,78 +118,49 @@ struct entity {
 
 	virtual void update(double dt) {}
 
-	bool move_grid_pos(glm::ivec3 _dir, int _distance = 1) {
-		if (_dir == glm::ivec3(0))
-			return false;
+	bool is_grounded(glm::ivec3 _pos) {
+		return manager->check_collisions(_pos + glm::ivec3(0, -1, 0), this);
+	}
 
-		glm::ivec3 new_pos = grid_pos + (_dir * _distance);
-		if (!(flags & ENTITY_NO_COLLISION)) {
-			if (_distance > 1) {
-				for (int i = 0; i < _distance + 1; i++) {
-					if (manager->check_collisions(grid_pos + (_distance * i), this)) {
-						new_pos = grid_pos + (_distance * (i - 1));
+	bool is_moving() const {
+		return (visual_pos != (glm::vec3)grid_pos);
+	}
+
+	void move_grid_pos(glm::ivec3 _dir) {
+		if (is_moving())
+			return;
+
+		glm::ivec3 new_pos = grid_pos + _dir;
+		if (is_grounded(grid_pos)) {
+			if (!manager->check_collisions(new_pos, this)) {
+				if (is_grounded(new_pos)) {
+					set_grid_pos(new_pos);
+				}
+				else {
+					if (!manager->check_collisions(new_pos + glm::ivec3(0, -1, 0))) {
+						if (is_grounded(new_pos + glm::ivec3(0, -1, 0)))
+							set_grid_pos(new_pos + glm::ivec3(0, -1, 0));
 					}
 				}
 			}
 			else {
-				if (manager->check_collisions(new_pos, this)) {
-					return false;
+				if (!manager->check_collisions(new_pos + glm::ivec3(0, 1, 0))) {
+					set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
 				}
 			}
 		}
-
-		previous_grid_pos = grid_pos;
-		grid_pos = new_pos;
-		return true;
 	}
 
-	void move_with_collision(glm::ivec3 _dir, int _distance = 1) {
-		glm::ivec3 new_pos = grid_pos + (_dir * _distance);
-		if (manager->check_collisions(new_pos, this))
-			return;
-
+	void set_grid_pos(glm::vec3 _pos) {
 		previous_grid_pos = grid_pos;
-		grid_pos = new_pos;
+		grid_pos = _pos;
+	}
+
+	void revert_grid_pos() {
+		grid_pos = previous_grid_pos;
 	}
 
 	void interp_visuals(double dt, float interp_speed) {
-		if (vel == glm::vec3(0))
-			visual_pos = grid_pos;
-		
 		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
-
-		is_moving = (visual_pos != (glm::vec3)grid_pos);
-	}
-
-	void do_damage(int _damage) {
-		if (flags & ENTITY_NO_DAMAGE)
-			return;
-
-		if (is_dead)
-			return;
-
-		current_health_points -= _damage;
-
-		if (current_health_points <= 0)
-			is_dead = true;
-	}
-
-	int stagger_end_time = 0;
-
-	void stagger(int _seconds) {
-		if (flags & ENTITY_NO_STAGGER)
-			return;
-
-		if (is_dead)
-			return;
-
-		stagger_end_time = SDL_GetTicks() + (_seconds);
-	}
-
-	void knockback(glm::ivec3 _direction, int _range) {
-		if (flags & ENTITY_NO_KNOCKBACK)
-			return;
-
-		move_grid_pos(_direction, _range);
 	}
 };
