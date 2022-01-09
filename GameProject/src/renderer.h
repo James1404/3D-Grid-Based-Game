@@ -24,8 +24,6 @@ namespace colour {
 };
 
 namespace renderer {
-	const int cell_size = 16;
-
 	extern SDL_Window* window;
 	extern SDL_GLContext context;
 

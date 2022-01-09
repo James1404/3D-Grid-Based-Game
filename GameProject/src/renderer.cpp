@@ -229,8 +229,7 @@ void renderer::sprite::draw() {
 	glUseProgram(sprite_shader);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(*position * (float)cell_size));
-	model = glm::scale(model, glm::vec3(cell_size, 1.0f, cell_size));
+	model = glm::translate(model, glm::vec3(*position));
 
 	glUniform3fv(glGetUniformLocation(sprite_shader, "colour"), 1, glm::value_ptr(colour));
 
@@ -334,8 +333,7 @@ void renderer::cube::draw() {
 	glUseProgram(cube_shader);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(*position * (float)cell_size));
-	model = glm::scale(model, glm::vec3(cell_size));
+	model = glm::translate(model, glm::vec3(*position));
 
 	glUniform3fv(glGetUniformLocation(cube_shader, "colour"), 1, glm::value_ptr(colour));
 
