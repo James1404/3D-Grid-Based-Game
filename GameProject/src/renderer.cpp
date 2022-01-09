@@ -399,7 +399,6 @@ void renderer::debug::draw_debug() {
 
 		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
-		glUniform1i(glGetUniformLocation(square_shader, "u_is_screen_space"), square->screen_space);
 
 		glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(square->colour));
 
@@ -412,7 +411,6 @@ void renderer::debug::draw_debug() {
 
 		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_projection"), 1, false, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_view"), 1, false, glm::value_ptr(view));
-		glUniform1i(glGetUniformLocation(circle_shader, "u_is_screen_space"), circle->screen_space);
 
 		glUniform3fv(glGetUniformLocation(circle_shader, "u_color"), 1, glm::value_ptr(circle->colour));
 
@@ -425,7 +423,6 @@ void renderer::debug::draw_debug() {
 
 		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_projection"), 1, false, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_view"), 1, false, glm::value_ptr(view));
-		glUniform1i(glGetUniformLocation(line_shader, "u_is_screen_space"), line->screen_space);
 
 		glUniform3fv(glGetUniformLocation(line_shader, "u_color"), 1, glm::value_ptr(line->colour));
 
@@ -434,7 +431,8 @@ void renderer::debug::draw_debug() {
 	}
 }
 
-void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space) {
+/*
+void renderer::debug::second_dimension::draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
 	float vertices[] = {
 		p1.x, p1.y,	// first point
@@ -453,7 +451,7 @@ void renderer::debug::draw_line(const glm::vec2 p1, const glm::vec2 p2, const gl
 	line_draw_list.push_back(drawing);
 }
 
-void renderer::debug::draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
+void renderer::debug::second_dimension::draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
 	float vertices[] = {
 		position.x + size.x, position.y + size.y,	// top right
@@ -481,14 +479,14 @@ void renderer::debug::draw_box(const glm::vec2 position, const glm::vec2 size, c
 	square_draw_list.push_back(drawing);
 }
 
-void renderer::debug::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
+void renderer::debug::second_dimension::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
 	draw_line(pos, { size.x + pos.x, pos.y }, colour);
 	draw_line(pos, { pos.x, size.y + pos.y }, colour);
 	draw_line(size + pos, { pos.x, size.y + pos.y }, colour);
 	draw_line(size + pos, { size.x + pos.x, pos.y }, colour);
 }
 
-void renderer::debug::draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space) {
+void renderer::debug::second_dimension::draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space) {
 	// SETUP STUFF
 	float vertices[] = {
 		position.x + (radius * .5f), position.y + (radius * .5f),	// top right
@@ -527,5 +525,43 @@ void renderer::debug::draw_circle(const glm::vec2 position, const float radius, 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	circle_draw_list.push_back(drawing);
+}
+*/
+
+void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
+	// SETUP STUFF
+	float vertices[] = {
+		p1.x, p1.y, p1.z,	// first point
+		p2.x, p2.y, p2.z	// second point
+	};
+
+	auto drawing = std::make_shared<debug_drawing>();
+
+	drawing->colour = colour;
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+
+	line_draw_list.push_back(drawing);
+}
+
+void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
+	draw_line(pos, { pos.x + size.x, pos.y, pos.z }, colour);
+	draw_line(pos, { pos.x, pos.y + size.y, pos.z }, colour);
+	draw_line(pos, { pos.x, pos.y, pos.z + size.z }, colour);
+
+	draw_line(pos + size, pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(pos + size, pos + size - glm::vec3(0, size.y, 0), colour);
+	draw_line(pos + size, pos + size - glm::vec3(0, 0, size.z), colour);
+
+	draw_line(pos + glm::vec3(0, size.y, 0), pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(pos + glm::vec3(0, size.y, 0), pos + size - glm::vec3(0, 0, size.z), colour);
+
+	draw_line(pos + size - glm::vec3(0, size.y, 0), pos + size - glm::vec3(size.x, size.y, 0), colour);
+	draw_line(pos + size - glm::vec3(0, size.y, 0), pos + size - glm::vec3(0, size.y, size.z), colour);
+
+	draw_line(pos + glm::vec3(size.x, 0, 0), pos + glm::vec3(size.x, size.y, 0), colour);
+	draw_line(pos + glm::vec3(0, 0, size.z), pos + glm::vec3(0, size.y, size.z), colour);
 }
 #endif // _DEBUG

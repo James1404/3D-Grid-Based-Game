@@ -44,17 +44,17 @@ void player_entity::update(double dt) {
 
 	//renderer::debug::draw_circle(glm::vec2(grid_pos) + 0.5f, 0.1f, colour::green);
 	//renderer::debug::draw_box_wireframe(glm::vec2(grid_pos + glm::ivec3(direction.x, 0, direction.y)), glm::vec2(1), colour::pink);
-
+	renderer::debug::draw_box_wireframe(grid_pos + glm::ivec3(direction.x, 0, direction.y), glm::vec3(1), colour::pink);
 	if (!is_moving()) {
 		vel = { 0,0,0 };
 
 		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
 			if (input::button_pressed("MoveUp")) {
-				direction = { 0,1 };
+				direction = { 0,-1 };
 				vel = { 0,0,-1 };
 			}
 			else if (input::button_pressed("MoveDown")) {
-				direction = { 0,-1 };
+				direction = { 0,1 };
 				vel = { 0,0,1 };
 			}
 		}

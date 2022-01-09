@@ -3,7 +3,6 @@
 
 #include "entity.h"
 #include "renderer.h"
-#include "collision.h"
 #include "common.h"
 
 struct player_entity : public entity {

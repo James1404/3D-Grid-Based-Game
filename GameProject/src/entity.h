@@ -9,7 +9,6 @@
 #include <SDL.h>
 
 #include "renderer.h"
-#include "collision.h"
 #include "common.h"
 #include "log.h"
 #include "camera.h"
