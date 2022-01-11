@@ -12,6 +12,7 @@
 #include "common.h"
 #include "log.h"
 #include "camera.h"
+#include "uuid.h"
 
 //
 // EVENTS
@@ -32,6 +33,21 @@ struct event_manager {
 };
 
 //
+// ENTITY FLAGS
+//
+
+typedef uint32_t ENTITY_FLAGS;
+enum ENTITY_FLAGS_ {
+	ENTITY_NONE = 0,
+	ENTITY_DISABLED = 1 << 0,
+	ENTITY_NO_COLLISION = 1 << 1,
+	ENTITY_NO_CLIMB = 1 << 2
+};
+inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
+inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
+inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x ^= mask; }
+
+//
 // ENTITY MANAGER
 //
 
@@ -40,10 +56,10 @@ struct entity;
 struct entity_manager {
 	std::string name;
 
-	int step_accumulator = 0;
-
 	event_manager game_event_manager;
 	camera_manager cameras;
+
+	bool is_paused = false;
 
 	std::vector<std::shared_ptr<entity>> entities;
 	std::multimap<std::string, std::shared_ptr<entity>> entities_tag_lookup;
@@ -54,6 +70,9 @@ struct entity_manager {
 
 	void save();
 	void load(std::string level_name);
+
+	void add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags, glm::ivec3 _grid_pos);
+	void remove_entity(std::weak_ptr<entity> _entity);
 
 	// helper functions
 	std::vector<glm::ivec3> neighbors(glm::ivec3 _pos) const;
@@ -77,18 +96,9 @@ struct entity_manager {
 // Entities
 //
 
-typedef uint32_t ENTITY_FLAGS;
-enum ENTITY_FLAGS_ {
-	ENTITY_NONE = 0,
-	ENTITY_DISABLED = 1 << 0,
-	ENTITY_NO_COLLISION = 1 << 1,
-	ENTITY_NO_CLIMB = 1 << 2
-};
-inline void ENTITY_FLAG_SET(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x |= mask; }
-inline void ENTITY_FLAG_CLEAR(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x &= ~mask; }
-inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x ^= mask; }
-
 struct entity {
+	// TODO: implement Entity ID for entity referencing
+	uuid id;
 	ENTITY_FLAGS flags;
 	std::string tag;
 
@@ -98,15 +108,9 @@ struct entity {
 	glm::vec3 visual_pos;
 	glm::vec3 vel;
 
-	int max_health_points = 3;
-	int current_health_points;
-
-	bool is_dead = false;
-
 	entity()
-		: flags(0), tag(""),
-		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0),
-		current_health_points(3), is_dead(false)
+		: id(0), flags(0), tag(""),
+		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0)
 	{
 		logger::info("INITIALIZED ENTITY ", this);
 	}
@@ -143,6 +147,7 @@ struct entity {
 				}
 			}
 			else {
+				// TODO: make no climb work
 				if (!manager->check_collisions(new_pos + glm::ivec3(0, 1, 0))) {
 					set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
 				}
@@ -160,6 +165,8 @@ struct entity {
 	}
 
 	void interp_visuals(double dt, float interp_speed) {
+		// TODO: implement lerping instead of move_towards
+		//visual_pos = common::lerp((glm::vec3)previous_grid_pos, (glm::vec3)grid_pos, interp_speed * dt);
 		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
 	}
 };

@@ -48,8 +48,10 @@ float accumulator = 0.0f;
 float tick_rate = 1.0f / 24.0f;
 
 void entity_manager::update(double dt) {
-	for (auto& _entity : entities) {
-		_entity->update(dt);
+	if (!is_paused) {
+		for (auto& _entity : entities) {
+			_entity->update(dt);
+		}
 	}
 
 	cameras.update(dt);
@@ -74,11 +76,12 @@ void entity_manager::save() {
 
 	std::ofstream ofs(levelPath, std::ofstream::trunc);
 	if (ofs.is_open()) {
-		ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
+		//ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
 
 		if (!entities.empty()) {
 			for (auto& _entity : entities) {
-				ofs << _entity->tag << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
+				ofs << _entity->id << " " << _entity->tag << " " << _entity->flags << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
+				//ofs << _entity->tag << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
 			}
 		}
 	}
@@ -102,6 +105,7 @@ void entity_manager::load(std::string level_name) {
 		std::string line;
 		while (std::getline(ifs, line)) {
 			std::stringstream ss(line);
+			/*
 			std::string type;
 
 			std::getline(ss, type, ' ');
@@ -122,23 +126,28 @@ void entity_manager::load(std::string level_name) {
 				ss >> position.x >> position.y >> position.z;
 
 				auto p = std::make_shared<player_entity>();
-				p->manager = this;
 				p->grid_pos = position;
 
-				entities.push_back(p);
-				entities_tag_lookup.emplace(p->tag, p);
+				add_entity(p);
 			}
 			else if (type == "block") {
 				glm::ivec3 position;
 				ss >> position.x >> position.y >> position.z;
 
 				auto b = std::make_shared<block_entity>();
-				b->manager = this;
 				b->grid_pos = position;
 
-				entities.push_back(b);
-				entities_tag_lookup.emplace(b->tag, b);
+				add_entity(b);
 			}
+			*/
+
+			uint64_t id;
+			std::string type;
+			ENTITY_FLAGS flags;
+			glm::ivec3 grid_pos;
+
+			ss >> id >> type >> flags >> grid_pos.x >> grid_pos.y >> grid_pos.z;
+			add_entity(type, id, flags, grid_pos);
 		}
 
 		name = level_name;
@@ -150,6 +159,40 @@ void entity_manager::load(std::string level_name) {
 	}
 
 	ifs.close();
+}
+
+void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags, glm::ivec3 _grid_pos) {
+	std::shared_ptr<entity> _new_entity;
+
+	if (_type == "player") {
+		_new_entity = std::make_shared<player_entity>();
+	} else if (_type == "block") {
+		_new_entity = std::make_shared<block_entity>();
+	}
+	else {
+		logger::warning("ENTITY TYPE UNKOWN : ", _type);
+		return;
+	}
+	
+	_new_entity->manager = this;
+
+	_new_entity->id = _id;
+	_new_entity->flags = _flags;
+	_new_entity->grid_pos = _grid_pos;
+	_new_entity->visual_pos = _new_entity->grid_pos;
+
+	entities.push_back(_new_entity);
+	entities_tag_lookup.emplace(_new_entity->tag, _new_entity);
+}
+
+void entity_manager::remove_entity(std::weak_ptr<entity> _entity) {
+	entities.erase(std::remove(entities.begin(), entities.end(), _entity.lock()), entities.end());
+
+	for (auto iter = entities_tag_lookup.begin(); iter != entities_tag_lookup.end();) {
+		auto erase_iter = iter++;
+		if (erase_iter->second == _entity.lock())
+			entities_tag_lookup.erase(erase_iter);
+	}
 }
 
 std::vector<glm::ivec3> entity_manager::neighbors(glm::ivec3 _pos) const {

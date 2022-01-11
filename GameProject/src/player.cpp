@@ -25,12 +25,6 @@ player_entity::~player_entity() {
 }
 
 void player_entity::update(double dt) {
-	if (is_dead) {
-		spr.colour = { 1, .5f, 0 };
-		ENTITY_FLAG_SET(flags, ENTITY_NO_COLLISION);
-		return;
-	}
-
 	manager->cameras.set_camera("Player");
 
 	if (auto player_cam = manager->cameras.get_camera("Player").lock()) {
@@ -42,9 +36,10 @@ void player_entity::update(double dt) {
 		player_cam->rotation.x = 20;
 	}
 
-	//renderer::debug::draw_circle(glm::vec2(grid_pos) + 0.5f, 0.1f, colour::green);
-	//renderer::debug::draw_box_wireframe(glm::vec2(grid_pos + glm::ivec3(direction.x, 0, direction.y)), glm::vec2(1), colour::pink);
-	renderer::debug::draw_box_wireframe(grid_pos + glm::ivec3(direction.x, 0, direction.y), glm::vec3(1), colour::pink);
+	// TODO: if player is not loaded first then they are render after them.
+	
+	//renderer::debug::draw_box_wireframe(grid_pos + glm::ivec3(direction.x, 0, direction.y), glm::vec3(1), colour::pink);
+	
 	if (!is_moving()) {
 		vel = { 0,0,0 };
 
