@@ -76,6 +76,8 @@ unsigned int create_shader(const char* vertexSource, const char* fragmentSource)
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 
+	logger::info("Loaded and compiled shader ", vertexSource, " ", fragmentSource);
+
 	return shader;
 }
 
@@ -116,7 +118,7 @@ void renderer::init() {
 		}
 	}
 
-	projection = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 1000.0f);
+	projection = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
 
 	sprite_shader = create_shader("data/shaders/sprite_core.vs", "data/shaders/sprite_core.fs");
 	cube_shader = create_shader("data/shaders/cube_core.vs", "data/shaders/cube_core.fs");
@@ -430,103 +432,6 @@ void renderer::debug::draw_debug() {
 		glDrawArrays(GL_LINES, 0, 2);
 	}
 }
-
-/*
-void renderer::debug::second_dimension::draw_line(const glm::vec2 p1, const glm::vec2 p2, const glm::vec3 colour, bool screen_space) {
-	// SETUP STUFF
-	float vertices[] = {
-		p1.x, p1.y,	// first point
-		p2.x, p2.y	// second point
-	};
-
-	auto drawing = std::make_shared<debug_drawing>();
-
-	drawing->screen_space = screen_space;
-	drawing->colour = colour;
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-	glEnableVertexAttribArray(0);
-
-	line_draw_list.push_back(drawing);
-}
-
-void renderer::debug::second_dimension::draw_box(const glm::vec2 position, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
-	// SETUP STUFF
-	float vertices[] = {
-		position.x + size.x, position.y + size.y,	// top right
-		position.x + size.x, position.y,			// bottom right
-		position.x,		     position.y,			// bottom left
-		position.x,		     position.y + size.y,	// top left
-	};
-	
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	auto drawing = std::make_shared<debug_drawing>();
-
-	drawing->screen_space = screen_space;
-	drawing->colour = colour;
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-	glEnableVertexAttribArray(0);
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	square_draw_list.push_back(drawing);
-}
-
-void renderer::debug::second_dimension::draw_box_wireframe(const glm::vec2 pos, const glm::vec2 size, const glm::vec3 colour, bool screen_space) {
-	draw_line(pos, { size.x + pos.x, pos.y }, colour);
-	draw_line(pos, { pos.x, size.y + pos.y }, colour);
-	draw_line(size + pos, { pos.x, size.y + pos.y }, colour);
-	draw_line(size + pos, { size.x + pos.x, pos.y }, colour);
-}
-
-void renderer::debug::second_dimension::draw_circle(const glm::vec2 position, const float radius, const glm::vec3 colour, bool screen_space) {
-	// SETUP STUFF
-	float vertices[] = {
-		position.x + (radius * .5f), position.y + (radius * .5f),	// top right
-		position.x + (radius * .5f), position.y - (radius * .5f),	// bottom right
-		position.x - (radius * .5f), position.y - (radius * .5f),	// bottom left
-		position.x - (radius * .5f), position.y + (radius * .5f)	// top left
-	};
-
-	float texcoords[] = {
-		// texture coords
-		1.0f, 1.0f, // top right
-		1.0f, 0.0f, // bottom right
-		0.0f, 0.0f, // bottom left
-		0.0f, 1.0f  // top left
-	};
-
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	auto drawing = std::make_shared<debug_drawing>();
-
-	drawing->screen_space = screen_space;
-	drawing->colour = colour;
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texcoords), NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texcoords), &texcoords);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(vertices)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	circle_draw_list.push_back(drawing);
-}
-*/
 
 void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF

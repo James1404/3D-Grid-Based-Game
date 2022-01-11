@@ -282,6 +282,13 @@ void input::load() {
 
 		MAPPED_INPUTS.insert({ "Exit", INPUT(SDL_SCANCODE_ESCAPE, KEYBOARD) });
 
+		//
+		// -- EDITOR INPUT --
+		//
+
+		MAPPED_INPUTS.insert({ "IncreaseHeight", INPUT(SDL_SCANCODE_E, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "DecreaseHeight", INPUT(SDL_SCANCODE_Q, KEYBOARD) });
+
 		save();
 		load();
 	}
