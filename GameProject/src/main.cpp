@@ -3,26 +3,23 @@
 #include "renderer.h"
 #include "input.h"
 #include "log.h"
-
-#include "player.h"
-#include "camera.h"
-
-// TODO: implement centrilaised log system
-
-SDL_Event event;
-
-bool isRunning = false;
-
-enum class GAME_STATE {
-	GAMEPLAY,
-	MENU
-} static CurrentState;
-
-entity_manager manager;
-
-uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
+#include "editor.h"
 
 int main(int argc, char* args[]) {
+	SDL_Event event;
+
+	bool isRunning = false;
+
+	entity_manager entities;
+	editor_manager editor;
+
+	enum class GAME_STATE {
+		GAMEPLAY,
+		EDITOR
+	} static CurrentState;
+
+	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
+
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		renderer::init();
@@ -36,8 +33,10 @@ int main(int argc, char* args[]) {
 		// LEVEL NAMES :
 		// combattestlevel
 		// newtestlevel
-		manager.load("combattestlevel");
-		manager.init();
+		entities.load("combattestlevel");
+		entities.init();
+
+		editor.init(entities);
 		
 		isRunning = true;
 	}
@@ -69,26 +68,43 @@ int main(int argc, char* args[]) {
 		NOW = SDL_GetPerformanceCounter();
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-		if (CurrentState == GAME_STATE::GAMEPLAY) {
-			manager.update(dt);
+		entities.update(dt);
+
+		if (CurrentState == GAME_STATE::EDITOR) {
+			entities.is_paused = true;
+			editor.update(dt);
+		}
+		else {
+			entities.is_paused = false;
 		}
 
-		input::update();
+		if (input::key_down(SDL_SCANCODE_ESCAPE)) {
+			if (CurrentState == GAME_STATE::GAMEPLAY)
+				CurrentState = GAME_STATE::EDITOR;
+			else if (CurrentState == GAME_STATE::EDITOR)
+				CurrentState = GAME_STATE::GAMEPLAY;
+		}
 
 		/* ----- RENDER GAME ----- */
 		renderer::start_draw();
 
 		renderer::draw_sprites();
 
+		if (CurrentState == GAME_STATE::EDITOR) {
+			editor.draw();
+		}
+
 		renderer::debug::draw_debug();
 
 		renderer::stop_draw();
+
+		input::update();
 	}
 
 	/* ----- CLEAN GAME ----- */
 	logger::info("STARTING CLEANUP");
 
-	manager.clean();
+	entities.clean();
 
 	renderer::debug::clean_debug();
 	renderer::clean();
