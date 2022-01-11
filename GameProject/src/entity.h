@@ -74,13 +74,14 @@ struct entity_manager {
 	void add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags, glm::ivec3 _grid_pos);
 	void remove_entity(std::weak_ptr<entity> _entity);
 
-	// helper functions
 	std::vector<glm::ivec3> neighbors(glm::ivec3 _pos) const;
 	std::vector<glm::ivec3> diagonal_neighbors(glm::ivec3 _pos) const;
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
+	std::weak_ptr<entity> find_entity_by_position(glm::vec3 _pos) const;
 
-	// collisions
+	bool is_entity_at_position(glm::vec3 _pos) const;
+
 	bool check_collisions(glm::vec3 _pos) const;
 	bool check_collisions(glm::vec3 _pos, entity* _ignored_entity) const;
 	bool check_collisions(glm::vec3 _pos, std::string _tag) const;

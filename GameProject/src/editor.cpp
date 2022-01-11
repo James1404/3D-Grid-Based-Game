@@ -111,7 +111,7 @@ void editor_manager::update(double dt) {
 	if (input::key_down(SDL_SCANCODE_F)) {
 		// TODO: skip collision testing instead for simple position testing
 		// because entites with NO_COLLISION flag arent selected.
-		auto entity = manager->get_collisions(cursor_grid_pos);
+		auto entity = manager->find_entity_by_position(cursor_grid_pos);
 		for (auto tmp_entity : selected_entities) {
 			if (entity.lock() == tmp_entity.lock()) {
 				logger::warning("Already selected entity");
@@ -128,15 +128,19 @@ void editor_manager::update(double dt) {
 	}
 
 	if (input::key_down(SDL_SCANCODE_X)) {
-		manager->remove_entity(manager->get_collisions(cursor_grid_pos));
+		if (!selected_entities.empty()) {
+			for (auto selected : selected_entities) {
+				manager->remove_entity(selected);
+			}
+			selected_entities.clear();
+		}
+		else {
+			manager->remove_entity(manager->find_entity_by_position(cursor_grid_pos));
+		}
 	}
 
 	if (input::key_down(SDL_SCANCODE_1)) {
-		if (!manager->check_collisions(cursor_grid_pos)) {
-			/*
-			auto new_entity = std::make_shared<block_entity>();
-			new_entity->grid_pos = cursor_grid_pos;
-			*/
+		if (!manager->is_entity_at_position(cursor_grid_pos)) {
 			manager->add_entity("block", uuid(), 0, cursor_grid_pos);
 		}
 		else {
@@ -144,12 +148,7 @@ void editor_manager::update(double dt) {
 		}
 	}
 	else if (input::key_down(SDL_SCANCODE_2)) {
-		if (!manager->check_collisions(cursor_grid_pos)) {
-			/*
-			auto new_entity = std::make_shared<player_entity>();
-			new_entity->grid_pos = cursor_grid_pos;
-			*/
-
+		if (!manager->is_entity_at_position(cursor_grid_pos)) {
 			manager->add_entity("player", uuid(), 0, cursor_grid_pos);
 		}
 		else {
@@ -159,8 +158,6 @@ void editor_manager::update(double dt) {
 }
 
 static void draw_entity_data(std::weak_ptr<entity> _entity) {
-	/* NOT SURE IF I WANT TO BE ABLE TO CHANGE ENTITY DATA? (MIGHT RE-ENABLE LATER)
-	*/
 	static const float button_width = 0.25f;
 	if (auto tmp_entity = _entity.lock()) {
 		ImGui::Text("uuid: %llu", tmp_entity->id);

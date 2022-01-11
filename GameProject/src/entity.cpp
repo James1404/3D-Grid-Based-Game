@@ -174,6 +174,9 @@ void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags
 		return;
 	}
 	
+	if (_id == 0)
+		_id = uuid();
+
 	_new_entity->manager = this;
 
 	_new_entity->id = _id;
@@ -239,9 +242,23 @@ std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const
 	return std::weak_ptr<entity>();
 }
 
-//
-// CHECK COLLISIONS
-//
+std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) const {
+	for (auto& entity : entities) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return entity;
+		}
+	}
+}
+
+bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
+	for (auto& entity : entities) {
+		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 bool entity_manager::check_collisions(glm::vec3 _pos) const {
 	for(auto& entity : entities) {
