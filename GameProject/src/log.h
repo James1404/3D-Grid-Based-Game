@@ -15,7 +15,7 @@ namespace logger {
 
 		switch (_type) {
 		case LogType::INFO:
-			std::cout << "Info: ";
+			//std::cout << "Info: ";
 			break;
 		case LogType::WARNING:
 			std::cout << "Warning: ";
@@ -30,17 +30,17 @@ namespace logger {
 	}
 
 	template <typename ...Args>
-	inline void info(std::string _message, Args&& ..._args) {
-		log(LogType::INFO, _message, _args...);
+	inline void info(Args&& ..._args) {
+		log(LogType::INFO, _args...);
 	}
 
 	template <typename ...Args>
-	inline void warning(std::string _message, Args&& ..._args) {
-		log(LogType::WARNING, _message, _args...);
+	inline void warning(Args&& ..._args) {
+		log(LogType::WARNING, _args...);
 	}
 
 	template <typename ...Args>
-	inline void error(std::string _message, Args&& ..._args) {
-		log(LogType::ERROR, _message, _args...);
+	inline void error(Args&& ..._args) {
+		log(LogType::ERROR, _args...);
 	}
 }
