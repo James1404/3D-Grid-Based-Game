@@ -62,7 +62,8 @@ struct entity_manager {
 	bool is_paused = false;
 
 	std::vector<std::shared_ptr<entity>> entities;
-	std::multimap<std::string, std::shared_ptr<entity>> entities_tag_lookup;
+	std::map<uuid, std::weak_ptr<entity>> entity_id_lookup;
+	std::multimap<std::string, std::weak_ptr<entity>> entities_tag_lookup;
 
 	void init();
 	void update(double dt);
@@ -78,6 +79,7 @@ struct entity_manager {
 	std::vector<glm::ivec3> diagonal_neighbors(glm::ivec3 _pos) const;
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
+	std::weak_ptr<entity> find_entity_by_id(uuid _id) const;
 	std::weak_ptr<entity> find_entity_by_position(glm::vec3 _pos) const;
 
 	bool is_entity_at_position(glm::vec3 _pos) const;
@@ -149,8 +151,10 @@ struct entity {
 			}
 			else {
 				// TODO: make no climb work
-				if (!manager->check_collisions(new_pos + glm::ivec3(0, 1, 0))) {
-					set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
+				if (!manager->check_collisions(grid_pos + glm::ivec3(0, 1, 0))) {
+					if (!manager->check_collisions(new_pos + glm::ivec3(0, 1, 0))) {
+						set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
+					}
 				}
 			}
 		}

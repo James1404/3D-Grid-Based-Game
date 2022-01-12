@@ -76,16 +76,16 @@ void entity_manager::save() {
 
 	std::ofstream ofs(levelPath, std::ofstream::trunc);
 	if (ofs.is_open()) {
-		//ofs << "FILE_VERSION " << fileVersion << std::endl << std::endl;
+		ofs << "file_version " << fileVersion << std::endl;
 
 		if (!entities.empty()) {
 			for (auto& _entity : entities) {
-				ofs << _entity->id << " " << _entity->tag << " " << _entity->flags << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
-				//ofs << _entity->tag << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
+				ofs << _entity->tag << " " << _entity->id << " " << _entity->flags << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
 			}
 		}
 	}
 
+	logger::info("SAVED SCENE TO FILE");
 	ofs.close();
 }
 
@@ -105,49 +105,23 @@ void entity_manager::load(std::string level_name) {
 		std::string line;
 		while (std::getline(ifs, line)) {
 			std::stringstream ss(line);
-			/*
-			std::string type;
-
-			std::getline(ss, type, ' ');
-
-			if (type == "FILE_VERSION") {
-				uint32_t file_version;
-				ss >> file_version;
-
-				if (file_version != fileVersion) {
-					logger::warning("OUTDATED LEVEL FILE");
-					// TODO: maybe remove the return and just let it attempt to parse it.
-					return;
-				}
-			}
-
-			if (type == "player") {
-				glm::ivec3 position;
-				ss >> position.x >> position.y >> position.z;
-
-				auto p = std::make_shared<player_entity>();
-				p->grid_pos = position;
-
-				add_entity(p);
-			}
-			else if (type == "block") {
-				glm::ivec3 position;
-				ss >> position.x >> position.y >> position.z;
-
-				auto b = std::make_shared<block_entity>();
-				b->grid_pos = position;
-
-				add_entity(b);
-			}
-			*/
-
 			uint64_t id;
 			std::string type;
 			ENTITY_FLAGS flags;
 			glm::ivec3 grid_pos;
 
-			ss >> id >> type >> flags >> grid_pos.x >> grid_pos.y >> grid_pos.z;
-			add_entity(type, id, flags, grid_pos);
+			ss >> type >> id >> flags >> grid_pos.x >> grid_pos.y >> grid_pos.z;
+
+			if (type == "file_version") {
+				if (id != fileVersion) {
+					logger::warning("OUTDATED LEVEL FILE");
+					// TODO: maybe remove the return and just let it attempt to parse it.
+					return;
+				}
+			}
+			else {
+				add_entity(type, id, flags, grid_pos);
+			}
 		}
 
 		name = level_name;
@@ -185,6 +159,7 @@ void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags
 	_new_entity->visual_pos = _new_entity->grid_pos;
 
 	entities.push_back(_new_entity);
+	entity_id_lookup.emplace(_new_entity->id, _new_entity);
 	entities_tag_lookup.emplace(_new_entity->tag, _new_entity);
 }
 
@@ -193,7 +168,7 @@ void entity_manager::remove_entity(std::weak_ptr<entity> _entity) {
 
 	for (auto iter = entities_tag_lookup.begin(); iter != entities_tag_lookup.end();) {
 		auto erase_iter = iter++;
-		if (erase_iter->second == _entity.lock())
+		if (erase_iter->second.lock() == _entity.lock())
 			entities_tag_lookup.erase(erase_iter);
 	}
 }
@@ -235,11 +210,19 @@ std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const
 	auto range = entities_tag_lookup.equal_range(_tag);
 
 	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second->tag == _tag)
+		if (i->second.lock()->tag == _tag)
 			return i->second;
 	}
 
 	return std::weak_ptr<entity>();
+}
+
+std::weak_ptr<entity> entity_manager::find_entity_by_id(uuid _id) const {
+	auto it = entity_id_lookup.find(_id);
+	if (it != entity_id_lookup.end())
+		return it->second;
+
+	logger::warning("ENTITY WITH ID DOES NOT EXIST");
 }
 
 std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) const {
@@ -248,6 +231,8 @@ std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) co
 			return entity;
 		}
 	}
+
+	logger::warning("ENTITY AT POSITION DOES NOT EXIST");
 }
 
 bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
