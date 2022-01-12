@@ -4,13 +4,12 @@
 #include "pathfinding.h"
 
 struct block_entity : public entity {
-	renderer::cube cb;
+	renderer::Model_Entity model;
 
-	block_entity() {
+	block_entity()
+		: model("data/models/block.obj", &visual_pos, glm::vec3(1, 0, 0))
+	{
 		tag = "block";
-
-		cb.position = &visual_pos;
-		cb.colour = { 1,0,0 };
 	}
 
 	~block_entity() {

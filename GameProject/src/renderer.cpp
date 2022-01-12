@@ -5,14 +5,260 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <vector>
 
-#include "stb_image.h"
-#include "log.h"
+//
+// ----- MESH -----
+//
+
+renderer::Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+	this->vertices = vertices;
+	this->indices = indices;
+	this->textures = textures;
+
+	setupMesh();
+}
+
+void renderer::Mesh::draw(Shader& _shader) {
+	unsigned int diffuseNr = 1;
+	unsigned int specularNr = 1;
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		std::string number;
+		std::string name = textures[i].type;
+		if (name == "texture_diffuse")
+			number = std::to_string(diffuseNr++);
+		else if (name == "texture_specular")
+			number = std::to_string(specularNr++);
+
+		glUniform1i(glGetUniformLocation(_shader.id, (name + number).c_str()), i);
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+	}
+
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void renderer::Mesh::setupMesh() {
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
+
+	glBindVertexArray(0);
+}
+
+//
+// ----- MODEL -----
+//
+
+
+void renderer::Model::draw(Shader& _shader) {
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].draw(_shader);
+	}
+}
+
+void renderer::Model::load_model(std::string _path) {
+	Assimp::Importer import;
+	const aiScene* scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+		logger::error("ERROR::ASSIMP::", import.GetErrorString());
+		return;
+	}
+	directory = _path.substr(0, _path.find_last_of('/'));
+
+	process_node(scene->mRootNode, scene);
+}
+
+void renderer::Model::process_node(aiNode* node, const aiScene* scene)
+{
+	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+	{
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		meshes.push_back(process_mesh(mesh, scene));
+	}
+
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
+		process_node(node->mChildren[i], scene);
+	}
+}
+
+renderer::Mesh renderer::Model::process_mesh(aiMesh* mesh, const aiScene* scene)
+{
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture> textures;
+
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	{
+		Vertex vertex;
+
+		glm::vec3 vector;
+		vector.x = mesh->mVertices[i].x;
+		vector.y = mesh->mVertices[i].y;
+		vector.z = mesh->mVertices[i].z;
+		vertex.position = vector;
+
+		vector.x = mesh->mNormals[i].x;
+		vector.y = mesh->mNormals[i].y;
+		vector.z = mesh->mNormals[i].z;
+		vertex.normal = vector;
+
+		if (mesh->mTextureCoords[0])
+		{
+			glm::vec2 vec;
+			vec.x = mesh->mTextureCoords[0][i].x;
+			vec.y = mesh->mTextureCoords[0][i].y;
+			vertex.tex_coords = vec;
+		}
+		else
+			vertex.tex_coords = glm::vec2(0);
+
+		vertices.push_back(vertex);
+	}
+
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	{
+		aiFace face = mesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
+		{
+			indices.push_back(face.mIndices[j]);
+		}
+	}
+
+	if (mesh->mMaterialIndex >= 0)
+	{
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		std::vector<Texture> diffuseMaps = load_material_textures(material, aiTextureType_DIFFUSE, " texture_diffuse");
+
+		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		std::vector<Texture> specularMaps = load_material_textures(material, aiTextureType_SPECULAR, " texture_specular");
+
+		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+	}
+
+	return Mesh(vertices, indices, textures);
+}
+
+std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName)
+{
+	std::vector<Texture> textures;
+	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+	{
+		aiString str;
+		mat->GetTexture(type, i, &str);
+		bool skip = false;
+		for (unsigned int j = 0; j < textures_loaded.size(); j++)
+		{
+			if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+			{
+				textures.push_back(textures_loaded[j]);
+				skip = true;
+				break;
+			}
+		}
+		if (!skip)
+		{
+			Texture texture;
+			texture.id = texture_from_file(str.C_Str(), directory);
+			texture.type = typeName;
+			texture.path = str.C_Str();
+			textures.push_back(texture);
+			textures_loaded.push_back(texture);
+		}
+	}
+	return textures;
+}
 
 //
 // ----- SHADERS -----
 //
+
+renderer::Shader::Shader(const char* vertexSource, const char* fragmentSource) {
+	std::string vShaderCode, fShaderCode;
+	std::ifstream vShaderFile, fShaderFile;
+
+	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try {
+		vShaderFile.open(vertexSource);
+		fShaderFile.open(fragmentSource);
+		std::stringstream vShaderStream, fShaderStream;
+
+		vShaderStream << vShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
+
+		vShaderFile.close();
+		fShaderFile.close();
+
+		vShaderCode = vShaderStream.str();
+		fShaderCode = fShaderStream.str();
+	}
+	catch (std::ifstream::failure e) {
+		logger::error("SHADER FILE NOT SUCCESFULLY READ");
+	}
+
+	const char* vertexShader = vShaderCode.c_str();
+	const char* fragmentShader = fShaderCode.c_str();
+
+	unsigned int vertex, fragment;
+
+	//create and compiler shaders from its source
+	vertex = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex, 1, &vertexShader, NULL);
+	glCompileShader(vertex);
+	check_shader_compiler_errors(vertex);
+
+	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragment, 1, &fragmentShader, NULL);
+	glCompileShader(fragment);
+	check_shader_compiler_errors(fragment);
+
+	// create program and attach shaders
+	unsigned int shader;
+	shader = glCreateProgram();
+	glAttachShader(shader, vertex);
+	glAttachShader(shader, fragment);
+	glLinkProgram(shader);
+
+	// delete shaders as they are no longer needed
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+
+	logger::info("Loaded and compiled shader ", vertexSource, " ", fragmentSource);
+
+	id = shader;
+}
+
+void renderer::Shader::check_shader_compiler_errors(unsigned int shader) {
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
+		logger::error("SHADER COMPILATION FAILED ", infoLog);
+	}
+}
 
 void check_shader_compiler_errors(unsigned int shader) {
 	int success;
@@ -93,7 +339,7 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 
 int renderer::screen_resolution_x = 1280, renderer::screen_resolution_y = 720;
 
-static std::vector<renderer::renderable*> render_list;
+static std::vector<renderer::Model_Entity*> model_list;
 
 unsigned int sprite_shader;
 unsigned int cube_shader;
@@ -145,7 +391,7 @@ void renderer::start_draw() {
 }
 
 void renderer::draw_sprites() {
-	for (auto& i : render_list) {
+	for (auto& i : model_list) {
 		i->draw();
 	}
 }
@@ -154,197 +400,38 @@ void renderer::stop_draw() {
 	SDL_GL_SwapWindow(window);
 }
 
-//
-// ----- SPRITES -----
-//
+renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _position, glm::vec3 _colour)
+	: model(_model_path), shader("data/shaders/model_loading.vs", "data/shaders/model_loading.fs"),
+	position(_position), colour(_colour)
+{
+	glUseProgram(shader.id);
+	glUniformMatrix4fv(glGetUniformLocation(shader.id, "projection"), 1, false, glm::value_ptr(projection));
 
-renderer::sprite::sprite() {
-	// Generate and bind buffers
-	float vertices[] = {
-		// positions
-		 1.0f,  1.0f, // top right
-		 1.0f,  0.0f, // bottom right
-		 0.0f,  0.0f, // bottom left
-		 0.0f,  1.0f, // top left
-	};
-
-	float texcoords[] = {
-		// texture coords
-		1.0f, 1.0f, // top right
-		1.0f, 0.0f, // bottom right
-		0.0f, 0.0f, // bottom left
-		0.0f, 1.0f  // top left
-	};
-
-	// Generate and bind vao
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	// Generate and bind vbo
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texcoords), NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texcoords), &texcoords);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(vertices)));
-
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Set image attribute
-	// glUniform1i(glGetUniformLocation(sprite_shader, "image"), 0);
-
-	// Set projection matrix attribute
-	glUseProgram(sprite_shader);
-	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "projection"), 1, false, glm::value_ptr(projection));
-
-	render_list.push_back(this);
+	model_list.push_back(this);
 }
 
-renderer::sprite::~sprite() {
-	// glDeleteTextures(1, &texture);
-	glDeleteVertexArrays(1, &vao);
-
-	for (auto it = render_list.begin(); it != render_list.end();) {
+renderer::Model_Entity::~Model_Entity() {
+	for (auto it = model_list.begin(); it != model_list.end();) {
 		if (*it == this)
-			it = render_list.erase(it);
+			it = model_list.erase(it);
 		else
 			++it;
 	}
 }
 
-void renderer::sprite::draw() {
-	glUseProgram(sprite_shader);
+void renderer::Model_Entity::draw() {
+	glUseProgram(shader.id);
 
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(*position));
+	glm::mat4 new_model = glm::mat4(1.0f);
+	new_model = glm::translate(new_model, *position);
 
-	glUniform3fv(glGetUniformLocation(sprite_shader, "colour"), 1, glm::value_ptr(colour));
+	glUniform3fv(glGetUniformLocation(shader.id, "colour"), 1, glm::value_ptr(colour));
+	glUniformMatrix4fv(glGetUniformLocation(shader.id, "view"), 1, false, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, false, glm::value_ptr(new_model));
 
-	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "view"), 1, false, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(sprite_shader, "model"), 1, false, glm::value_ptr(model));
-
-	/*
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	*/
-
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	model.draw(shader);
 }
 
-renderer::cube::cube() {
-	// Generate and bind buffers
-	/* OLD VERTICES (takes up 4 squares instead of 1)
-	float vertices[] = {
-		-1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f
-	};
-	*/
-
-	float vertices[] = {
-		0.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f
-	};
-
-	float texcoords[] = {
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f 
-	};
-
-	// Generate and bind vao
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	// Generate and bind vbo
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texcoords), NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texcoords), &texcoords);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(sizeof(vertices)));
-
-	unsigned int indices[] = {
-		0, 1, 3, 3, 1, 2,
-		1, 5, 2, 2, 5, 6,
-		5, 4, 6, 6, 4, 7,
-		4, 0, 7, 7, 0, 3,
-		3, 2, 7, 7, 2, 6,
-		4, 5, 0, 0, 5, 1
-	};
-
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Set projection matrix attribute
-	glUseProgram(cube_shader);
-	glUniformMatrix4fv(glGetUniformLocation(cube_shader, "projection"), 1, false, glm::value_ptr(projection));
-
-	render_list.push_back(this);
-}
-
-renderer::cube::~cube() {
-	glDeleteVertexArrays(1, &vao);
-
-	for (auto it = render_list.begin(); it != render_list.end();) {
-		if (*it == this)
-			it = render_list.erase(it);
-		else
-			++it;
-	}
-}
-
-void renderer::cube::draw() {
-	glUseProgram(cube_shader);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(*position));
-
-	glUniform3fv(glGetUniformLocation(cube_shader, "colour"), 1, glm::value_ptr(colour));
-
-	glUniformMatrix4fv(glGetUniformLocation(cube_shader, "view"), 1, false, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(cube_shader, "model"), 1, false, glm::value_ptr(model));
-
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-}
 
 #ifdef _DEBUG
 //
@@ -452,21 +539,22 @@ void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const gl
 }
 
 void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
-	draw_line(pos, { pos.x + size.x, pos.y, pos.z }, colour);
-	draw_line(pos, { pos.x, pos.y + size.y, pos.z }, colour);
-	draw_line(pos, { pos.x, pos.y, pos.z + size.z }, colour);
+	glm::vec3 new_pos = pos + -.5f;
+	draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
+	draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
+	draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
 
-	draw_line(pos + size, pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(pos + size, pos + size - glm::vec3(0, size.y, 0), colour);
-	draw_line(pos + size, pos + size - glm::vec3(0, 0, size.z), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	draw_line(pos + glm::vec3(0, size.y, 0), pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(pos + glm::vec3(0, size.y, 0), pos + size - glm::vec3(0, 0, size.z), colour);
+	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	draw_line(pos + size - glm::vec3(0, size.y, 0), pos + size - glm::vec3(size.x, size.y, 0), colour);
-	draw_line(pos + size - glm::vec3(0, size.y, 0), pos + size - glm::vec3(0, size.y, size.z), colour);
+	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
+	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
 
-	draw_line(pos + glm::vec3(size.x, 0, 0), pos + glm::vec3(size.x, size.y, 0), colour);
-	draw_line(pos + glm::vec3(0, 0, size.z), pos + glm::vec3(0, size.y, size.z), colour);
+	draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
+	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
 #endif // _DEBUG

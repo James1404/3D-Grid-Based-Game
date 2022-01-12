@@ -8,12 +8,10 @@
 #include <gtc/type_ptr.hpp>
 #include <memory>
 
-player_entity::player_entity() {
+player_entity::player_entity()
+	: model("data/models/player.obj", &visual_pos, glm::vec3(0, 0, 1))
+{
 	tag = "player";
-
-	//data.spr->set_sprite_path("player.png");
-	spr.position = &visual_pos;
-	spr.colour = { 0,0,1 };
 
 	direction = { 0,1 };
 
@@ -30,7 +28,7 @@ void player_entity::update(double dt) {
 	if (auto player_cam = manager->cameras.get_camera("Player").lock()) {
 		glm::vec3 offset = glm::vec3(0, 6, 5);
 		
-		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset + 0.5f);
+		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
 		player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
 
 		player_cam->rotation.x = 20;

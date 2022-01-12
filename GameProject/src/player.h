@@ -6,7 +6,7 @@
 #include "common.h"
 
 struct player_entity : public entity {
-	renderer::sprite spr;
+	renderer::Model_Entity model;
 
 	glm::ivec2 direction;
 

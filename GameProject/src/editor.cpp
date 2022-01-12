@@ -60,7 +60,7 @@ void editor_manager::update(double dt) {
 
 	if (auto editor_cam = manager->cameras.get_camera("Editor").lock()) {
 		glm::vec3 offset = glm::vec3(0, 6, 5);
-		editor_cam->position = ((glm::vec3)cursor_grid_pos + offset + 0.5f);
+		editor_cam->position = ((glm::vec3)cursor_grid_pos + offset);
 
 		editor_cam->rotation.x = 20;
 	}
