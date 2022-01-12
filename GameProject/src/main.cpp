@@ -87,7 +87,7 @@ int main(int argc, char* args[]) {
 
 		/* ----- RENDER GAME ----- */
 		renderer::start_draw();
-
+		
 		renderer::draw_sprites();
 
 		if (CurrentState == GAME_STATE::EDITOR) {

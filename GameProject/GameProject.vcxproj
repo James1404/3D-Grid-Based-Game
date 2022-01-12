@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>includes/sdl2/include;includes/glew/include;includes/imgui;includes/glm;includes/nlohmann;resources;$(IncludePath)</IncludePath>
-    <LibraryPath>includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>includes/sdl2/include;includes/glew/include;includes/assimp/include;includes/imgui;includes/glm;resources;$(IncludePath)</IncludePath>
+    <LibraryPath>includes/assimp/lib;includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>includes/sdl2/include;includes/glew/include;includes/imgui;includes/glm;includes/nlohmann;resources;$(IncludePath)</IncludePath>
-    <LibraryPath>includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>includes/sdl2/include;includes/glew/include;includes/assimp/include;includes/imgui;includes/glm;resources;$(IncludePath)</IncludePath>
+    <LibraryPath>includes/assimp/lib;includes/sdl2/lib/x64;includes/glew/lib/Release/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,7 +127,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)data\*.*" "$(SolutionDir)x64\Release\data\" /Y /E /I
@@ -177,6 +177,85 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClCompile Include="src\uuid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\assimp\include\assimp\aabb.h" />
+    <ClInclude Include="includes\assimp\include\assimp\ai_assert.h" />
+    <ClInclude Include="includes\assimp\include\assimp\anim.h" />
+    <ClInclude Include="includes\assimp\include\assimp\BaseImporter.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Bitmap.h" />
+    <ClInclude Include="includes\assimp\include\assimp\BlobIOSystem.h" />
+    <ClInclude Include="includes\assimp\include\assimp\ByteSwapper.h" />
+    <ClInclude Include="includes\assimp\include\assimp\camera.h" />
+    <ClInclude Include="includes\assimp\include\assimp\cexport.h" />
+    <ClInclude Include="includes\assimp\include\assimp\cfileio.h" />
+    <ClInclude Include="includes\assimp\include\assimp\cimport.h" />
+    <ClInclude Include="includes\assimp\include\assimp\ColladaMetaData.h" />
+    <ClInclude Include="includes\assimp\include\assimp\color4.h" />
+    <ClInclude Include="includes\assimp\include\assimp\commonMetaData.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="includes\assimp\include\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="includes\assimp\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="includes\assimp\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="includes\assimp\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\defs.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Exceptional.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Exporter.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\fast_atof.h" />
+    <ClInclude Include="includes\assimp\include\assimp\GenericProperty.h" />
+    <ClInclude Include="includes\assimp\include\assimp\GltfMaterial.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Hash.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Importer.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\importerdesc.h" />
+    <ClInclude Include="includes\assimp\include\assimp\IOStream.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="includes\assimp\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\light.h" />
+    <ClInclude Include="includes\assimp\include\assimp\LineSplitter.h" />
+    <ClInclude Include="includes\assimp\include\assimp\LogAux.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Logger.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\LogStream.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\material.h" />
+    <ClInclude Include="includes\assimp\include\assimp\MathFunctions.h" />
+    <ClInclude Include="includes\assimp\include\assimp\matrix3x3.h" />
+    <ClInclude Include="includes\assimp\include\assimp\matrix4x4.h" />
+    <ClInclude Include="includes\assimp\include\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="includes\assimp\include\assimp\mesh.h" />
+    <ClInclude Include="includes\assimp\include\assimp\metadata.h" />
+    <ClInclude Include="includes\assimp\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\ParsingUtils.h" />
+    <ClInclude Include="includes\assimp\include\assimp\pbrmaterial.h" />
+    <ClInclude Include="includes\assimp\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="includes\assimp\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="includes\assimp\include\assimp\postprocess.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Profiler.h" />
+    <ClInclude Include="includes\assimp\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="includes\assimp\include\assimp\qnan.h" />
+    <ClInclude Include="includes\assimp\include\assimp\quaternion.h" />
+    <ClInclude Include="includes\assimp\include\assimp\RemoveComments.h" />
+    <ClInclude Include="includes\assimp\include\assimp\scene.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SGSpatialSort.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SmallVector.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SmoothingGroups.h" />
+    <ClInclude Include="includes\assimp\include\assimp\SpatialSort.h" />
+    <ClInclude Include="includes\assimp\include\assimp\StandardShapes.h" />
+    <ClInclude Include="includes\assimp\include\assimp\StreamReader.h" />
+    <ClInclude Include="includes\assimp\include\assimp\StreamWriter.h" />
+    <ClInclude Include="includes\assimp\include\assimp\StringComparison.h" />
+    <ClInclude Include="includes\assimp\include\assimp\StringUtils.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Subdivision.h" />
+    <ClInclude Include="includes\assimp\include\assimp\texture.h" />
+    <ClInclude Include="includes\assimp\include\assimp\TinyFormatter.h" />
+    <ClInclude Include="includes\assimp\include\assimp\types.h" />
+    <ClInclude Include="includes\assimp\include\assimp\vector2.h" />
+    <ClInclude Include="includes\assimp\include\assimp\vector3.h" />
+    <ClInclude Include="includes\assimp\include\assimp\version.h" />
+    <ClInclude Include="includes\assimp\include\assimp\Vertex.h" />
+    <ClInclude Include="includes\assimp\include\assimp\XmlParser.h" />
+    <ClInclude Include="includes\assimp\include\assimp\XMLTools.h" />
+    <ClInclude Include="includes\assimp\include\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\world_entities.h" />
@@ -199,6 +278,16 @@ xcopy "$(ProjectDir)glew32.dll" "$(SolutionDir)x64\Release\" /Y</Command>
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\uuid.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="includes\assimp\include\assimp\color4.inl" />
+    <None Include="includes\assimp\include\assimp\material.inl" />
+    <None Include="includes\assimp\include\assimp\matrix3x3.inl" />
+    <None Include="includes\assimp\include\assimp\matrix4x4.inl" />
+    <None Include="includes\assimp\include\assimp\quaternion.inl" />
+    <None Include="includes\assimp\include\assimp\SmoothingGroups.inl" />
+    <None Include="includes\assimp\include\assimp\vector2.inl" />
+    <None Include="includes\assimp\include\assimp\vector3.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

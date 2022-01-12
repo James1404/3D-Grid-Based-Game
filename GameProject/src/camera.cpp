@@ -37,7 +37,9 @@ void camera_manager::set_camera(std::string _id) {
 		}
 	}
 	else {
-		current_camera = it->second;
+		if (current_camera.lock() != it->second) {
+			current_camera = it->second;
+		}
 	}
 }
 
