@@ -9,7 +9,7 @@
 #include <memory>
 
 player_entity::player_entity()
-	: model("data/models/player.obj", &visual_pos, glm::vec3(0, 0, 1))
+	: model("data/models/player/player.obj", &visual_pos, glm::vec3(0, 0, 1))
 {
 	tag = "player";
 
@@ -26,53 +26,108 @@ void player_entity::update(double dt) {
 	manager->cameras.set_camera("Player");
 
 	if (auto player_cam = manager->cameras.get_camera("Player").lock()) {
-		glm::vec3 offset = glm::vec3(0, 6, 5);
-		
-		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
-		player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+		if (is_first_person) {
+			model.is_paused = true;
 
-		player_cam->rotation.x = 20;
+			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, .5f, 0));
+			//player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+			player_cam->position = target_pos;
+			vel = { 0,0,0 };
+
+			if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+				if (input::button_pressed("MoveUp")) {
+					vel.x = 1;
+				}
+				else if (input::button_pressed("MoveDown")) {
+					vel.x = -1;
+				}
+			}
+
+			if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
+				if (input::button_pressed("MoveLeft")) {
+					vel.y = -1;
+				}
+				else if (input::button_pressed("MoveRight")) {
+					vel.y = 1;
+				}
+			}
+
+			vel *= 0.1f;
+			vel *= dt;
+
+			fp_look_rotation += vel;
+
+			if (fp_look_rotation.x > 50.0f)
+				fp_look_rotation.x = 50.0f;
+			if (fp_look_rotation.x < -60.0f)
+				fp_look_rotation.x = -60.0f;
+
+			if (fp_look_rotation.y > 360.0f)
+				fp_look_rotation.y = 0.0f;
+			if (fp_look_rotation.y < 0.0f)
+				fp_look_rotation.y = 360.0f;
+
+			player_cam->rotation = fp_look_rotation;
+			//player_cam->rotation = common::lerp(player_cam->rotation, look_rotation, camera_speed * dt);
+		}
+		else {
+			model.is_paused = false;
+
+			glm::vec3 offset = glm::vec3(0, 6, 5);
+
+			glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
+			player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+			player_cam->rotation = common::lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
+		}
 	}
-
-	// TODO: if player is not loaded first then they are render after them.
-	
-	//renderer::debug::draw_box_wireframe(grid_pos + glm::ivec3(direction.x, 0, direction.y), glm::vec3(1), colour::pink);
 	
 	if (!is_moving()) {
-		vel = { 0,0,0 };
-
-		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
-			if (input::button_pressed("MoveUp")) {
-				direction = { 0,-1 };
-				vel = { 0,0,-1 };
-			}
-			else if (input::button_pressed("MoveDown")) {
-				direction = { 0,1 };
-				vel = { 0,0,1 };
+		if (input::key_pressed(SDL_SCANCODE_SPACE)) {
+			if (!is_first_person) {
+				is_first_person = true;
+				fp_look_rotation = fp_look_direction;
 			}
 		}
+		else {
+			is_first_person = false;
+		}
 
-		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
-			if (input::button_pressed("MoveLeft")) {
-				direction = { -1,0 };
-				vel = { -1,0,0 };
+		if (!is_first_person) {
+			vel = { 0,0,0 };
+
+			if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
+				if (input::button_pressed("MoveUp")) {
+					vel = { 0,0,-1 };
+					fp_look_direction = { 0, 270, 0 };
+				}
+				else if (input::button_pressed("MoveDown")) {
+					vel = { 0,0,1 };
+					fp_look_direction = { 0, 90, 0 };
+				}
 			}
-			else if (input::button_pressed("MoveRight")) {
-				direction = { 1,0 };
-				vel = { 1,0,0 };
+
+			if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
+				if (input::button_pressed("MoveLeft")) {
+					vel = { -1,0,0 };
+					fp_look_direction = { 0, 180, 0 };
+				}
+				else if (input::button_pressed("MoveRight")) {
+					vel = { 1,0,0 };
+					fp_look_direction = { 0, 0, 0 };
+				}
 			}
-		}
 
-		interp_speed = walk_speed;
-		if (input::button_pressed("Run")) {
-			interp_speed = run_speed;
-		}
+			interp_speed = walk_speed;
+			if (input::button_pressed("Run")) {
+				interp_speed = run_speed;
+			}
 
-		if (input::button_down("Attack")) {
-			vel.y = 1;
-		}
+			if (input::button_down("Attack")) {
+				vel.y = 1;
+			}
 
-		move_grid_pos(vel);
+			move_grid_pos(vel);
+		}
 	}
 
 	interp_visuals(dt, interp_speed);

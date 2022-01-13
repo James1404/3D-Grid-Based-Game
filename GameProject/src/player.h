@@ -15,12 +15,11 @@ struct player_entity : public entity {
 
 	float interp_speed;
 	
-	const int shoot_range = 5;
-	uint32_t shoot_end_time = 0;
-	const uint32_t shoot_cooldown_duration = 1000;
-
 	glm::vec3 cam_original_pos;
 	const float camera_speed = 0.01f;
+	glm::vec3 fp_look_rotation = { 0, 270, 0 };
+	glm::vec3 fp_look_direction = { 0, 270, 0 };
+	bool is_first_person = false;
 
 	player_entity();
 	~player_entity();
