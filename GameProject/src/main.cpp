@@ -11,7 +11,9 @@ int main(int argc, char* args[]) {
 	bool isRunning = false;
 
 	entity_manager entities;
+#ifdef _DEBUG
 	editor_manager editor;
+#endif // _DEBUG
 
 	enum class GAME_STATE {
 		GAMEPLAY,
@@ -36,7 +38,9 @@ int main(int argc, char* args[]) {
 		entities.load("combattestlevel");
 		entities.init();
 
+#ifdef _DEBUG
 		editor.init(entities);
+#endif // _DEBUG
 		
 		isRunning = true;
 	}
@@ -48,15 +52,15 @@ int main(int argc, char* args[]) {
 			case SDL_QUIT:
 				isRunning = false;
 				break;
-			/*
+				/*
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-					renderer::screen_width = event.window.data1;
-					renderer::screen_height = event.window.data2;
-					SDL_SetWindowSize(renderer::window, renderer::screen_width, renderer::screen_height);
+					renderer::screen_resolution_x = event.window.data1;
+					renderer::screen_resolution_y = event.window.data2;
+					SDL_SetWindowSize(renderer::window, renderer::screen_resolution_x, renderer::screen_resolution_y);
 				}
 				break;
-			*/
+				*/
 			}
 		}
 
@@ -70,6 +74,7 @@ int main(int argc, char* args[]) {
 
 		entities.update(dt);
 
+#ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR) {
 			entities.is_paused = true;
 			editor.update(dt);
@@ -77,6 +82,7 @@ int main(int argc, char* args[]) {
 		else {
 			entities.is_paused = false;
 		}
+#endif // _DEBUG
 
 		if (input::key_down(SDL_SCANCODE_ESCAPE)) {
 			if (CurrentState == GAME_STATE::GAMEPLAY)
@@ -90,9 +96,11 @@ int main(int argc, char* args[]) {
 		
 		renderer::draw_sprites();
 
+#ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR) {
 			editor.draw();
 		}
+#endif // _DEBUG
 
 		renderer::debug::draw_debug();
 
@@ -103,6 +111,10 @@ int main(int argc, char* args[]) {
 
 	/* ----- CLEAN GAME ----- */
 	logger::info("STARTING CLEANUP");
+
+#ifdef _DEBUG
+	editor.clean();
+#endif // _DEBUG
 
 	entities.clean();
 

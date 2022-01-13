@@ -68,7 +68,7 @@ void entity_manager::clean() {
 	logger::info("CLEANED LEVEL DATA");
 }
 
-uint32_t fileVersion = 8;
+uint32_t fileVersion = 9;
 void entity_manager::save() {
 	std::string levelPath = "data/scenes/";
 	levelPath.append(name);
@@ -140,7 +140,8 @@ void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags
 
 	if (_type == "player") {
 		_new_entity = std::make_shared<player_entity>();
-	} else if (_type == "block") {
+	}
+	else if (_type == "block") {
 		_new_entity = std::make_shared<block_entity>();
 	}
 	else {
