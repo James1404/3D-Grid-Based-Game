@@ -62,7 +62,8 @@ void editor_manager::update(double dt) {
 		glm::vec3 offset = glm::vec3(0, 6, 5);
 		editor_cam->position = ((glm::vec3)cursor_grid_pos + offset);
 
-		editor_cam->rotation.x = 20;
+		editor_cam->rotation.x = -50;
+		editor_cam->rotation.y = -90;
 	}
 
 	glm::ivec3 vel{ 0 };

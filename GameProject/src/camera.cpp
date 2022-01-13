@@ -15,8 +15,9 @@ camera::camera()
 camera::~camera() { }
 
 glm::mat4 camera::getViewMatrix() {
+	// pitch = rotation.x | yaw = rotation.y
 	front.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
-	front.y = sin(glm::radians(rotation.y));
+	front.y = sin(glm::radians(rotation.x));
 	front.z = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 
 	front = glm::normalize(front);
