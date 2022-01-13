@@ -2,9 +2,6 @@
 
 #include <memory>
 #include <map>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 
 //
 // ----- MESH -----
@@ -89,16 +86,13 @@ void renderer::Model::load_model(std::string _path) {
 	process_node(scene->mRootNode, scene);
 }
 
-void renderer::Model::process_node(aiNode* node, const aiScene* scene)
-{
-	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-	{
+void renderer::Model::process_node(aiNode* node, const aiScene* scene) {
+	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(process_mesh(mesh, scene));
 	}
 
-	for (unsigned int i = 0; i < node->mNumChildren; i++)
-	{
+	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		process_node(node->mChildren[i], scene);
 	}
 }
@@ -160,25 +154,20 @@ renderer::Mesh renderer::Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	return Mesh(vertices, indices, textures);
 }
 
-std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName)
-{
+std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName) {
 	std::vector<Texture> textures;
-	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-	{
+	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		bool skip = false;
-		for (unsigned int j = 0; j < textures_loaded.size(); j++)
-		{
-			if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
-			{
+		for (unsigned int j = 0; j < textures_loaded.size(); j++) {
+			if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
 				textures.push_back(textures_loaded[j]);
 				skip = true;
 				break;
 			}
 		}
-		if (!skip)
-		{
+		if (!skip) {
 			Texture texture;
 			texture.id = texture_from_file(str.C_Str(), directory);
 			texture.type = typeName;
@@ -188,143 +177,6 @@ std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMateria
 		}
 	}
 	return textures;
-}
-
-//
-// ----- SHADERS -----
-//
-
-renderer::Shader::Shader(const char* vertexSource, const char* fragmentSource) {
-	std::string vShaderCode, fShaderCode;
-	std::ifstream vShaderFile, fShaderFile;
-
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try {
-		vShaderFile.open(vertexSource);
-		fShaderFile.open(fragmentSource);
-		std::stringstream vShaderStream, fShaderStream;
-
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		vShaderFile.close();
-		fShaderFile.close();
-
-		vShaderCode = vShaderStream.str();
-		fShaderCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e) {
-		logger::error("SHADER FILE NOT SUCCESFULLY READ");
-	}
-
-	const char* vertexShader = vShaderCode.c_str();
-	const char* fragmentShader = fShaderCode.c_str();
-
-	unsigned int vertex, fragment;
-
-	//create and compiler shaders from its source
-	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vertexShader, NULL);
-	glCompileShader(vertex);
-	check_shader_compiler_errors(vertex);
-
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fragmentShader, NULL);
-	glCompileShader(fragment);
-	check_shader_compiler_errors(fragment);
-
-	// create program and attach shaders
-	unsigned int shader;
-	shader = glCreateProgram();
-	glAttachShader(shader, vertex);
-	glAttachShader(shader, fragment);
-	glLinkProgram(shader);
-
-	// delete shaders as they are no longer needed
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
-
-	logger::info("Loaded and compiled shader ", vertexSource, " ", fragmentSource);
-
-	id = shader;
-}
-
-void renderer::Shader::check_shader_compiler_errors(unsigned int shader) {
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		logger::error("SHADER COMPILATION FAILED ", infoLog);
-	}
-}
-
-void check_shader_compiler_errors(unsigned int shader) {
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		logger::error("SHADER COMPILATION FAILED ", infoLog);
-	}
-}
-
-unsigned int create_shader(const char* vertexSource, const char* fragmentSource) {
-	// load shaders from file
-	std::string vShaderCode, fShaderCode;
-	std::ifstream vShaderFile, fShaderFile;
-
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try {
-		vShaderFile.open(vertexSource);
-		fShaderFile.open(fragmentSource);
-		std::stringstream vShaderStream, fShaderStream;
-
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		vShaderFile.close();
-		fShaderFile.close();
-
-		vShaderCode = vShaderStream.str();
-		fShaderCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e) {
-		logger::error("SHADER FILE NOT SUCCESFULLY READ");
-	}
-
-	const char* vertexShader = vShaderCode.c_str();
-	const char* fragmentShader = fShaderCode.c_str();
-
-	unsigned int vertex, fragment;
-
-	//create and compiler shaders from its source
-	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vertexShader, NULL);
-	glCompileShader(vertex);
-	check_shader_compiler_errors(vertex);
-
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fragmentShader, NULL);
-	glCompileShader(fragment);
-	check_shader_compiler_errors(fragment);
-
-	// create program and attach shaders
-	unsigned int shader;
-	shader = glCreateProgram();
-	glAttachShader(shader, vertex);
-	glAttachShader(shader, fragment);
-	glLinkProgram(shader);
-
-	// delete shaders as they are no longer needed
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
-
-	logger::info("Loaded and compiled shader ", vertexSource, " ", fragmentSource);
-
-	return shader;
 }
 
 //
@@ -340,9 +192,6 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 int renderer::screen_resolution_x = 1280, renderer::screen_resolution_y = 720;
 
 static std::vector<renderer::Model_Entity*> model_list;
-
-unsigned int sprite_shader;
-unsigned int cube_shader;
 
 void renderer::init() {
 	logger::info("STARTING RENDERER INITIALIZATION");
@@ -366,16 +215,10 @@ void renderer::init() {
 
 	projection = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
 
-	sprite_shader = create_shader("data/shaders/sprite_core.vs", "data/shaders/sprite_core.fs");
-	cube_shader = create_shader("data/shaders/cube_core.vs", "data/shaders/cube_core.fs");
-
 	logger::info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 }
 
 void renderer::clean() {
-	glDeleteProgram(sprite_shader);
-	glDeleteProgram(cube_shader);
-
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -401,8 +244,8 @@ void renderer::stop_draw() {
 }
 
 renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _position, glm::vec3 _colour)
-	: model(_model_path), shader("data/shaders/model_loading.vs", "data/shaders/model_loading.fs"),
-	position(_position), colour(_colour)
+	: model(model_from_file(_model_path)), shader(shader_from_file("data/shaders/model_loading.vs", "data/shaders/model_loading.fs")),
+	position(_position), colour(_colour), is_paused(false)
 {
 	glUseProgram(shader.id);
 	glUniformMatrix4fv(glGetUniformLocation(shader.id, "projection"), 1, false, glm::value_ptr(projection));
@@ -420,6 +263,9 @@ renderer::Model_Entity::~Model_Entity() {
 }
 
 void renderer::Model_Entity::draw() {
+	if (is_paused)
+		return;
+
 	glUseProgram(shader.id);
 
 	glm::mat4 new_model = glm::mat4(1.0f);
@@ -455,21 +301,21 @@ renderer::debug::debug_drawing::~debug_drawing() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-unsigned int square_shader;
-unsigned int circle_shader;
-unsigned int line_shader;
+renderer::Shader square_shader;
+renderer::Shader circle_shader;
+renderer::Shader line_shader;
 void renderer::debug::init_debug() {
-	square_shader = create_shader("data/shaders/square.vs", "data/shaders/square.fs");
-	circle_shader = create_shader("data/shaders/circle.vs", "data/shaders/circle.fs");
-	line_shader	= create_shader("data/shaders/line.vs", "data/shaders/line.fs");
+	square_shader = shader_from_file("data/shaders/square.vs", "data/shaders/square.fs");
+	circle_shader = shader_from_file("data/shaders/circle.vs", "data/shaders/circle.fs");
+	line_shader	= shader_from_file("data/shaders/line.vs", "data/shaders/line.fs");
 }
 
 void renderer::debug::clean_debug() {
 	clear_debug_list();
 
-	glDeleteProgram(square_shader);
-	glDeleteProgram(circle_shader);
-	glDeleteProgram(line_shader);
+	glDeleteProgram(square_shader.id);
+	glDeleteProgram(circle_shader.id);
+	glDeleteProgram(line_shader.id);
 }
 
 std::vector<std::shared_ptr<renderer::debug::debug_drawing>> square_draw_list;
@@ -484,36 +330,36 @@ void renderer::debug::clear_debug_list () {
 
 void renderer::debug::draw_debug() {
 	for(auto& square : square_draw_list) {
-		glUseProgram(square_shader);
+		glUseProgram(square_shader.id);
 
-		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(square_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(square_shader.id, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(square_shader.id, "u_view"), 1, false, glm::value_ptr(view));
 
-		glUniform3fv(glGetUniformLocation(square_shader, "u_color"), 1, glm::value_ptr(square->colour));
+		glUniform3fv(glGetUniformLocation(square_shader.id, "u_color"), 1, glm::value_ptr(square->colour));
 
 		glBindVertexArray(square->vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
 	for(auto& circle : circle_draw_list) {
-		glUseProgram(circle_shader);
+		glUseProgram(circle_shader.id);
 
-		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(circle_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(circle_shader.id, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(circle_shader.id, "u_view"), 1, false, glm::value_ptr(view));
 
-		glUniform3fv(glGetUniformLocation(circle_shader, "u_color"), 1, glm::value_ptr(circle->colour));
+		glUniform3fv(glGetUniformLocation(circle_shader.id, "u_color"), 1, glm::value_ptr(circle->colour));
 
 		glBindVertexArray(circle->vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
 	for(auto& line : line_draw_list) {
-		glUseProgram(line_shader);
+		glUseProgram(line_shader.id);
 
-		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_projection"), 1, false, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(line_shader, "u_view"), 1, false, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(line_shader.id, "u_projection"), 1, false, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(line_shader.id, "u_view"), 1, false, glm::value_ptr(view));
 
-		glUniform3fv(glGetUniformLocation(line_shader, "u_color"), 1, glm::value_ptr(line->colour));
+		glUniform3fv(glGetUniformLocation(line_shader.id, "u_color"), 1, glm::value_ptr(line->colour));
 
 		glBindVertexArray(line->vao);
 		glDrawArrays(GL_LINES, 0, 2);

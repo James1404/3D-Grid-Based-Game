@@ -8,6 +8,6 @@ uniform vec3 colour;
 
 void main()
 {
-	//FragColor = texture(texture_diffuse1, TexCoords);
-	FragColor = vec4(colour, 1);
+	FragColor = texture(texture_diffuse1, TexCoords);
+	//FragColor = vec4(colour, 1);
 }

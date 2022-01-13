@@ -10,6 +10,9 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -52,11 +55,10 @@ namespace renderer {
 
 	struct Shader {
 		unsigned int id;
-
-		Shader(const char* vertexSource, const char* fragmentSource);
-	private:
-		void check_shader_compiler_errors(unsigned int shader);
+		std::string path;
 	};
+
+	static std::vector<Shader> shaders_loaded;
 
 	struct Vertex {
 		glm::vec3 position;
@@ -70,7 +72,35 @@ namespace renderer {
 		std::string path;
 	};
 
-	inline unsigned int texture_from_file(const char* path, const std::string& directory, bool gamma = false) {
+	struct Mesh {
+		std::vector<Vertex> vertices;
+		std::vector<unsigned int> indices;
+		std::vector<Texture> textures;
+
+		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+		void draw(Shader& _shader);
+	private:
+		unsigned int vao, vbo, ebo;
+		void setupMesh();
+	};
+
+	struct Model {
+		std::vector<Texture> textures_loaded;
+		std::vector<Mesh> meshes;
+		std::string directory;
+		std::string path;
+
+		void draw(Shader& _shader);
+
+		void load_model(std::string _path);
+		void process_node(aiNode* node, const aiScene* scene);
+		Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
+		std::vector<Texture> load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName);
+	};
+
+	static std::vector<Model> models_loaded;
+
+	inline unsigned int texture_from_file(const char* path, const std::string& directory) {
 		std::string filename = std::string(path);
 		filename = directory + '/' + filename;
 
@@ -109,36 +139,107 @@ namespace renderer {
 		return textureID;
 	}
 
-	struct Mesh {
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void draw(Shader& _shader);
-	private:
-		unsigned int vao, vbo, ebo;
-		void setupMesh();
-	};
-
-	struct Model {
-		std::vector<Texture> textures_loaded;
-		std::vector<Mesh> meshes;
-		std::string directory;
-		bool gammaCorrection;
-
-		Model(const std::string _path, bool gamma = false) : gammaCorrection(gamma)
-		{
-			load_model(_path);
+	inline Shader shader_from_file(const char* vertex_source, const char* fragment_source) {
+		Shader _shader;
+		bool skip = false;
+		for (unsigned int i = 0; i < shaders_loaded.size(); i++) {
+			if (shaders_loaded[i].path == vertex_source) {
+				_shader = shaders_loaded[i];
+				skip = true;
+			}
 		}
 
-		void draw(Shader& _shader);
+		if (!skip) {
+			// load shaders from file
+			std::string vShaderCode, fShaderCode;
+			std::ifstream vShaderFile, fShaderFile;
 
-		void load_model(std::string _path);
-		void process_node(aiNode* node, const aiScene* scene);
-		Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName);
-	};
+			vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+			fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+			try {
+				vShaderFile.open(vertex_source);
+				fShaderFile.open(fragment_source);
+				std::stringstream vShaderStream, fShaderStream;
+
+				vShaderStream << vShaderFile.rdbuf();
+				fShaderStream << fShaderFile.rdbuf();
+
+				vShaderFile.close();
+				fShaderFile.close();
+
+				vShaderCode = vShaderStream.str();
+				fShaderCode = fShaderStream.str();
+			}
+			catch (std::ifstream::failure e) {
+				logger::error("SHADER FILE NOT SUCCESFULLY READ");
+			}
+
+			const char* vertexShader = vShaderCode.c_str();
+			const char* fragmentShader = fShaderCode.c_str();
+
+			unsigned int vertex, fragment;
+
+			//create and compiler shaders from its source
+			vertex = glCreateShader(GL_VERTEX_SHADER);
+			glShaderSource(vertex, 1, &vertexShader, NULL);
+			glCompileShader(vertex);
+
+			int success;
+			char infoLog[512];
+			glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+				logger::error("SHADER COMPILATION FAILED ", infoLog);
+			}
+
+			fragment = glCreateShader(GL_FRAGMENT_SHADER);
+			glShaderSource(fragment, 1, &fragmentShader, NULL);
+			glCompileShader(fragment);
+
+			glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+				logger::error("SHADER COMPILATION FAILED ", infoLog);
+			}
+
+			// create program and attach shaders
+			unsigned int shader_program;
+			shader_program = glCreateProgram();
+			glAttachShader(shader_program, vertex);
+			glAttachShader(shader_program, fragment);
+			glLinkProgram(shader_program);
+
+			// delete shaders as they are no longer needed
+			glDeleteShader(vertex);
+			glDeleteShader(fragment);
+
+			_shader.id = shader_program;
+			_shader.path = vertex_source;
+			shaders_loaded.push_back(_shader);
+
+			logger::info("LOADED AND COMPILED SHADER ", vertex_source, " ", fragment_source);
+		}
+
+		return _shader;
+	}
+
+	inline Model model_from_file(const std::string _path) {
+		for (unsigned int i = 0; i < models_loaded.size(); i++) {
+			if (models_loaded[i].path == _path) {
+				return models_loaded[i];
+			}
+		}
+
+		Model _model;
+		_model.path = _path;
+
+		_model.load_model(_model.path);
+		models_loaded.push_back(_model);
+
+		logger::info("LOADED MODEL ", _path);
+
+		return _model;
+	}
 
 	struct Model_Entity {
 		Model model;
@@ -146,6 +247,7 @@ namespace renderer {
 
 		glm::vec3 colour;
 		glm::vec3* position;
+		bool is_paused;
 
 		Model_Entity(std::string _model_path, glm::vec3* _position, glm::vec3 _colour);
 		~Model_Entity();
