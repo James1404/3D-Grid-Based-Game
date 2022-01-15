@@ -115,7 +115,7 @@ struct entity {
 		: id(0), flags(0), tag(""),
 		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0)
 	{
-		logger::info("INITIALIZED ENTITY ", this);
+		//logger::info("INITIALIZED ENTITY ", this);
 	}
 
 	virtual ~entity() {
@@ -171,7 +171,7 @@ struct entity {
 
 	void interp_visuals(double dt, float interp_speed) {
 		// TODO: implement lerping instead of move_towards
-		//visual_pos = common::lerp((glm::vec3)previous_grid_pos, (glm::vec3)grid_pos, interp_speed * dt);
+		//visual_pos = common::lerp(visual_pos, (glm::vec3)grid_pos, interp_speed * dt);
 		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
 	}
 };
