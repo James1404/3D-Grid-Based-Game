@@ -243,9 +243,9 @@ void renderer::stop_draw() {
 	SDL_GL_SwapWindow(window);
 }
 
-renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _position, glm::vec3 _colour)
-	: model(model_from_file(_model_path)), shader(shader_from_file("data/shaders/model_loading.vs", "data/shaders/model_loading.fs")),
-	position(_position), colour(_colour), is_paused(false)
+renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _position)
+	: model(model_from_file(_model_path)), shader(shader_from_file("data/shaders/model_loading.shader")),
+	position(_position), is_paused(false), rotation(0,0,0), scale(1,1,1)
 {
 	glUseProgram(shader.id);
 	glUniformMatrix4fv(glGetUniformLocation(shader.id, "projection"), 1, false, glm::value_ptr(projection));
@@ -270,8 +270,13 @@ void renderer::Model_Entity::draw() {
 
 	glm::mat4 new_model = glm::mat4(1.0f);
 	new_model = glm::translate(new_model, *position);
+	//new_model = glm::rotate(new_model, rotation);
+	new_model = glm::rotate(new_model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+	new_model = glm::rotate(new_model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+	new_model = glm::rotate(new_model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 
-	glUniform3fv(glGetUniformLocation(shader.id, "colour"), 1, glm::value_ptr(colour));
+	new_model = glm::scale(new_model, scale);
+
 	glUniformMatrix4fv(glGetUniformLocation(shader.id, "view"), 1, false, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, false, glm::value_ptr(new_model));
 
@@ -301,46 +306,29 @@ renderer::debug::debug_drawing::~debug_drawing() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-renderer::Shader square_shader;
 renderer::Shader circle_shader;
 renderer::Shader line_shader;
 void renderer::debug::init_debug() {
-	square_shader = shader_from_file("data/shaders/square.vs", "data/shaders/square.fs");
-	circle_shader = shader_from_file("data/shaders/circle.vs", "data/shaders/circle.fs");
-	line_shader	= shader_from_file("data/shaders/line.vs", "data/shaders/line.fs");
+	circle_shader = shader_from_file("data/shaders/debug/debug_circle.shader");
+	line_shader	= shader_from_file("data/shaders/debug/debug_line.shader");
 }
 
 void renderer::debug::clean_debug() {
 	clear_debug_list();
 
-	glDeleteProgram(square_shader.id);
 	glDeleteProgram(circle_shader.id);
 	glDeleteProgram(line_shader.id);
 }
 
-std::vector<std::shared_ptr<renderer::debug::debug_drawing>> square_draw_list;
 std::vector<std::shared_ptr<renderer::debug::debug_drawing>> circle_draw_list;
 std::vector<std::shared_ptr<renderer::debug::debug_drawing>> line_draw_list;
 
 void renderer::debug::clear_debug_list () {
-	square_draw_list.clear();
 	circle_draw_list.clear();
 	line_draw_list.clear();
 }
 
 void renderer::debug::draw_debug() {
-	for(auto& square : square_draw_list) {
-		glUseProgram(square_shader.id);
-
-		glUniformMatrix4fv(glGetUniformLocation(square_shader.id, "u_projection"), 1, false, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(square_shader.id, "u_view"), 1, false, glm::value_ptr(view));
-
-		glUniform3fv(glGetUniformLocation(square_shader.id, "u_color"), 1, glm::value_ptr(square->colour));
-
-		glBindVertexArray(square->vao);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	}
-
 	for(auto& circle : circle_draw_list) {
 		glUseProgram(circle_shader.id);
 

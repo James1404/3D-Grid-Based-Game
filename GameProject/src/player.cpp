@@ -9,7 +9,7 @@
 #include <memory>
 
 player_entity::player_entity()
-	: model("data/models/player/player.obj", &visual_pos, glm::vec3(0, 0, 1))
+	: model("data/models/player/player.obj", &visual_pos)
 {
 	tag = "player";
 
@@ -29,9 +29,9 @@ void player_entity::update(double dt) {
 		if (is_first_person) {
 			model.is_paused = true;
 
-			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, .5f, 0));
-			//player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
-			player_cam->position = target_pos;
+			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, .4f, 0));
+			player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+			//player_cam->position = target_pos;
 			vel = { 0,0,0 };
 
 			if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
@@ -66,9 +66,9 @@ void player_entity::update(double dt) {
 				fp_look_rotation.y = 0.0f;
 			if (fp_look_rotation.y < 0.0f)
 				fp_look_rotation.y = 360.0f;
-
+			// TODO: dont allow rotation until camera has reached first-person position
 			player_cam->rotation = fp_look_rotation;
-			//player_cam->rotation = common::lerp(player_cam->rotation, look_rotation, camera_speed * dt);
+			//player_cam->rotation = common::lerp(player_cam->rotation, fp_look_rotation, camera_speed * dt);
 		}
 		else {
 			model.is_paused = false;
@@ -79,6 +79,13 @@ void player_entity::update(double dt) {
 			player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
 			player_cam->rotation = common::lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
 		}
+
+		/* TOP DOWN CAMERA
+		glm::vec3 offset = glm::vec3(0, 4, 0);
+		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
+		player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+		player_cam->rotation = glm::vec3(-89, -90, 0);
+		*/
 	}
 	
 	if (!is_moving()) {

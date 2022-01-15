@@ -139,40 +139,67 @@ namespace renderer {
 		return textureID;
 	}
 
-	inline Shader shader_from_file(const char* vertex_source, const char* fragment_source) {
+	inline Shader shader_from_file(const char* shader_source) {
 		Shader _shader;
 		bool skip = false;
 		for (unsigned int i = 0; i < shaders_loaded.size(); i++) {
-			if (shaders_loaded[i].path == vertex_source) {
+			if (shaders_loaded[i].path == shader_source) {
 				_shader = shaders_loaded[i];
 				skip = true;
 			}
 		}
 
 		if (!skip) {
-			// load shaders from file
 			std::string vShaderCode, fShaderCode;
-			std::ifstream vShaderFile, fShaderFile;
+			std::string shader_version;
+			std::ifstream ifs(shader_source);
+			if (ifs.is_open()) {
+				enum class line_type_ {
+					none = 0,
+					vertex,
+					fragment,
+					version
+				} line_type = line_type_::none;
 
-			vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-			fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-			try {
-				vShaderFile.open(vertex_source);
-				fShaderFile.open(fragment_source);
-				std::stringstream vShaderStream, fShaderStream;
+				std::string line;
+				while (std::getline(ifs, line)) {
+					if (line == "[version]") {
+						line_type = line_type_::version;
+						continue;
+					}
+					else if (line == "[vertex]") {
+						line_type = line_type_::vertex;
+						continue;
+					}
+					else if (line == "[fragment]") {
+						line_type = line_type_::fragment;
+						continue;
+					}
 
-				vShaderStream << vShaderFile.rdbuf();
-				fShaderStream << fShaderFile.rdbuf();
+					if (line_type == line_type_::vertex) {
+						//vStream << line;
+						vShaderCode += line;
+						vShaderCode += "\n";
+					}
+					else if (line_type == line_type_::fragment) {
+						//fStream >> line;
+						fShaderCode += line;
+						fShaderCode += "\n";
+					}
+					else if (line_type == line_type_::version) {
+						shader_version += line;
+						shader_version += "\n";
+					}
+				}
 
-				vShaderFile.close();
-				fShaderFile.close();
-
-				vShaderCode = vShaderStream.str();
-				fShaderCode = fShaderStream.str();
+				ifs.close();
 			}
-			catch (std::ifstream::failure e) {
-				logger::error("SHADER FILE NOT SUCCESFULLY READ");
+			else {
+				logger::error("COULD NOT OPEN SHADER FILE: ", shader_source);
 			}
+
+			vShaderCode.insert(0, shader_version);
+			fShaderCode.insert(0, shader_version);
 
 			const char* vertexShader = vShaderCode.c_str();
 			const char* fragmentShader = fShaderCode.c_str();
@@ -214,10 +241,10 @@ namespace renderer {
 			glDeleteShader(fragment);
 
 			_shader.id = shader_program;
-			_shader.path = vertex_source;
+			_shader.path = shader_source;
 			shaders_loaded.push_back(_shader);
 
-			logger::info("LOADED AND COMPILED SHADER ", vertex_source, " ", fragment_source);
+			logger::info("LOADED AND COMPILED SHADER ", shader_source);
 		}
 
 		return _shader;
@@ -245,11 +272,13 @@ namespace renderer {
 		Model model;
 		Shader shader;
 
-		glm::vec3 colour;
 		glm::vec3* position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
+
 		bool is_paused;
 
-		Model_Entity(std::string _model_path, glm::vec3* _position, glm::vec3 _colour);
+		Model_Entity(std::string _model_path, glm::vec3* _position);
 		~Model_Entity();
 
 		void draw();
