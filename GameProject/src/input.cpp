@@ -38,52 +38,17 @@ void input::clean() {
 }
 
 // TODO: Add Controller Support
-enum input_type { KEYBOARD = 0, MOUSE };
-
 struct INPUT {
 	unsigned int input_index;
-	input_type type;
 
-	INPUT(Uint8 _input, input_type _type) : input_index(_input), type(_type) {}
+	INPUT(Uint8 _input) : input_index(_input) {}
 	~INPUT() {}
 
 	virtual bool State() {
-		if (type == KEYBOARD) {
-			return keyboard_state[input_index];
-		} else if (type == MOUSE) {
-			Uint32 mask = 0;
-
-			switch (input_index) {
-			case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
-			case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
-			case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
-			}
-
-			return (mouse_state & mask);
-		}
-
-		return false;
+		return keyboard_state[input_index];
 	}
 	virtual bool P_State() {
-		if (type == KEYBOARD) {
-			return previous_keyboard_state[input_index];
-		} else if (type == MOUSE) {
-			Uint32 mask = 0;
-
-			switch (input_index) {
-			case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
-			case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
-			case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
-			case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
-			case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
-			}
-
-			return (previous_mouse_state & mask);
-		}
-
-		return false;
+		return previous_keyboard_state[input_index];
 	}
 };
 
@@ -138,11 +103,11 @@ bool input::mouse_button_down(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case mouse_button::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case mouse_button::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
 	return (mouse_state & mask) && !(previous_mouse_state & mask);
@@ -152,11 +117,11 @@ bool input::mouse_button_pressed(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case mouse_button::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case mouse_button::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
 	return (mouse_state & mask);
@@ -166,11 +131,11 @@ bool input::mouse_button_released(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
-	case input::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
-	case input::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
-	case input::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
-	case input::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
-	case input::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
+	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
+	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
+	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
+	case mouse_button::MOUSE_BACK: mask = SDL_BUTTON_X1MASK; break;
+	case mouse_button::MOUSE_FORWARD: mask = SDL_BUTTON_X2MASK; break;
 	}
 
 	return !(mouse_state & mask) && (previous_mouse_state & mask);
@@ -223,7 +188,7 @@ void input::save() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {
 		for (auto KEY : MAPPED_INPUTS) {
-			ofs << KEY.first << " " << KEY.second.type << " " << KEY.second.input_index << std::endl;
+			ofs << KEY.first << " " << KEY.second.input_index << std::endl;
 		}
 	}
 
@@ -243,12 +208,11 @@ void input::load() {
 		while (std::getline(ifs, line)) {
 			std::string key;
 			unsigned int value;
-			int type;
 
 			std::istringstream iss(line);
-			if (!(iss >> key >> type >> value)) { break; }
+			if (!(iss >> key >> value)) { break; }
 
-			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value, (input_type)type)));
+			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value)));
 			logger::info(" - ", key.c_str(), " ", value);
 		}
 		logger::info("FINISHED LOADING INPUT DATA");
@@ -262,32 +226,32 @@ void input::load() {
 		// -- MOVEMENT INPUT --
 		//
 
-		MAPPED_INPUTS.insert({ "MoveUp", INPUT(SDL_SCANCODE_W, KEYBOARD)});
-		MAPPED_INPUTS.insert({ "MoveDown", INPUT(SDL_SCANCODE_S, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "MoveLeft", INPUT(SDL_SCANCODE_A, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "MoveRight", INPUT(SDL_SCANCODE_D, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "MoveUp", INPUT(SDL_SCANCODE_W)});
+		MAPPED_INPUTS.insert({ "MoveDown", INPUT(SDL_SCANCODE_S) });
+		MAPPED_INPUTS.insert({ "MoveLeft", INPUT(SDL_SCANCODE_A) });
+		MAPPED_INPUTS.insert({ "MoveRight", INPUT(SDL_SCANCODE_D) });
 
-		MAPPED_INPUTS.insert({ "Run", INPUT(SDL_SCANCODE_LSHIFT, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "Run", INPUT(SDL_SCANCODE_LSHIFT) });
 
 		//
 		// -- COMBAT INPUT --
 		//
 
-		MAPPED_INPUTS.insert({ "Attack", INPUT(SDL_SCANCODE_SPACE, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "Shoot", INPUT(SDL_SCANCODE_F, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "Attack", INPUT(SDL_SCANCODE_SPACE) });
+		MAPPED_INPUTS.insert({ "Shoot", INPUT(SDL_SCANCODE_F) });
 
 		//
 		// -- MISC INPUT --
 		//
 
-		MAPPED_INPUTS.insert({ "Exit", INPUT(SDL_SCANCODE_ESCAPE, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "Exit", INPUT(SDL_SCANCODE_ESCAPE) });
 
 		//
 		// -- EDITOR INPUT --
 		//
 
-		MAPPED_INPUTS.insert({ "IncreaseHeight", INPUT(SDL_SCANCODE_E, KEYBOARD) });
-		MAPPED_INPUTS.insert({ "DecreaseHeight", INPUT(SDL_SCANCODE_Q, KEYBOARD) });
+		MAPPED_INPUTS.insert({ "IncreaseHeight", INPUT(SDL_SCANCODE_E) });
+		MAPPED_INPUTS.insert({ "DecreaseHeight", INPUT(SDL_SCANCODE_Q) });
 
 		save();
 		load();

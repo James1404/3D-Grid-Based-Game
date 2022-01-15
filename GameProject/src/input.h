@@ -4,9 +4,14 @@
 #include <glm.hpp>
 #include <SDL.h>
 
+enum class mouse_button {
+	MOUSE_LEFT = 0,
+	MOUSE_RIGHT,
+	MOUSE_MIDDLE, 
+	MOUSE_BACK,
+	MOUSE_FORWARD
+};
 namespace input {
-	enum mouse_button { MOUSE_LEFT = 0, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_BACK, MOUSE_FORWARD };
-
 	void init();
 	void clean();
 
