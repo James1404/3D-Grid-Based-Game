@@ -58,28 +58,28 @@ void editor_manager::move_cursor(glm::ivec3 _vel) {
 void editor_manager::placement_cam_mode_update(double dt, std::shared_ptr<camera> cam) {
 	cursor_pos = common::vec_to_ivec(cursor_pos);
 	glm::ivec3 vel{ 0 };
-	if (!(input::button_down("MoveUp") && input::button_down("MoveDown"))) {
-		if (input::button_down("MoveUp")) {
+	if (!(input::key_down(SDL_SCANCODE_W) && input::key_down(SDL_SCANCODE_S))) {
+		if (input::key_down(SDL_SCANCODE_W)) {
 			vel = { 0,0, -1 };
 		}
-		else if (input::button_down("MoveDown")) {
+		else if (input::key_down(SDL_SCANCODE_S)) {
 			vel = { 0,0, 1 };
 		}
 	}
 
-	if (!(input::button_down("MoveLeft") && input::button_down("MoveRight"))) {
-		if (input::button_down("MoveLeft")) {
+	if (!(input::key_down(SDL_SCANCODE_A) && input::key_down(SDL_SCANCODE_D))) {
+		if (input::key_down(SDL_SCANCODE_A)) {
 			vel = { -1,0,0 };
 		}
-		else if (input::button_down("MoveRight")) {
+		else if (input::key_down(SDL_SCANCODE_D)) {
 			vel = { 1,0,0 };
 		}
 	}
 
-	if (input::button_down("IncreaseHeight")) {
+	if (input::key_down(SDL_SCANCODE_E)) {
 		vel = { 0,1,0 };
 	}
-	else if (input::button_down("DecreaseHeight")) {
+	else if (input::key_down(SDL_SCANCODE_Q)) {
 		vel = { 0,-1,0 };
 	}
 
@@ -161,34 +161,36 @@ void editor_manager::free_cam_mode_update(double dt, std::shared_ptr<camera> cam
 	if (is_cam_control) {
 		glm::vec3 new_pos = cursor_pos;
 		float cam_speed = cam_movement_speed * dt;
-		if (input::button_pressed("Run"))
-			cam_speed *= 2;
+		if (input::key_pressed(SDL_SCANCODE_LSHIFT))
+			cam_speed = 0.3f;
+		else if (input::key_pressed(SDL_SCANCODE_LALT))
+			cam_speed = 0.005f;
 
-		if (!(input::button_pressed("MoveUp") && input::button_pressed("MoveDown"))) {
-			if (input::button_pressed("MoveUp")) {
+		if (!(input::key_pressed(SDL_SCANCODE_W) && input::key_pressed(SDL_SCANCODE_S))) {
+			if (input::key_pressed(SDL_SCANCODE_W)) {
 				cam->position += cam->front * cam_speed;
 			}
-			else if (input::button_pressed("MoveDown")) {
+			else if (input::key_pressed(SDL_SCANCODE_S)) {
 				cam->position -= cam->front * cam_speed;
 			}
 		}
 
 		glm::vec3 up = { 0,1,0 };
-		if (!(input::button_pressed("MoveLeft") && input::button_pressed("MoveRight"))) {
-			if (input::button_pressed("MoveLeft")) {
+		if (!(input::key_pressed(SDL_SCANCODE_A) && input::key_pressed(SDL_SCANCODE_D))) {
+			if (input::key_pressed(SDL_SCANCODE_A)) {
 				//cursor_pos -= glm::normalize(glm::cross(cam->front, up)) * cam_speed;
 				cam->position -= cam->right * cam_speed;
 			}
-			else if (input::button_pressed("MoveRight")) {
+			else if (input::key_pressed(SDL_SCANCODE_D)) {
 				//cursor_pos += glm::normalize(glm::cross(cam->front, up)) * cam_speed;
 				cam->position += cam->right * cam_speed;
 			}
 		}
 
-		if (input::button_pressed("IncreaseHeight")) {
+		if (input::key_pressed(SDL_SCANCODE_E)) {
 			cam->position += cam->up * cam_speed;
 		}
-		else if (input::button_pressed("DecreaseHeight")) {
+		else if (input::key_pressed(SDL_SCANCODE_Q)) {
 			cam->position -= cam->up * cam_speed;
 		}
 

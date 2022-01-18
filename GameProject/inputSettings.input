@@ -1,7 +1,5 @@
 Attack 44
-DecreaseHeight 20
 Exit 41
-IncreaseHeight 8
 MoveDown 22
 MoveLeft 4
 MoveRight 7

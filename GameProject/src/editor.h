@@ -18,7 +18,7 @@ struct editor_manager {
 
 	editor_mode mode = placement_cam;
 	const float cam_movement_speed = 0.01f;
-	const float cam_rotation_speed = 0.05f;
+	const float cam_rotation_speed = 0.03f;
 	bool is_cam_control = false;
 
 	void move_cursor(glm::ivec3 _vel);

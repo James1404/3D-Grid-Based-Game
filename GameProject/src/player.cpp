@@ -52,6 +52,7 @@ void player_entity::update(double dt) {
 				}
 			}
 
+			vel = common::sqrt_magnitude(vel);
 			vel *= 0.1f;
 			vel *= dt;
 
