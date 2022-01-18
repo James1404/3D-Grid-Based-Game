@@ -55,6 +55,16 @@ namespace common {
 		return (glm::ivec3)vec_floor(vec);
 	}
 
+	inline glm::vec3 sqrt_magnitude(glm::vec3 vec)
+	{
+		float length = sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z));
+		if (length != 0) {
+			vec /= length;
+		}
+
+		return vec;
+	}
+
 	template<class _Ty, int _TSize>
 	class Limited_Queue {
 	public:
