@@ -78,7 +78,7 @@ void renderer::Model::load_model(std::string _path) {
 	const aiScene* scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		logger::error("ERROR::ASSIMP::", import.GetErrorString());
+		log_error("ERROR::ASSIMP::", import.GetErrorString());
 		return;
 	}
 	directory = _path.substr(0, _path.find_last_of('/'));
@@ -191,10 +191,10 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 
 int renderer::screen_resolution_x = 1280, renderer::screen_resolution_y = 720;
 
-static std::vector<renderer::Model_Entity*> model_list;
+static std::vector<renderer::model_entity*> model_list;
 
 void renderer::init() {
-	logger::info("STARTING RENDERER INITIALIZATION");
+	log_info("STARTING RENDERER INITIALIZATION");
 	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -209,13 +209,13 @@ void renderer::init() {
 		glewExperimental = GL_TRUE;
 		GLenum glewError = glewInit();
 		if (glewError != GLEW_OK) {
-			logger::error("Error initializing GLEW! ", glewGetErrorString(glewError));
+			log_error("Error initializing GLEW! ", glewGetErrorString(glewError));
 		}
 	}
 
 	projection = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
 
-	logger::info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
+	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 }
 
 void renderer::clean() {
@@ -243,7 +243,7 @@ void renderer::stop_draw() {
 	SDL_GL_SwapWindow(window);
 }
 
-renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _position)
+renderer::model_entity::model_entity(std::string _model_path, glm::vec3* _position)
 	: model(model_from_file(_model_path)), shader(shader_from_file("data/shaders/model_loading.shader")),
 	position(_position), is_paused(false), rotation(0,0,0), scale(1,1,1)
 {
@@ -253,7 +253,7 @@ renderer::Model_Entity::Model_Entity(std::string _model_path, glm::vec3* _positi
 	model_list.push_back(this);
 }
 
-renderer::Model_Entity::~Model_Entity() {
+renderer::model_entity::~model_entity() {
 	for (auto it = model_list.begin(); it != model_list.end();) {
 		if (*it == this)
 			it = model_list.erase(it);
@@ -262,7 +262,7 @@ renderer::Model_Entity::~Model_Entity() {
 	}
 }
 
-void renderer::Model_Entity::draw() {
+void renderer::model_entity::draw() {
 	if (is_paused)
 		return;
 
@@ -391,4 +391,28 @@ void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 si
 	draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
 	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
+#else
+renderer::debug::debug_drawing::debug_drawing()
+{}
+
+renderer::debug::debug_drawing::~debug_drawing()
+{}
+
+void renderer::debug::init_debug()
+{}
+
+void renderer::debug::clean_debug()
+{}
+
+void renderer::debug::clear_debug_list()
+{}
+
+void renderer::debug::draw_debug()
+{}
+
+void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour)
+{}
+
+void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour)
+{}
 #endif // _DEBUG

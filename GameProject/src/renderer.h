@@ -132,7 +132,7 @@ namespace renderer {
 		}
 		else
 		{
-			logger::warning("Texture failed to load as path: ", path);
+			log_warning("Texture failed to load as path: ", path);
 			stbi_image_free(data);
 		}
 
@@ -195,7 +195,7 @@ namespace renderer {
 				ifs.close();
 			}
 			else {
-				logger::error("COULD NOT OPEN SHADER FILE: ", shader_source);
+				log_error("COULD NOT OPEN SHADER FILE: ", shader_source);
 			}
 
 			vShaderCode.insert(0, shader_version);
@@ -216,7 +216,7 @@ namespace renderer {
 			glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 			if (!success) {
 				glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-				logger::error("SHADER COMPILATION FAILED ", infoLog);
+				log_error("SHADER COMPILATION FAILED ", infoLog);
 			}
 
 			fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -226,7 +226,7 @@ namespace renderer {
 			glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 			if (!success) {
 				glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-				logger::error("SHADER COMPILATION FAILED ", infoLog);
+				log_error("SHADER COMPILATION FAILED ", infoLog);
 			}
 
 			// create program and attach shaders
@@ -244,7 +244,7 @@ namespace renderer {
 			_shader.path = shader_source;
 			shaders_loaded.push_back(_shader);
 
-			logger::info("LOADED AND COMPILED SHADER ", shader_source);
+			log_info("LOADED AND COMPILED SHADER ", shader_source);
 		}
 
 		return _shader;
@@ -263,12 +263,12 @@ namespace renderer {
 		_model.load_model(_model.path);
 		models_loaded.push_back(_model);
 
-		logger::info("LOADED MODEL ", _path);
+		log_info("LOADED MODEL ", _path);
 
 		return _model;
 	}
 
-	struct Model_Entity {
+	struct model_entity {
 		Model model;
 		Shader shader;
 
@@ -278,13 +278,12 @@ namespace renderer {
 
 		bool is_paused;
 
-		Model_Entity(std::string _model_path, glm::vec3* _position);
-		~Model_Entity();
+		model_entity(std::string _model_path, glm::vec3* _position);
+		~model_entity();
 
 		void draw();
 	};
 
-#ifdef _DEBUG
 	namespace debug {
 		struct debug_drawing {
 			unsigned int vao, vbo, ebo;
@@ -304,5 +303,4 @@ namespace renderer {
 		void draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
 		void draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
 	}
-#endif // _DEBUG
 }

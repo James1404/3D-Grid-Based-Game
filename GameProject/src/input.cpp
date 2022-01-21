@@ -22,7 +22,7 @@ void input::init() {
 	previous_keyboard_state = new Uint8[keyboard_state_size];
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 
-	logger::info("INITIALIZED INPUT");
+	log_info("INITIALIZED INPUT");
 }
 
 void input::update() {
@@ -193,16 +193,16 @@ void input::save() {
 	}
 
 	ofs.close();
-	logger::info("SAVED INPUT");
+	log_info("SAVED INPUT");
 }
 
 void input::load() {
 	MAPPED_INPUTS.clear();
 
-	logger::info("RETRIEVING INPUT FILE");
+	log_info("RETRIEVING INPUT FILE");
 	std::ifstream ifs("inputSettings.input");
 	if (ifs.is_open()) {
-		logger::info("PARSING INPUT FILE");
+		log_info("PARSING INPUT FILE");
 
 		std::string line;
 		while (std::getline(ifs, line)) {
@@ -213,14 +213,14 @@ void input::load() {
 			if (!(iss >> key >> value)) { break; }
 
 			MAPPED_INPUTS.insert(std::make_pair(key, INPUT(value)));
-			logger::info(" - ", key.c_str(), " ", value);
+			log_info(" - ", key.c_str(), " ", value);
 		}
-		logger::info("FINISHED LOADING INPUT DATA");
+		log_info("FINISHED LOADING INPUT DATA");
 	}
 	else {
 		// THIS IS CALLED IF NOT INPUT FILE EXISTS AND IT MAKES ONE.
 
-		logger::warning("CANNOT FIND INPUT FILE");
+		log_warning("CANNOT FIND INPUT FILE");
 
 		//
 		// -- MOVEMENT INPUT --
