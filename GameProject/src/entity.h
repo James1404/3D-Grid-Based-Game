@@ -93,6 +93,8 @@ struct entity_manager {
 	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, entity* _ignored_entity);
 	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, std::string _tag);
 	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag);
+
+	bool check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std::weak_ptr<entity>& _entity);
 };
 
 // 
@@ -115,11 +117,11 @@ struct entity {
 		: id(0), flags(0), tag(""),
 		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0)
 	{
-		//logger::info("INITIALIZED ENTITY ", this);
+		//log_info("INITIALIZED ENTITY ", this);
 	}
 
 	virtual ~entity() {
-		logger::info("DESTROYED ENTITY ", this);
+		log_info("DESTROYED ENTITY ", this);
 	}
 
 	virtual void update(double dt) {}

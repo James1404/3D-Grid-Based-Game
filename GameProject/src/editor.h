@@ -11,17 +11,18 @@ struct editor_manager {
 	std::vector<std::weak_ptr<entity>> selected_entities;
 	bool is_grabbed = false;
 
-	enum editor_mode {
+	enum class editor_mode {
 		placement_cam = 0,
 		free_cam
 	};
 
-	editor_mode mode = placement_cam;
+	editor_mode mode = editor_mode::placement_cam;
 	const float cam_movement_speed = 0.01f;
 	const float cam_rotation_speed = 0.03f;
 	bool is_cam_control = false;
 
 	void move_cursor(glm::ivec3 _vel);
+	void select_entity(std::weak_ptr<entity> _entity);
 	
 	void placement_cam_mode_update(double dt, std::shared_ptr<camera> cam);
 	void free_cam_mode_update(double dt, std::shared_ptr<camera> cam);

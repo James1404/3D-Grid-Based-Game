@@ -65,7 +65,7 @@ void entity_manager::clean() {
 
 	name.clear();
 
-	logger::info("CLEANED LEVEL DATA");
+	log_info("CLEANED LEVEL DATA");
 }
 
 uint32_t fileVersion = 9;
@@ -85,12 +85,12 @@ void entity_manager::save() {
 		}
 	}
 
-	logger::info("SAVED SCENE TO FILE");
+	log_info("SAVED SCENE TO FILE");
 	ofs.close();
 }
 
 void entity_manager::load(std::string level_name) {
-	logger::info("RETRIEVING SCENE FILE");
+	log_info("RETRIEVING SCENE FILE");
 
 	clean();
 
@@ -100,7 +100,7 @@ void entity_manager::load(std::string level_name) {
 
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open()) {
-		logger::info("PARSING SCENE FILE");
+		log_info("PARSING SCENE FILE");
 
 		std::string line;
 		while (std::getline(ifs, line)) {
@@ -114,7 +114,7 @@ void entity_manager::load(std::string level_name) {
 
 			if (type == "file_version") {
 				if (id != fileVersion) {
-					logger::warning("OUTDATED LEVEL FILE");
+					log_warning("OUTDATED LEVEL FILE");
 					// TODO: maybe remove the return and just let it attempt to parse it.
 					return;
 				}
@@ -126,10 +126,10 @@ void entity_manager::load(std::string level_name) {
 
 		name = level_name;
 
-		logger::info("FINISHED LOADING SCENE DATA");
+		log_info("FINISHED LOADING SCENE DATA");
 	}
 	else {
-		logger::error("CANNOT FIND SCENE FILE");
+		log_error("CANNOT FIND SCENE FILE");
 	}
 
 	ifs.close();
@@ -145,7 +145,7 @@ void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags
 		_new_entity = std::make_shared<block_entity>();
 	}
 	else {
-		logger::warning("ENTITY TYPE UNKOWN : ", _type);
+		log_warning("ENTITY TYPE UNKOWN : ", _type);
 		return;
 	}
 	
@@ -223,7 +223,7 @@ std::weak_ptr<entity> entity_manager::find_entity_by_id(uuid _id) const {
 	if (it != entity_id_lookup.end())
 		return it->second;
 
-	logger::warning("ENTITY WITH ID DOES NOT EXIST");
+	log_warning("ENTITY WITH ID DOES NOT EXIST");
 }
 
 std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) const {
@@ -233,7 +233,7 @@ std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) co
 		}
 	}
 
-	logger::warning("ENTITY AT POSITION DOES NOT EXIST");
+	log_warning("ENTITY AT POSITION DOES NOT EXIST");
 }
 
 bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
@@ -244,6 +244,73 @@ bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
 	}
 
 	return false;
+}
+
+bool entity_manager::check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std::weak_ptr<entity>& _entity) {
+
+	/*
+	int length = int(floor(glm::length(_dir)));
+	glm::vec3 new_dir = glm::normalize(_dir);
+	
+	for (int i = 0; i < length; i++) {
+		auto hit_entity = get_collisions(_pos + (new_dir * glm::vec3(i)));
+
+		if (auto tmp_entity = hit_entity.lock()) {
+			_entity = hit_entity;
+			return true;
+		}
+	}
+
+	return false;
+	*/
+
+	std::map<float, std::weak_ptr<entity>> results;
+
+	for (auto& entity : entities) {
+		float tmin = (entity->grid_pos.x - _pos.x) / _dir.x;
+		float tmax = ((entity->grid_pos.x + 1) - _pos.x) / _dir.x;
+
+		if (tmin > tmax) std::swap(tmin, tmax);
+
+		float tymin = (entity->grid_pos.y - _pos.y) / _dir.y;
+		float tymax = ((entity->grid_pos.y + 1) - _pos.y) / _dir.y;
+
+		if (tymin > tymax) std::swap(tymin, tymax);
+
+		if ((tmin > tymax) || (tymin > tmax))
+			continue;
+
+		if (tymin > tmin)
+			tmin = tymin;
+
+		if (tymax < tmax)
+			tmax = tymax;
+
+		float tzmin = (entity->grid_pos.z - _pos.z) / _dir.z;
+		float tzmax = ((entity->grid_pos.z + 1) - _pos.z) / _dir.z;
+
+		if (tzmin > tzmax) std::swap(tzmin, tzmax);
+
+		if ((tmin > tzmax) || (tzmin > tmax))
+			continue;
+
+		if (tzmin > tmin)
+			tmin = tzmin;
+
+		if (tzmax < tmax)
+			tmax = tzmax;
+
+		float distance = glm::distance(_pos, (glm::vec3)entity->grid_pos);
+		results.emplace(distance, entity);
+	}
+
+	if (results.empty()) {
+		return false;
+	}
+	else {
+		_entity = results.begin()->second;
+		return true;
+	}
 }
 
 bool entity_manager::check_collisions(glm::vec3 _pos) const {
