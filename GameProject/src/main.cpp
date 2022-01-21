@@ -25,7 +25,9 @@ int main(int argc, char* args[]) {
 	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		renderer::init();
+#ifdef _DEBUG
 		renderer::debug::init_debug();
+#endif // _DEBUG
 
 		input::init();
 		input::load();
@@ -65,7 +67,9 @@ int main(int argc, char* args[]) {
 		}
 
 		/* ----- UPDATE GAME ----- */
+#ifdef _DEBUG
 		renderer::debug::clear_debug_list();
+#endif // _DEBUG
 
 		// calculate delta time;
 		LAST = NOW;
@@ -100,9 +104,9 @@ int main(int argc, char* args[]) {
 		if (CurrentState == GAME_STATE::EDITOR) {
 			editor.draw();
 		}
-#endif // _DEBUG
 
 		renderer::debug::draw_debug();
+#endif // _DEBUG
 
 		renderer::stop_draw();
 
@@ -110,18 +114,18 @@ int main(int argc, char* args[]) {
 	}
 
 	/* ----- CLEAN GAME ----- */
-	logger::info("STARTING CLEANUP");
+	log_info("STARTING CLEANUP");
 
 #ifdef _DEBUG
 	editor.clean();
+	renderer::debug::clean_debug();
 #endif // _DEBUG
 
 	entities.clean();
 
-	renderer::debug::clean_debug();
 	renderer::clean();
 
-	logger::info("CLEANUP FINISHED");
+	log_info("CLEANUP FINISHED");
 
 	return 0;
 }

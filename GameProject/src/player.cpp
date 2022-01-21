@@ -88,7 +88,7 @@ void player_entity::update(double dt) {
 		player_cam->rotation = glm::vec3(-89, -90, 0);
 		*/
 	}
-	
+
 	if (!is_moving()) {
 		if (input::key_pressed(SDL_SCANCODE_SPACE)) {
 			if (!is_first_person) {
