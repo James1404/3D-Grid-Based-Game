@@ -31,12 +31,12 @@ struct editor_manager {
 	void add_multiselect_entity(std::weak_ptr<entity> _entity);
 	void clear_selected_entities();
 
-	void placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam);
-	void free_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam);
+	void placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam);
+	void free_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam);
 
 	void init(entity_manager_t& _manager);
 	void clean();
 
-	void update(double dt, input_manager_t& input_manager);
+	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager);
 	void draw();
 };

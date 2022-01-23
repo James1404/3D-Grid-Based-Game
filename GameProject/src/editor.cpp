@@ -106,7 +106,7 @@ void editor_manager::clear_selected_entities()
 	selected_entities.clear();
 }
 
-void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam) {
+void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam) {
 	cursor_pos = common::vec_to_ivec(cursor_pos);
 	glm::ivec3 vel{ 0 };
 	if (!(input_manager.key_down(SDL_SCANCODE_W) && input_manager.key_down(SDL_SCANCODE_S))) {
@@ -174,7 +174,7 @@ void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input
 	}
 }
 
-void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam)
+void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam)
 {
 	if (!can_use_mouse)
 		return;
@@ -277,14 +277,14 @@ void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_mana
 	}
 }
 
-void editor_manager::update(double dt, input_manager_t& input_manager)
+void editor_manager::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager)
 {
-	entity_manager->cameras.set_camera("Editor");
+	camera_manager.set_camera("Editor");
 
 	if (!can_use_keyboard)
 		return;
 
-	if (auto editor_cam = entity_manager->cameras.get_camera("Editor").lock())
+	if (auto editor_cam = camera_manager.get_camera("Editor").lock())
 	{
 		if (input_manager.key_down(SDL_SCANCODE_TAB))
 		{

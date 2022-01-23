@@ -16,7 +16,7 @@ struct block_entity : public entity {
 
 	}
 
-	void update(double dt, input_manager_t& input_manager) override {
+	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) override {
 		visual_pos = grid_pos;
 	}
 };

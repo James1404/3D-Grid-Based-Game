@@ -50,7 +50,7 @@ void event_manager_t::notify(std::string _event_name)
 //
 
 entity_manager_t::entity_manager_t()
-	: event_manager(), cameras(),
+	: event_manager(), 
 	is_paused(false)
 {
 }
@@ -79,14 +79,12 @@ float currentTime = SDL_GetTicks() / 1000.0f;
 float accumulator = 0.0f;
 float tick_rate = 1.0f / 24.0f;
 
-void entity_manager_t::update(double dt, input_manager_t& input_manager) {
+void entity_manager_t::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) {
 	if (!is_paused) {
 		for (auto& _entity : entities) {
-			_entity->update(dt, input_manager);
+			_entity->update(dt, input_manager, camera_manager);
 		}
 	}
-
-	cameras.update(dt);
 }
 
 uint32_t fileVersion = 9;

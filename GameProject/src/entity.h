@@ -60,7 +60,6 @@ struct entity_manager_t {
 	std::string name;
 
 	event_manager_t event_manager;
-	camera_manager cameras;
 
 	bool is_paused = false;
 
@@ -71,7 +70,7 @@ struct entity_manager_t {
 	entity_manager_t();
 	~entity_manager_t();
 
-	void update(double dt, input_manager_t& input_manager);
+	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager);
 
 	void clear_data();
 
@@ -129,7 +128,7 @@ struct entity {
 		log_info("DESTROYED ENTITY ", this);
 	}
 
-	virtual void update(double dt, input_manager_t& input_manager) {}
+	virtual void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) {}
 
 	bool is_grounded(glm::ivec3 _pos) {
 		return manager->check_collisions(_pos + glm::ivec3(0, -1, 0), this);

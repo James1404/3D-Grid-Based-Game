@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 
-struct camera{
+struct camera_t {
 	glm::vec3 position;
 	glm::vec3 rotation;
 
@@ -17,17 +17,17 @@ struct camera{
 	
 	glm::mat4 getViewMatrix();
 
-	camera();
-	~camera();
+	camera_t();
+	~camera_t();
 };
 
-struct camera_manager {
+struct camera_manager_t {
 	// TODO: change from shared to weak ptr
-	std::map<std::string, std::shared_ptr<camera>> cameras;
-	std::weak_ptr<camera> current_camera;
+	std::map<std::string, std::shared_ptr<camera_t>> cameras;
+	std::weak_ptr<camera_t> current_camera;
 
 	void set_camera(std::string _id);
-	std::weak_ptr<camera> get_camera(std::string _id);
+	std::weak_ptr<camera_t> get_camera(std::string _id);
 
 	void update(double dt);
 };
