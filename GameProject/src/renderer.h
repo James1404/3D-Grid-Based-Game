@@ -46,59 +46,59 @@ namespace renderer {
 	void init();
 	void clean();
 
-	void start_draw();
-	void draw_sprites();
-	void stop_draw();
+	void start_drawing_frame();
+	void draw_models();
+	void stop_drawing_frame();
 
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering
 
-	struct Shader {
+	struct shader_t {
 		unsigned int id;
 		std::string path;
 	};
 
-	static std::vector<Shader> shaders_loaded;
+	static std::vector<shader_t> shaders_loaded;
 
-	struct Vertex {
+	struct vertex_t {
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 tex_coords;
 	};
 
-	struct Texture {
+	struct texture_t {
 		unsigned int id;
 		std::string type;
 		std::string path;
 	};
 
-	struct Mesh {
-		std::vector<Vertex> vertices;
+	struct mesh_t {
+		std::vector<vertex_t> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
+		std::vector<texture_t> textures;
 
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void draw(Shader& _shader);
+		mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, std::vector<texture_t> textures);
+		void draw(shader_t& _shader);
 	private:
 		unsigned int vao, vbo, ebo;
 		void setupMesh();
 	};
 
-	struct Model {
-		std::vector<Texture> textures_loaded;
-		std::vector<Mesh> meshes;
+	struct model_t {
+		std::vector<texture_t> textures_loaded;
+		std::vector<mesh_t> meshes;
 		std::string directory;
 		std::string path;
 
-		void draw(Shader& _shader);
+		void draw(shader_t& _shader);
 
 		void load_model(std::string _path);
 		void process_node(aiNode* node, const aiScene* scene);
-		Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName);
+		mesh_t process_mesh(aiMesh* mesh, const aiScene* scene);
+		std::vector<texture_t> load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName);
 	};
 
-	static std::vector<Model> models_loaded;
+	static std::vector<model_t> models_loaded;
 
 	inline unsigned int texture_from_file(const char* path, const std::string& directory) {
 		std::string filename = std::string(path);
@@ -139,8 +139,8 @@ namespace renderer {
 		return textureID;
 	}
 
-	inline Shader shader_from_file(const char* shader_source) {
-		Shader _shader;
+	inline shader_t shader_from_file(const char* shader_source) {
+		shader_t _shader;
 		bool skip = false;
 		for (unsigned int i = 0; i < shaders_loaded.size(); i++) {
 			if (shaders_loaded[i].path == shader_source) {
@@ -250,14 +250,14 @@ namespace renderer {
 		return _shader;
 	}
 
-	inline Model model_from_file(const std::string _path) {
+	inline model_t model_from_file(const std::string _path) {
 		for (unsigned int i = 0; i < models_loaded.size(); i++) {
 			if (models_loaded[i].path == _path) {
 				return models_loaded[i];
 			}
 		}
 
-		Model _model;
+		model_t _model;
 		_model.path = _path;
 
 		_model.load_model(_model.path);
@@ -268,9 +268,9 @@ namespace renderer {
 		return _model;
 	}
 
-	struct model_entity {
-		Model model;
-		Shader shader;
+	struct model_entity_t {
+		model_t model;
+		shader_t shader;
 
 		glm::vec3* position;
 		glm::vec3 rotation;
@@ -278,8 +278,8 @@ namespace renderer {
 
 		bool is_paused;
 
-		model_entity(std::string _model_path, glm::vec3* _position);
-		~model_entity();
+		model_entity_t(std::string _model_path, glm::vec3* _position);
+		~model_entity_t();
 
 		void draw();
 	};

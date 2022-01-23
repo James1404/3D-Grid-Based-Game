@@ -7,7 +7,7 @@
 // ----- MESH -----
 //
 
-renderer::Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+renderer::mesh_t::mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, std::vector<texture_t> textures) {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
@@ -15,7 +15,7 @@ renderer::Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> ind
 	setupMesh();
 }
 
-void renderer::Mesh::draw(Shader& _shader) {
+void renderer::mesh_t::draw(shader_t& _shader) {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (unsigned int i = 0; i < textures.size(); i++)
@@ -37,7 +37,7 @@ void renderer::Mesh::draw(Shader& _shader) {
 	glBindVertexArray(0);
 }
 
-void renderer::Mesh::setupMesh() {
+void renderer::mesh_t::setupMesh() {
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &ebo);
@@ -45,19 +45,19 @@ void renderer::Mesh::setupMesh() {
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex_t), &vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, normal));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coords));
 
 	glBindVertexArray(0);
 }
@@ -67,13 +67,13 @@ void renderer::Mesh::setupMesh() {
 //
 
 
-void renderer::Model::draw(Shader& _shader) {
+void renderer::model_t::draw(shader_t& _shader) {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].draw(_shader);
 	}
 }
 
-void renderer::Model::load_model(std::string _path) {
+void renderer::model_t::load_model(std::string _path) {
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -86,7 +86,7 @@ void renderer::Model::load_model(std::string _path) {
 	process_node(scene->mRootNode, scene);
 }
 
-void renderer::Model::process_node(aiNode* node, const aiScene* scene) {
+void renderer::model_t::process_node(aiNode* node, const aiScene* scene) {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(process_mesh(mesh, scene));
@@ -97,15 +97,15 @@ void renderer::Model::process_node(aiNode* node, const aiScene* scene) {
 	}
 }
 
-renderer::Mesh renderer::Model::process_mesh(aiMesh* mesh, const aiScene* scene)
+renderer::mesh_t renderer::model_t::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
-	std::vector<Vertex> vertices;
+	std::vector<vertex_t> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<Texture> textures;
+	std::vector<texture_t> textures;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
-		Vertex vertex;
+		vertex_t vertex;
 
 		glm::vec3 vector;
 		vector.x = mesh->mVertices[i].x;
@@ -143,19 +143,19 @@ renderer::Mesh renderer::Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<Texture> diffuseMaps = load_material_textures(material, aiTextureType_DIFFUSE, " texture_diffuse");
+		std::vector<texture_t> diffuseMaps = load_material_textures(material, aiTextureType_DIFFUSE, " texture_diffuse");
 
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		std::vector<Texture> specularMaps = load_material_textures(material, aiTextureType_SPECULAR, " texture_specular");
+		std::vector<texture_t> specularMaps = load_material_textures(material, aiTextureType_SPECULAR, " texture_specular");
 
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
-	return Mesh(vertices, indices, textures);
+	return mesh_t(vertices, indices, textures);
 }
 
-std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-	std::vector<Texture> textures;
+std::vector<renderer::texture_t> renderer::model_t::load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+	std::vector<texture_t> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
@@ -168,7 +168,7 @@ std::vector<renderer::Texture> renderer::Model::load_material_textures(aiMateria
 			}
 		}
 		if (!skip) {
-			Texture texture;
+			texture_t texture;
 			texture.id = texture_from_file(str.C_Str(), directory);
 			texture.type = typeName;
 			texture.path = str.C_Str();
@@ -191,7 +191,7 @@ glm::mat4 renderer::view = glm::mat4(1.0f);
 
 int renderer::screen_resolution_x = 1280, renderer::screen_resolution_y = 720;
 
-static std::vector<renderer::model_entity*> model_list;
+static std::vector<renderer::model_entity_t*> model_list;
 
 void renderer::init() {
 	log_info("STARTING RENDERER INITIALIZATION");
@@ -224,7 +224,7 @@ void renderer::clean() {
 	SDL_Quit();
 }
 
-void renderer::start_draw() {
+void renderer::start_drawing_frame() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -233,17 +233,17 @@ void renderer::start_draw() {
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 }
 
-void renderer::draw_sprites() {
+void renderer::draw_models() {
 	for (auto& i : model_list) {
 		i->draw();
 	}
 }
 
-void renderer::stop_draw() {
+void renderer::stop_drawing_frame() {
 	SDL_GL_SwapWindow(window);
 }
 
-renderer::model_entity::model_entity(std::string _model_path, glm::vec3* _position)
+renderer::model_entity_t::model_entity_t(std::string _model_path, glm::vec3* _position)
 	: model(model_from_file(_model_path)), shader(shader_from_file("data/shaders/model_loading.shader")),
 	position(_position), is_paused(false), rotation(0,0,0), scale(1,1,1)
 {
@@ -253,7 +253,7 @@ renderer::model_entity::model_entity(std::string _model_path, glm::vec3* _positi
 	model_list.push_back(this);
 }
 
-renderer::model_entity::~model_entity() {
+renderer::model_entity_t::~model_entity_t() {
 	for (auto it = model_list.begin(); it != model_list.end();) {
 		if (*it == this)
 			it = model_list.erase(it);
@@ -262,7 +262,7 @@ renderer::model_entity::~model_entity() {
 	}
 }
 
-void renderer::model_entity::draw() {
+void renderer::model_entity_t::draw() {
 	if (is_paused)
 		return;
 
@@ -306,8 +306,8 @@ renderer::debug::debug_drawing::~debug_drawing() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-renderer::Shader circle_shader;
-renderer::Shader line_shader;
+renderer::shader_t circle_shader;
+renderer::shader_t line_shader;
 void renderer::debug::init_debug() {
 	circle_shader = shader_from_file("data/shaders/debug/debug_circle.shader");
 	line_shader	= shader_from_file("data/shaders/debug/debug_line.shader");
