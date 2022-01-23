@@ -10,7 +10,8 @@ int main(int argc, char* args[]) {
 
 	bool isRunning = false;
 
-	entity_manager entities;
+	entity_manager_t entity_manager;
+	input_manager_t input_manager;
 #ifdef _DEBUG
 	editor_manager editor;
 #endif // _DEBUG
@@ -29,19 +30,16 @@ int main(int argc, char* args[]) {
 		renderer::debug::init_debug();
 #endif // _DEBUG
 
-		input::init();
-		input::load();
-
 		CurrentState = GAME_STATE::GAMEPLAY;
 
 		// LEVEL NAMES :
 		// combattestlevel
 		// newtestlevel
-		entities.load("combattestlevel");
-		entities.init();
+		entity_manager.load("combattestlevel");
 
+		input_manager.load();
 #ifdef _DEBUG
-		editor.init(entities);
+		editor.init(entity_manager);
 #endif // _DEBUG
 		
 		isRunning = true;
@@ -76,29 +74,31 @@ int main(int argc, char* args[]) {
 		NOW = SDL_GetPerformanceCounter();
 		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-		entities.update(dt);
+		entity_manager.update(dt, input_manager);
 
 #ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR) {
-			entities.is_paused = true;
-			editor.update(dt);
+			entity_manager.is_paused = true;
+			editor.update(dt, input_manager);
 		}
 		else {
-			entities.is_paused = false;
+			entity_manager.is_paused = false;
 		}
-#endif // _DEBUG
 
-		if (input::key_down(SDL_SCANCODE_ESCAPE)) {
+		if (input_manager.key_down(SDL_SCANCODE_ESCAPE)) {
 			if (CurrentState == GAME_STATE::GAMEPLAY)
 				CurrentState = GAME_STATE::EDITOR;
 			else if (CurrentState == GAME_STATE::EDITOR)
 				CurrentState = GAME_STATE::GAMEPLAY;
 		}
+#endif // _DEBUG
+
+		input_manager.update();
 
 		/* ----- RENDER GAME ----- */
-		renderer::start_draw();
+		renderer::start_drawing_frame();
 		
-		renderer::draw_sprites();
+		renderer::draw_models();
 
 #ifdef _DEBUG
 		if (CurrentState == GAME_STATE::EDITOR) {
@@ -108,9 +108,7 @@ int main(int argc, char* args[]) {
 		renderer::debug::draw_debug();
 #endif // _DEBUG
 
-		renderer::stop_draw();
-
-		input::update();
+		renderer::stop_drawing_frame();
 	}
 
 	/* ----- CLEAN GAME ----- */
@@ -120,8 +118,6 @@ int main(int argc, char* args[]) {
 	editor.clean();
 	renderer::debug::clean_debug();
 #endif // _DEBUG
-
-	entities.clean();
 
 	renderer::clean();
 

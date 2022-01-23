@@ -1,9 +1,10 @@
 #pragma once
 #include "camera.h"
 #include "entity.h"
+#include "input.h"
 
 struct editor_manager {
-	entity_manager* manager;
+	entity_manager_t* entity_manager;
 
 	glm::vec3 cursor_pos{ 0 };
 
@@ -21,15 +22,21 @@ struct editor_manager {
 	const float cam_rotation_speed = 0.03f;
 	bool is_cam_control = false;
 
-	void move_cursor(glm::ivec3 _vel);
-	void select_entity(std::weak_ptr<entity> _entity);
-	
-	void placement_cam_mode_update(double dt, std::shared_ptr<camera> cam);
-	void free_cam_mode_update(double dt, std::shared_ptr<camera> cam);
+	bool can_use_keyboard = true;
+	bool can_use_mouse = true;
 
-	void init(entity_manager& _manager);
+	void move_cursor(glm::ivec3 _vel);
+
+	void select_entity(std::weak_ptr<entity> _entity);
+	void add_multiselect_entity(std::weak_ptr<entity> _entity);
+	void clear_selected_entities();
+
+	void placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam);
+	void free_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera> cam);
+
+	void init(entity_manager_t& _manager);
 	void clean();
 
-	void update(double dt);
+	void update(double dt, input_manager_t& input_manager);
 	void draw();
 };

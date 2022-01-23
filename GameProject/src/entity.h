@@ -13,6 +13,7 @@
 #include "log.h"
 #include "camera.h"
 #include "uuid.h"
+#include "input.h"
 
 //
 // EVENTS
@@ -23,13 +24,15 @@ struct listener {
 	virtual void on_notify() = 0;
 };
 
-struct event_manager {
+struct event_manager_t {
 	std::unordered_multimap<std::string, listener*> events;
+
+	event_manager_t();
+	~event_manager_t();
 
 	void register_listener(std::string _event_name, listener* _listener);
 	void remove_listener(std::string _event_name, listener* _listener);
 	void notify(std::string _event_name);
-	void clear();
 };
 
 //
@@ -53,10 +56,10 @@ inline void ENTITY_FLAG_TOGGLE(ENTITY_FLAGS& x, ENTITY_FLAGS_ mask) { x ^= mask;
 
 struct entity;
 
-struct entity_manager {
+struct entity_manager_t {
 	std::string name;
 
-	event_manager game_event_manager;
+	event_manager_t event_manager;
 	camera_manager cameras;
 
 	bool is_paused = false;
@@ -65,9 +68,12 @@ struct entity_manager {
 	std::map<uuid, std::weak_ptr<entity>> entity_id_lookup;
 	std::multimap<std::string, std::weak_ptr<entity>> entities_tag_lookup;
 
-	void init();
-	void update(double dt);
-	void clean();
+	entity_manager_t();
+	~entity_manager_t();
+
+	void update(double dt, input_manager_t& input_manager);
+
+	void clear_data();
 
 	void save();
 	void load(std::string level_name);
@@ -94,7 +100,7 @@ struct entity_manager {
 	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, std::string _tag);
 	std::weak_ptr<entity> get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag);
 
-	bool check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std::weak_ptr<entity>& _entity);
+	bool check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, float _distance, std::weak_ptr<entity>& _entity);
 };
 
 // 
@@ -105,17 +111,16 @@ struct entity {
 	// TODO: implement Entity ID for entity referencing
 	uuid id;
 	ENTITY_FLAGS flags;
-	std::string tag;
+	std::string name;
 
-	entity_manager* manager;
+	entity_manager_t* manager;
 
 	glm::ivec3 grid_pos, previous_grid_pos;
 	glm::vec3 visual_pos;
-	glm::vec3 vel;
 
-	entity()
-		: id(0), flags(0), tag(""),
-		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0), vel(0, 0, 0)
+		entity()
+		: id(0), flags(0), name(""),
+		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0)
 	{
 		//log_info("INITIALIZED ENTITY ", this);
 	}
@@ -124,7 +129,7 @@ struct entity {
 		log_info("DESTROYED ENTITY ", this);
 	}
 
-	virtual void update(double dt) {}
+	virtual void update(double dt, input_manager_t& input_manager) {}
 
 	bool is_grounded(glm::ivec3 _pos) {
 		return manager->check_collisions(_pos + glm::ivec3(0, -1, 0), this);

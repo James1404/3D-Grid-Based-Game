@@ -10,56 +10,53 @@
 // EVENT MANAGER
 //
 
-void event_manager::register_listener(std::string _event_name, listener* _listener) {
+event_manager_t::event_manager_t()
+{}
+
+event_manager_t::~event_manager_t()
+{
+	events.clear();
+}
+
+void event_manager_t::register_listener(std::string _event_name, listener* _listener)
+{
 	events.emplace(_event_name, _listener);
 }
 
-void event_manager::remove_listener(std::string _event_name, listener* _listener) {
+void event_manager_t::remove_listener(std::string _event_name, listener* _listener)
+{
 	auto range = events.equal_range(_event_name);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second == _listener) {
+	for (auto i = range.first; i != range.second; ++i)
+	{
+		if (i->second == _listener)
+		{
 			events.erase(i);
 			break;
 		}
 	}
 }
 
-void event_manager::notify(std::string _event_name) {
+void event_manager_t::notify(std::string _event_name)
+{
 	auto range = events.equal_range(_event_name);
-	for (auto i = range.first; i != range.second; ++i) {
+	for (auto i = range.first; i != range.second; ++i)
+	{
 		i->second->on_notify();
 	}
-}
-
-void event_manager::clear() {
-	events.clear();
 }
 
 //
 // ENTITY MANAGER
 //
 
-void entity_manager::init() {
-
+entity_manager_t::entity_manager_t()
+	: event_manager(), cameras(),
+	is_paused(false)
+{
 }
 
-float currentTime = SDL_GetTicks() / 1000.0f;
-float accumulator = 0.0f;
-float tick_rate = 1.0f / 24.0f;
-
-void entity_manager::update(double dt) {
-	if (!is_paused) {
-		for (auto& _entity : entities) {
-			_entity->update(dt);
-		}
-	}
-
-	cameras.update(dt);
-}
-
-void entity_manager::clean() {
-	game_event_manager.clear();
-
+entity_manager_t::~entity_manager_t()
+{
 	entities.clear();
 	entities_tag_lookup.clear();
 
@@ -68,8 +65,32 @@ void entity_manager::clean() {
 	log_info("CLEANED LEVEL DATA");
 }
 
+void entity_manager_t::clear_data()
+{
+	entities.clear();
+	entities_tag_lookup.clear();
+
+	name.clear();
+
+	event_manager.events.clear();
+}
+
+float currentTime = SDL_GetTicks() / 1000.0f;
+float accumulator = 0.0f;
+float tick_rate = 1.0f / 24.0f;
+
+void entity_manager_t::update(double dt, input_manager_t& input_manager) {
+	if (!is_paused) {
+		for (auto& _entity : entities) {
+			_entity->update(dt, input_manager);
+		}
+	}
+
+	cameras.update(dt);
+}
+
 uint32_t fileVersion = 9;
-void entity_manager::save() {
+void entity_manager_t::save() {
 	std::string levelPath = "data/scenes/";
 	levelPath.append(name);
 	levelPath.append(".scene");
@@ -80,7 +101,7 @@ void entity_manager::save() {
 
 		if (!entities.empty()) {
 			for (auto& _entity : entities) {
-				ofs << _entity->tag << " " << _entity->id << " " << _entity->flags << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
+				ofs << _entity->name << " " << _entity->id << " " << _entity->flags << " " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
 			}
 		}
 	}
@@ -89,10 +110,10 @@ void entity_manager::save() {
 	ofs.close();
 }
 
-void entity_manager::load(std::string level_name) {
+void entity_manager_t::load(std::string level_name) {
 	log_info("RETRIEVING SCENE FILE");
 
-	clean();
+	clear_data();
 
 	std::string levelPath = "data/scenes/";
 	levelPath.append(level_name);
@@ -135,7 +156,7 @@ void entity_manager::load(std::string level_name) {
 	ifs.close();
 }
 
-void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags, glm::ivec3 _grid_pos) {
+void entity_manager_t::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags, glm::ivec3 _grid_pos) {
 	std::shared_ptr<entity> _new_entity;
 
 	if (_type == "player") {
@@ -161,10 +182,10 @@ void entity_manager::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _flags
 
 	entities.push_back(_new_entity);
 	entity_id_lookup.emplace(_new_entity->id, _new_entity);
-	entities_tag_lookup.emplace(_new_entity->tag, _new_entity);
+	entities_tag_lookup.emplace(_new_entity->name, _new_entity);
 }
 
-void entity_manager::remove_entity(std::weak_ptr<entity> _entity) {
+void entity_manager_t::remove_entity(std::weak_ptr<entity> _entity) {
 	entities.erase(std::remove(entities.begin(), entities.end(), _entity.lock()), entities.end());
 
 	for (auto iter = entities_tag_lookup.begin(); iter != entities_tag_lookup.end();) {
@@ -174,7 +195,7 @@ void entity_manager::remove_entity(std::weak_ptr<entity> _entity) {
 	}
 }
 
-std::vector<glm::ivec3> entity_manager::neighbors(glm::ivec3 _pos) const {
+std::vector<glm::ivec3> entity_manager_t::neighbors(glm::ivec3 _pos) const {
 	std::vector<glm::ivec3> results;
 
 	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0} };
@@ -190,7 +211,7 @@ std::vector<glm::ivec3> entity_manager::neighbors(glm::ivec3 _pos) const {
 	return results;
 }
 
-std::vector<glm::ivec3> entity_manager::diagonal_neighbors(glm::ivec3 _pos) const {
+std::vector<glm::ivec3> entity_manager_t::diagonal_neighbors(glm::ivec3 _pos) const {
 	std::vector<glm::ivec3> results;
 
 	// TODO: change directions to 3D
@@ -207,18 +228,18 @@ std::vector<glm::ivec3> entity_manager::diagonal_neighbors(glm::ivec3 _pos) cons
 	return results;
 }
 
-std::weak_ptr<entity> entity_manager::find_entity_by_tag(std::string _tag) const {
+std::weak_ptr<entity> entity_manager_t::find_entity_by_tag(std::string _tag) const {
 	auto range = entities_tag_lookup.equal_range(_tag);
 
 	for (auto i = range.first; i != range.second; ++i) {
-		if (i->second.lock()->tag == _tag)
+		if (i->second.lock()->name == _tag)
 			return i->second;
 	}
 
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::find_entity_by_id(uuid _id) const {
+std::weak_ptr<entity> entity_manager_t::find_entity_by_id(uuid _id) const {
 	auto it = entity_id_lookup.find(_id);
 	if (it != entity_id_lookup.end())
 		return it->second;
@@ -226,7 +247,7 @@ std::weak_ptr<entity> entity_manager::find_entity_by_id(uuid _id) const {
 	log_warning("ENTITY WITH ID DOES NOT EXIST");
 }
 
-std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) const {
+std::weak_ptr<entity> entity_manager_t::find_entity_by_position(glm::vec3 _pos) const {
 	for (auto& entity : entities) {
 		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return entity;
@@ -236,7 +257,7 @@ std::weak_ptr<entity> entity_manager::find_entity_by_position(glm::vec3 _pos) co
 	log_warning("ENTITY AT POSITION DOES NOT EXIST");
 }
 
-bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
+bool entity_manager_t::is_entity_at_position(glm::vec3 _pos) const {
 	for (auto& entity : entities) {
 		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
 			return true;
@@ -246,34 +267,20 @@ bool entity_manager::is_entity_at_position(glm::vec3 _pos) const {
 	return false;
 }
 
-bool entity_manager::check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std::weak_ptr<entity>& _entity) {
-
-	/*
-	int length = int(floor(glm::length(_dir)));
-	glm::vec3 new_dir = glm::normalize(_dir);
-	
-	for (int i = 0; i < length; i++) {
-		auto hit_entity = get_collisions(_pos + (new_dir * glm::vec3(i)));
-
-		if (auto tmp_entity = hit_entity.lock()) {
-			_entity = hit_entity;
-			return true;
-		}
-	}
-
-	return false;
-	*/
-
+bool entity_manager_t::check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, float _distance, std::weak_ptr<entity>& _entity) {
 	std::map<float, std::weak_ptr<entity>> results;
 
-	for (auto& entity : entities) {
-		float tmin = (entity->grid_pos.x - _pos.x) / _dir.x;
-		float tmax = ((entity->grid_pos.x + 1) - _pos.x) / _dir.x;
+	glm::vec3 direction = _dir * _distance;
+
+	for (auto& entity : entities)
+	{
+		float tmin = (entity->grid_pos.x - _pos.x) / direction.x;
+		float tmax = ((entity->grid_pos.x + 1) - _pos.x) / direction.x;
 
 		if (tmin > tmax) std::swap(tmin, tmax);
 
-		float tymin = (entity->grid_pos.y - _pos.y) / _dir.y;
-		float tymax = ((entity->grid_pos.y + 1) - _pos.y) / _dir.y;
+		float tymin = (entity->grid_pos.y - _pos.y) / direction.y;
+		float tymax = ((entity->grid_pos.y + 1) - _pos.y) / direction.y;
 
 		if (tymin > tymax) std::swap(tymin, tymax);
 
@@ -286,8 +293,8 @@ bool entity_manager::check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std
 		if (tymax < tmax)
 			tmax = tymax;
 
-		float tzmin = (entity->grid_pos.z - _pos.z) / _dir.z;
-		float tzmax = ((entity->grid_pos.z + 1) - _pos.z) / _dir.z;
+		float tzmin = (entity->grid_pos.z - _pos.z) / direction.z;
+		float tzmax = ((entity->grid_pos.z + 1) - _pos.z) / direction.z;
 
 		if (tzmin > tzmax) std::swap(tzmin, tzmax);
 
@@ -304,16 +311,18 @@ bool entity_manager::check_raycast_collision(glm::vec3 _pos, glm::vec3 _dir, std
 		results.emplace(distance, entity);
 	}
 
-	if (results.empty()) {
+	if (results.empty())
+	{
 		return false;
 	}
-	else {
+	else
+	{
 		_entity = results.begin()->second;
 		return true;
 	}
 }
 
-bool entity_manager::check_collisions(glm::vec3 _pos) const {
+bool entity_manager_t::check_collisions(glm::vec3 _pos) const {
 	for(auto& entity : entities) {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
@@ -326,7 +335,7 @@ bool entity_manager::check_collisions(glm::vec3 _pos) const {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity) const {
+bool entity_manager_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity) const {
 	for (auto& entity : entities) {
 		if (entity.get() == _ignored_entity)
 			continue;
@@ -342,9 +351,9 @@ bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity) c
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec3 _pos, std::string _tag) const {
+bool entity_manager_t::check_collisions(glm::vec3 _pos, std::string _tag) const {
 	for (auto& entity : entities) {
-		if (entity->tag != _tag)
+		if (entity->name != _tag)
 			continue;
 
 		if (entity->flags & ENTITY_NO_COLLISION)
@@ -358,9 +367,9 @@ bool entity_manager::check_collisions(glm::vec3 _pos, std::string _tag) const {
 	return false;
 }
 
-bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) const {
+bool entity_manager_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) const {
 	for (auto& entity : entities) {
-		if (entity->tag != _tag)
+		if (entity->name != _tag)
 			continue;
 
 		if (entity.get() == _ignored_entity)
@@ -381,7 +390,7 @@ bool entity_manager::check_collisions(glm::vec3 _pos, entity* _ignored_entity, s
 // GET COLLISIONS
 //
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos) {
+std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos) {
 	for (auto& entity : entities) {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
@@ -394,7 +403,7 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos) {
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, entity* _ignored_entity) {
+std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, entity* _ignored_entity) {
 	for (auto& entity : entities) {
 		if (entity.get() == _ignored_entity)
 			continue;
@@ -410,9 +419,9 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, entity* _ig
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, std::string _tag) {
+std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, std::string _tag) {
 	for (auto& entity : entities) {
-		if (entity->tag != _tag)
+		if (entity->name != _tag)
 			continue;
 
 		if (entity->flags & ENTITY_NO_COLLISION)
@@ -426,9 +435,9 @@ std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, std::string
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager::get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) {
+std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) {
 	for (auto& entity : entities) {
-		if (entity->tag != _tag)
+		if (entity->name != _tag)
 			continue;
 
 		if (entity.get() == _ignored_entity)

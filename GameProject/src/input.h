@@ -3,6 +3,7 @@
 
 #include <glm.hpp>
 #include <SDL.h>
+#include <map>
 
 enum class mouse_button {
 	MOUSE_LEFT = 0,
@@ -11,9 +12,21 @@ enum class mouse_button {
 	MOUSE_BACK,
 	MOUSE_FORWARD
 };
-namespace input {
-	void init();
-	void clean();
+
+struct input_manager_t {
+	input_manager_t();
+	~input_manager_t();
+
+	const uint8_t* keyboard_state;
+	uint8_t* previous_keyboard_state;
+	int keyboard_state_size;
+
+	Uint32 mouse_state;
+	Uint32 previous_mouse_state;
+	glm::ivec2 mouse_position;
+	glm::ivec2 previous_mouse_position;
+
+	std::multimap<std::string, unsigned int> mapped_inputs;
 
 	void update();
 
@@ -29,8 +42,8 @@ namespace input {
 	bool mouse_button_pressed(mouse_button button);
 	bool mouse_button_released(mouse_button button);
 
-	const glm::ivec2* get_mouse_pos();
-	const glm::ivec2* get_previous_mouse_pos();
+	const glm::ivec2 get_mouse_pos();
+	const glm::ivec2 get_previous_mouse_pos();
 	const glm::ivec2 get_mouse_delta();
 
 	// TODO: implement relative mouse positions.
@@ -40,4 +53,4 @@ namespace input {
 
 	void save();
 	void load();
-}
+};
