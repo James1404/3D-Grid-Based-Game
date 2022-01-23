@@ -4,19 +4,19 @@
 #include "pathfinding.h"
 
 struct block_entity : public entity {
-	renderer::model_entity model;
+	renderer::model_entity_t model;
 
 	block_entity()
 		: model("data/models/block/block.obj", &visual_pos)
 	{
-		tag = "block";
+		name = "block";
 	}
 
 	~block_entity() {
 
 	}
 
-	void update(double dt) override {
+	void update(double dt, input_manager_t& input_manager) override {
 		visual_pos = grid_pos;
 	}
 };

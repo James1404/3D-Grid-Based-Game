@@ -6,9 +6,9 @@
 #include "common.h"
 
 struct player_entity : public entity {
-	renderer::model_entity model;
+	renderer::model_entity_t model;
 
-	glm::ivec2 direction;
+	glm::vec3 vel;
 
 	float walk_speed = 0.003f;
 	float run_speed = 0.006f;
@@ -23,5 +23,5 @@ struct player_entity : public entity {
 
 	player_entity();
 	~player_entity();
-	void update(double dt) override;
+	void update(double dt, input_manager_t& input_manager) override;
 };
