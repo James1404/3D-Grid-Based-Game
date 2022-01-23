@@ -1,127 +1,44 @@
 #include <SDL.h>
+#include "engine.h"
 
-#include "renderer.h"
-#include "input.h"
-#include "log.h"
-#include "editor.h"
+SDL_Event event;
+bool update_sdl_events()
+{
+	if (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_QUIT:
+			return false;
+			break;
+			/*
+		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+				renderer::screen_resolution_x = event.window.data1;
+				renderer::screen_resolution_y = event.window.data2;
+				SDL_SetWindowSize(renderer::window, renderer::screen_resolution_x, renderer::screen_resolution_y);
+			}
+			break;
+			*/
+		}
+	}
+
+	return true;
+}
+
+uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
+double update_sdl_delta_time()
+{
+	LAST = NOW;
+	NOW = SDL_GetPerformanceCounter();
+	return (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+}
 
 int main(int argc, char* args[]) {
-	SDL_Event event;
 
-	bool isRunning = false;
-
-	entity_manager_t entity_manager;
-	input_manager_t input_manager;
-#ifdef _DEBUG
-	editor_manager editor;
-#endif // _DEBUG
-
-	enum class GAME_STATE {
-		GAMEPLAY,
-		EDITOR
-	} static CurrentState;
-
-	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
-
-	/* ----- INIT GAME ----- */
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-		renderer::init();
-#ifdef _DEBUG
-		renderer::debug::init_debug();
-#endif // _DEBUG
 
-		CurrentState = GAME_STATE::GAMEPLAY;
-
-		// LEVEL NAMES :
-		// combattestlevel
-		// newtestlevel
-		entity_manager.load("combattestlevel");
-
-		input_manager.load();
-#ifdef _DEBUG
-		editor.init(entity_manager);
-#endif // _DEBUG
-		
-		isRunning = true;
 	}
 
-	while (isRunning) {
-		/* ----- HANDLE EVENTS ----- */
-		if (SDL_PollEvent(&event)) {
-			switch (event.type) {
-			case SDL_QUIT:
-				isRunning = false;
-				break;
-				/*
-			case SDL_WINDOWEVENT:
-				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-					renderer::screen_resolution_x = event.window.data1;
-					renderer::screen_resolution_y = event.window.data2;
-					SDL_SetWindowSize(renderer::window, renderer::screen_resolution_x, renderer::screen_resolution_y);
-				}
-				break;
-				*/
-			}
-		}
-
-		/* ----- UPDATE GAME ----- */
-#ifdef _DEBUG
-		renderer::debug::clear_debug_list();
-#endif // _DEBUG
-
-		// calculate delta time;
-		LAST = NOW;
-		NOW = SDL_GetPerformanceCounter();
-		double dt = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-
-		entity_manager.update(dt, input_manager);
-
-#ifdef _DEBUG
-		if (CurrentState == GAME_STATE::EDITOR) {
-			entity_manager.is_paused = true;
-			editor.update(dt, input_manager);
-		}
-		else {
-			entity_manager.is_paused = false;
-		}
-
-		if (input_manager.key_down(SDL_SCANCODE_ESCAPE)) {
-			if (CurrentState == GAME_STATE::GAMEPLAY)
-				CurrentState = GAME_STATE::EDITOR;
-			else if (CurrentState == GAME_STATE::EDITOR)
-				CurrentState = GAME_STATE::GAMEPLAY;
-		}
-#endif // _DEBUG
-
-		input_manager.update();
-
-		/* ----- RENDER GAME ----- */
-		renderer::start_drawing_frame();
-		
-		renderer::draw_models();
-
-#ifdef _DEBUG
-		if (CurrentState == GAME_STATE::EDITOR) {
-			editor.draw();
-		}
-
-		renderer::debug::draw_debug();
-#endif // _DEBUG
-
-		renderer::stop_drawing_frame();
-	}
-
-	/* ----- CLEAN GAME ----- */
-	log_info("STARTING CLEANUP");
-
-#ifdef _DEBUG
-	editor.clean();
-	renderer::debug::clean_debug();
-#endif // _DEBUG
-
-	renderer::clean();
-
-	log_info("CLEANUP FINISHED");
+	engine_run(update_sdl_events, update_sdl_delta_time);
 
 	return 0;
 }
