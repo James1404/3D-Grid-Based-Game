@@ -158,9 +158,11 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\asset.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="includes\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\event.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\editor.cpp" />
@@ -256,7 +258,9 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClInclude Include="includes\assimp\include\assimp\XmlParser.h" />
     <ClInclude Include="includes\assimp\include\assimp\XMLTools.h" />
     <ClInclude Include="includes\assimp\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="src\asset.h" />
     <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\event.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\world_entities.h" />
     <ClInclude Include="src\camera.h" />
