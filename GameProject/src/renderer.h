@@ -1,8 +1,9 @@
 #pragma once
 #include <SDL.h>
 #include <GL/glew.h>
-#include <SDL_opengl.h>
 #include <GL/GLU.h>
+#include "asset.h"
+#include <SDL_opengl.h>
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -41,6 +42,8 @@ namespace renderer {
 	extern glm::mat4 projection;
 	extern glm::mat4 view;
 
+	extern asset_manager_t asset_manager;
+
 	extern int screen_resolution_x, screen_resolution_y;
 
 	void init();
@@ -53,224 +56,10 @@ namespace renderer {
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering
 
-	struct shader_t {
-		unsigned int id;
-		std::string path;
-	};
-
-	static std::vector<shader_t> shaders_loaded;
-
-	struct vertex_t {
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 tex_coords;
-	};
-
-	struct texture_t {
-		unsigned int id;
-		std::string type;
-		std::string path;
-	};
-
-	struct mesh_t {
-		std::vector<vertex_t> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<texture_t> textures;
-
-		mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices, std::vector<texture_t> textures);
-		void draw(shader_t& _shader);
-	private:
-		unsigned int vao, vbo, ebo;
-		void setupMesh();
-	};
-
-	struct model_t {
-		std::vector<texture_t> textures_loaded;
-		std::vector<mesh_t> meshes;
-		std::string directory;
-		std::string path;
-
-		void draw(shader_t& _shader);
-
-		void load_model(std::string _path);
-		void process_node(aiNode* node, const aiScene* scene);
-		mesh_t process_mesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<texture_t> load_material_textures(aiMaterial* mat, aiTextureType type, std::string typeName);
-	};
-
-	static std::vector<model_t> models_loaded;
-
-	inline unsigned int texture_from_file(const char* path, const std::string& directory) {
-		std::string filename = std::string(path);
-		filename = directory + '/' + filename;
-
-		unsigned int textureID;
-		glGenTextures(1, &textureID);
-
-		int width, height, nrComponents;
-		unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-		if (data)
-		{
-			GLenum format;
-			if (nrComponents == 1)
-				format = GL_RED;
-			else if (nrComponents == 3)
-				format = GL_RGB;
-			else if (nrComponents == 4)
-				format = GL_RGBA;
-
-			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-			stbi_image_free(data);
-		}
-		else
-		{
-			log_warning("Texture failed to load as path: ", path);
-			stbi_image_free(data);
-		}
-
-		return textureID;
-	}
-
-	inline shader_t shader_from_file(const char* shader_source) {
-		shader_t _shader;
-		bool skip = false;
-		for (unsigned int i = 0; i < shaders_loaded.size(); i++) {
-			if (shaders_loaded[i].path == shader_source) {
-				_shader = shaders_loaded[i];
-				skip = true;
-			}
-		}
-
-		if (!skip) {
-			std::string vShaderCode, fShaderCode;
-			std::string shader_version;
-			std::ifstream ifs(shader_source);
-			if (ifs.is_open()) {
-				enum class line_type_ {
-					none = 0,
-					vertex,
-					fragment,
-					version
-				} line_type = line_type_::none;
-
-				std::string line;
-				while (std::getline(ifs, line)) {
-					if (line == "[version]") {
-						line_type = line_type_::version;
-						continue;
-					}
-					else if (line == "[vertex]") {
-						line_type = line_type_::vertex;
-						continue;
-					}
-					else if (line == "[fragment]") {
-						line_type = line_type_::fragment;
-						continue;
-					}
-
-					if (line_type == line_type_::vertex) {
-						//vStream << line;
-						vShaderCode += line;
-						vShaderCode += "\n";
-					}
-					else if (line_type == line_type_::fragment) {
-						//fStream >> line;
-						fShaderCode += line;
-						fShaderCode += "\n";
-					}
-					else if (line_type == line_type_::version) {
-						shader_version += line;
-						shader_version += "\n";
-					}
-				}
-
-				ifs.close();
-			}
-			else {
-				log_error("COULD NOT OPEN SHADER FILE: ", shader_source);
-			}
-
-			vShaderCode.insert(0, shader_version);
-			fShaderCode.insert(0, shader_version);
-
-			const char* vertexShader = vShaderCode.c_str();
-			const char* fragmentShader = fShaderCode.c_str();
-
-			unsigned int vertex, fragment;
-
-			//create and compiler shaders from its source
-			vertex = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vertex, 1, &vertexShader, NULL);
-			glCompileShader(vertex);
-
-			int success;
-			char infoLog[512];
-			glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-			if (!success) {
-				glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-				log_error("SHADER COMPILATION FAILED ", infoLog);
-			}
-
-			fragment = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fragment, 1, &fragmentShader, NULL);
-			glCompileShader(fragment);
-
-			glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-			if (!success) {
-				glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-				log_error("SHADER COMPILATION FAILED ", infoLog);
-			}
-
-			// create program and attach shaders
-			unsigned int shader_program;
-			shader_program = glCreateProgram();
-			glAttachShader(shader_program, vertex);
-			glAttachShader(shader_program, fragment);
-			glLinkProgram(shader_program);
-
-			// delete shaders as they are no longer needed
-			glDeleteShader(vertex);
-			glDeleteShader(fragment);
-
-			_shader.id = shader_program;
-			_shader.path = shader_source;
-			shaders_loaded.push_back(_shader);
-
-			log_info("LOADED AND COMPILED SHADER ", shader_source);
-		}
-
-		return _shader;
-	}
-
-	inline model_t model_from_file(const std::string _path) {
-		for (unsigned int i = 0; i < models_loaded.size(); i++) {
-			if (models_loaded[i].path == _path) {
-				return models_loaded[i];
-			}
-		}
-
-		model_t _model;
-		_model.path = _path;
-
-		_model.load_model(_model.path);
-		models_loaded.push_back(_model);
-
-		log_info("LOADED MODEL ", _path);
-
-		return _model;
-	}
-
 	struct model_entity_t {
-		model_t model;
-		shader_t shader;
+		std::shared_ptr<model_t> model;
+		std::shared_ptr<shader_t> shader;
+		std::shared_ptr<texture_t> texture;
 
 		glm::vec3* position;
 		glm::vec3 rotation;
@@ -278,7 +67,7 @@ namespace renderer {
 
 		bool is_paused;
 
-		model_entity_t(std::string _model_path, glm::vec3* _position);
+		model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position);
 		~model_entity_t();
 
 		void draw();
