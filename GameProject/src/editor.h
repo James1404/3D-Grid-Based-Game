@@ -17,7 +17,7 @@ struct editor_manager {
 		free_cam
 	};
 
-	editor_mode mode = editor_mode::placement_cam;
+	editor_mode mode = editor_mode::free_cam;
 	const float cam_movement_speed = 0.01f;
 	const float cam_rotation_speed = 0.03f;
 	bool is_cam_control = false;
@@ -38,5 +38,22 @@ struct editor_manager {
 	void clean();
 
 	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager);
-	void draw();
+	void draw(input_manager_t& input_manager);
+	void draw_primitives();
+
+	// framebuffer
+	texture_t depth_texture_attachment;
+	texture_t color_texture_attachment;
+	texture_t id_texture_attachment;
+
+	unsigned int framebuffer_quad_vao, framebuffer_quad_vbo;
+	std::shared_ptr<shader_t> framebuffer_quad_shader;
+
+	unsigned int framebuffer_id;
+	void init_framebuffer();
+	void shutdown_framebuffer();
+	void bind_framebuffer();
+	void unbind_framebuffer();
+	void draw_framebuffer();
+	int read_framebuffer_pixel(int x, int y);
 };

@@ -34,17 +34,134 @@ void editor_manager::init(entity_manager_t& _entity_manager)
 
 	entity_manager = &_entity_manager;
 
+	init_framebuffer();
+
 	log_info("INITIALIZED EDITOR");
 }
 
 void editor_manager::clean()
 {
+	shutdown_framebuffer();
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
 	log_info("-----------------\n");
 	log_info("EDITOR CLEANED UP\n");
+}
+
+void editor_manager::init_framebuffer()
+{
+	// Initialize framebuffer
+	glGenFramebuffers(1, &framebuffer_id);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+
+	int resolution_x = 1280, resolution_y = 720;
+
+	// COLOR TEXTURE
+	glGenTextures(1, &color_texture_attachment.id);
+	glBindTexture(GL_TEXTURE_2D, color_texture_attachment.id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, resolution_x, resolution_y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture_attachment.id, 0);
+
+	// ENTITY ID TEXTURE
+	glGenTextures(1, &id_texture_attachment.id);
+	glBindTexture(GL_TEXTURE_2D, id_texture_attachment.id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, resolution_x, resolution_y, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, id_texture_attachment.id, 0);
+
+	// DEPTH TEXTURE
+	glGenTextures(1, &depth_texture_attachment.id);
+	glBindTexture(GL_TEXTURE_2D, depth_texture_attachment.id);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, resolution_x, resolution_y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_texture_attachment.id, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		log_error("Framebuffer is not complete");
+	}
+
+	GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	float quad_vertices[] =
+	{
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &framebuffer_quad_vao);
+	glGenBuffers(1, &framebuffer_quad_vbo);
+	glBindVertexArray(framebuffer_quad_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, framebuffer_quad_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), &quad_vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	framebuffer_quad_shader = renderer::asset_manager.load_shader_from_file("data/shaders/framebuffer.glsl");
+
+	glUseProgram(framebuffer_quad_shader->id);
+
+	glUniform1i(glGetUniformLocation(framebuffer_quad_shader->id, "screenTexture"), 0);
+}
+
+void editor_manager::shutdown_framebuffer()
+{
+	glDeleteFramebuffers(1, &framebuffer_id);
+	log_info("Deleted framebuffer");
+}
+
+void editor_manager::bind_framebuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+}
+
+void editor_manager::unbind_framebuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void editor_manager::draw_framebuffer()
+{
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(framebuffer_quad_shader->id);
+	glBindVertexArray(framebuffer_quad_vao);
+	glBindTexture(GL_TEXTURE_2D, color_texture_attachment.id);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glEnable(GL_DEPTH_TEST);
+}
+
+int editor_manager::read_framebuffer_pixel(int x, int y)
+{
+	bind_framebuffer();
+	glReadBuffer(GL_COLOR_ATTACHMENT1);
+
+	int pixel_data;
+	glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel_data);
+
+	unbind_framebuffer();
+	return pixel_data;
 }
 
 void editor_manager::move_cursor(glm::ivec3 _vel)
@@ -73,7 +190,6 @@ void editor_manager::select_entity(std::weak_ptr<entity> _entity)
 	{
 		if (_entity.lock() == tmp_entity.lock())
 		{
-			log_warning("Already selected entity");
 			return;
 		}
 	}
@@ -88,7 +204,6 @@ void editor_manager::add_multiselect_entity(std::weak_ptr<entity> _entity)
 	{
 		if (_entity.lock() == tmp_entity.lock())
 		{
-			log_warning("Already selected entity");
 			return;
 		}
 	}
@@ -98,39 +213,43 @@ void editor_manager::add_multiselect_entity(std::weak_ptr<entity> _entity)
 
 void editor_manager::clear_selected_entities()
 {
-	if (selected_entities.empty())
-	{
-		log_warning("selected_entites is already empty");
-	}
-
 	selected_entities.clear();
 }
 
-void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam) {
-	cursor_pos = common::vec_to_ivec(cursor_pos);
+void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input_manager, std::shared_ptr<camera_t> cam)
+{
+	cursor_pos = vec_to_ivec(cursor_pos);
 	glm::ivec3 vel{ 0 };
-	if (!(input_manager.key_down(SDL_SCANCODE_W) && input_manager.key_down(SDL_SCANCODE_S))) {
-		if (input_manager.key_down(SDL_SCANCODE_W)) {
+	if (!(input_manager.key_down(SDL_SCANCODE_W) && input_manager.key_down(SDL_SCANCODE_S)))
+	{
+		if (input_manager.key_down(SDL_SCANCODE_W))
+		{
 			vel = { 0,0, -1 };
 		}
-		else if (input_manager.key_down(SDL_SCANCODE_S)) {
+		else if (input_manager.key_down(SDL_SCANCODE_S))
+		{
 			vel = { 0,0, 1 };
 		}
 	}
 
-	if (!(input_manager.key_down(SDL_SCANCODE_A) && input_manager.key_down(SDL_SCANCODE_D))) {
-		if (input_manager.key_down(SDL_SCANCODE_A)) {
+	if (!(input_manager.key_down(SDL_SCANCODE_A) && input_manager.key_down(SDL_SCANCODE_D)))
+	{
+		if (input_manager.key_down(SDL_SCANCODE_A))
+		{
 			vel = { -1,0,0 };
 		}
-		else if (input_manager.key_down(SDL_SCANCODE_D)) {
+		else if (input_manager.key_down(SDL_SCANCODE_D))
+		{
 			vel = { 1,0,0 };
 		}
 	}
 
-	if (input_manager.key_down(SDL_SCANCODE_E)) {
+	if (input_manager.key_down(SDL_SCANCODE_E))
+	{
 		vel = { 0,1,0 };
 	}
-	else if (input_manager.key_down(SDL_SCANCODE_Q)) {
+	else if (input_manager.key_down(SDL_SCANCODE_Q))
+	{
 		vel = { 0,-1,0 };
 	}
 
@@ -142,33 +261,30 @@ void editor_manager::placement_cam_mode_update(double dt, input_manager_t& input
 
 	move_cursor(vel);
 
-	renderer::debug::draw_box_wireframe(cursor_pos, glm::vec3(1), colour::white);
+	//renderer::debug::draw_box_wireframe(cursor_pos, glm::vec3(1), colour::white);
 
-	for (auto selected : selected_entities) {
-		if (auto tmp_entity = selected.lock()) {
-			renderer::debug::draw_box_wireframe(tmp_entity->grid_pos, glm::vec3(1), colour::white);
-		}
-	}
-
-	if (input_manager.key_down(SDL_SCANCODE_F)) {
+	if (input_manager.key_down(SDL_SCANCODE_F))
+	{
 		// TODO: skip collision testing instead for simple position testing
 		// because entites with NO_COLLISION flag arent selected.
-		select_entity(entity_manager->find_entity_by_position(cursor_pos));
+		add_multiselect_entity(entity_manager->find_entity_by_position(cursor_pos));
 	}
 
-	if (input_manager.key_down(SDL_SCANCODE_1)) {
-		if (!entity_manager->is_entity_at_position(cursor_pos)) {
+	if (input_manager.key_down(SDL_SCANCODE_1))
+	{
+		if (!entity_manager->is_entity_at_position(cursor_pos))
+		{
 			entity_manager->add_entity("block", uuid(), 0, cursor_pos);
 		}
-		else {
-			log_warning("Entity already in position");
-		}
 	}
-	else if (input_manager.key_down(SDL_SCANCODE_2)) {
-		if (!entity_manager->is_entity_at_position(cursor_pos)) {
+	else if (input_manager.key_down(SDL_SCANCODE_2))
+	{
+		if (!entity_manager->is_entity_at_position(cursor_pos))
+		{
 			entity_manager->add_entity("player", uuid(), 0, cursor_pos);
 		}
-		else {
+		else
+		{
 			log_warning("Entity already in position");
 		}
 	}
@@ -183,11 +299,13 @@ void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_mana
 	if (is_cam_control)
 	{
 		glm::vec3 new_pos = cursor_pos;
-		float cam_speed = cam_movement_speed * dt;
+		float cam_speed = cam_movement_speed;
 		if (input_manager.key_pressed(SDL_SCANCODE_LSHIFT))
 			cam_speed = 0.3f;
 		else if (input_manager.key_pressed(SDL_SCANCODE_LALT))
 			cam_speed = 0.005f;
+
+		cam_speed *= dt;
 
 		if (!(input_manager.key_pressed(SDL_SCANCODE_W) && input_manager.key_pressed(SDL_SCANCODE_S)))
 		{
@@ -232,10 +350,10 @@ void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_mana
 		camera_rotation *= dt;
 		cam->rotation += camera_rotation;
 
-		if (camera_rotation.y > 360.0f)
-			camera_rotation.y -= 360.0f;
-		if (camera_rotation.y < 0.0f)
-			camera_rotation.y += 360.0f;
+		if (cam->rotation.y > 360.0f)
+			cam->rotation.y -= 360.0f;
+		if (cam->rotation.y < 0.0f)
+			cam->rotation.y += 360.0f;
 
 		if (cam->rotation.x > 89.0f)
 			cam->rotation.x = 89.0f;
@@ -250,23 +368,18 @@ void editor_manager::free_cam_mode_update(double dt, input_manager_t& input_mana
 		{
 			glm::vec2 mouse_pos = glm::vec2(input_manager.get_mouse_pos().x, renderer::screen_resolution_y - 1.0f - input_manager.get_mouse_pos().y);
 
-			auto dir = glm::unProject(glm::vec3(mouse_pos.x, mouse_pos.y, 1.0),
-				cam->getViewMatrix(), renderer::projection,
-				glm::vec4(0, 0, renderer::screen_resolution_x, renderer::screen_resolution_y));
+			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
 
-			std::weak_ptr<entity> hit_entity;
-			if (entity_manager->check_raycast_collision(cam->position, dir, 100.0f, hit_entity))
+			auto entity = entity_manager->find_entity_by_index(entity_index);
+			if(entity.lock())
 			{
-				if (hit_entity.lock())
+				if (input_manager.key_pressed(SDL_SCANCODE_LSHIFT))
 				{
-					if (input_manager.key_pressed(SDL_SCANCODE_LSHIFT))
-					{
-						add_multiselect_entity(hit_entity);
-					}
-					else
-					{
-						select_entity(hit_entity);
-					}
+					add_multiselect_entity(entity);
+				}
+				else
+				{
+					select_entity(entity);
 				}
 			}
 			else
@@ -340,6 +453,7 @@ void editor_manager::update(double dt, input_manager_t& input_manager, camera_ma
 			entity_manager->remove_entity(entity_manager->find_entity_by_position(cursor_pos));
 		}
 	}
+
 }
 
 static void draw_entity_data(std::weak_ptr<entity> _entity)
@@ -349,6 +463,7 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 	{
 		ImGui::PushID(tmp_entity.get());
 
+		ImGui::Text("Index: %i", tmp_entity->index);
 		ImGui::Text("ID: %llu", tmp_entity->id);
 		ImGui::Text("flags: %i", tmp_entity->flags);
 
@@ -386,13 +501,24 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 
 		ImGui::Separator();
 
-		renderer::debug::draw_box_wireframe(tmp_entity->grid_pos, glm::vec3(1), colour::white);
+		//renderer::debug::draw_box_wireframe(tmp_entity->grid_pos, glm::vec3(1), colour::white);
 
 		ImGui::PopID();
 	}
 }
 
-void editor_manager::draw()
+void editor_manager::draw_primitives()
+{
+	for (auto selected : selected_entities)
+	{
+		if (auto tmp_entity = selected.lock())
+		{
+			renderer::debug::draw_box_wireframe(tmp_entity->grid_pos, glm::vec3(1), colour::white);
+		}
+	}
+}
+
+void editor_manager::draw(input_manager_t& input_manager)
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(renderer::window);
