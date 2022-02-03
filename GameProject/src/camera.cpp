@@ -28,6 +28,13 @@ glm::mat4 camera_t::getViewMatrix() {
 }
 
 void camera_manager_t::set_camera(std::string _id) {
+	glm::vec3 pos{}, rot{};
+	if (auto temp_camera = current_camera.lock())
+	{
+		pos = temp_camera->position;
+		rot = temp_camera->rotation;
+	}
+
 	auto it = cameras.find(_id);
 	if (it == cameras.end()) {
 		cameras.emplace(_id, std::make_shared<camera_t>());
@@ -42,6 +49,9 @@ void camera_manager_t::set_camera(std::string _id) {
 			current_camera = it->second;
 		}
 	}
+
+	current_camera.lock()->position = pos;
+	current_camera.lock()->rotation = rot;
 }
 
 std::weak_ptr<camera_t> camera_manager_t::get_camera(std::string _id) {
