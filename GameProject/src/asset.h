@@ -20,12 +20,24 @@
 
 #include "stb_image.h"
 
+#include "log.h"
+
 struct shader_t {
 	unsigned int id;
+
+	~shader_t()
+	{
+		glDeleteProgram(id);
+	}
 };
 
 struct texture_t {
 	unsigned int id;
+
+	~texture_t()
+	{
+		glDeleteTextures(1, &id);
+	}
 };
 
 struct vertex_t {

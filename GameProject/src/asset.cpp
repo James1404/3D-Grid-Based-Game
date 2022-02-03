@@ -22,7 +22,7 @@ void mesh_t::setupMesh() {
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	
+
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex_t), &vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -114,7 +114,6 @@ mesh_t model_t::process_mesh(aiMesh* mesh, const aiScene* scene)
 
 	return mesh_t(vertices, indices);
 }
-
 
 std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string path)
 {
@@ -209,11 +208,15 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 		// create program and attach shaders
 		unsigned int shader_program;
 		shader_program = glCreateProgram();
+
 		glAttachShader(shader_program, vertex);
 		glAttachShader(shader_program, fragment);
 		glLinkProgram(shader_program);
 
 		// delete shaders as they are no longer needed
+		glDetachShader(shader_program, vertex);
+		glDetachShader(shader_program, fragment);
+
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
 
