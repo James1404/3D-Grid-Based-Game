@@ -48,13 +48,13 @@ void renderer::init() {
 	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 }
 
-void renderer::clean() {
+void renderer::shutdown() {
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
-void renderer::start_drawing_frame() {
+void renderer::clear_screen() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -63,14 +63,14 @@ void renderer::start_drawing_frame() {
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 }
 
+void renderer::swap_screen_buffers() {
+	SDL_GL_SwapWindow(window);
+}
+
 void renderer::draw_models() {
 	for (auto& i : model_list) {
 		i->draw();
 	}
-}
-
-void renderer::stop_drawing_frame() {
-	SDL_GL_SwapWindow(window);
 }
 
 renderer::model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position)
@@ -122,6 +122,10 @@ void renderer::model_entity_t::draw() {
 	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
 
+#ifdef _DEBUG
+	glUniform1i(glGetUniformLocation(shader->id, "entity_index"), index);
+#endif
+
 	model->draw(*shader);
 }
 
@@ -130,6 +134,9 @@ void renderer::model_entity_t::draw() {
 // ----- DEBUG RENDERER -----
 //
 
+std::shared_ptr<shader_t> line_shader;
+unsigned int line_vao, line_vbo, line_ebo;
+/*
 renderer::debug::debug_drawing::debug_drawing() {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -147,16 +154,42 @@ renderer::debug::debug_drawing::~debug_drawing() {
 	glDeleteVertexArrays(1, &vao);
 }
 
-std::shared_ptr<shader_t> line_shader;
+void renderer::debug::debug_drawing::draw()
+{
+	glUseProgram(line_shader->id);
+
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view));
+
+	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
+
+	glBindVertexArray(vao);
+	glDrawArrays(GL_LINES, 0, 2);
+}
+*/
+
 void renderer::debug::init_debug() {
-	line_shader	= asset_manager.load_shader_from_file("data/shaders/debug/debug_line.shader");
+	line_shader	= asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
+
+	glGenVertexArrays(1, &line_vao);
+	glBindVertexArray(line_vao);
+
+	glGenBuffers(1, &line_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+
+	glGenBuffers(1, &line_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
 }
 
 void renderer::debug::clean_debug() {
-	clear_debug_list();
+	//clear_debug_list();
 	glDeleteProgram(line_shader->id);
+	glDeleteBuffers(1, &line_vbo);
+	glDeleteBuffers(1, &line_ebo);
+	glDeleteVertexArrays(1, &line_vao);
 }
 
+/*
 std::vector<std::shared_ptr<renderer::debug::debug_drawing>> line_draw_list;
 
 void renderer::debug::clear_debug_list () {
@@ -177,22 +210,39 @@ void renderer::debug::draw_debug() {
 	}
 }
 
+*/
 void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF
 	float vertices[] = {
 		p1.x, p1.y, p1.z,	// first point
 		p2.x, p2.y, p2.z	// second point
 	};
-
+	/*
 	auto drawing = std::make_shared<debug_drawing>();
 
 	drawing->colour = colour;
 
+	*/
+	//drawing->draw();
+
+	glBindVertexArray(line_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	line_draw_list.push_back(drawing);
+	glUseProgram(line_shader->id);
+
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view));
+
+	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
+
+	glBindVertexArray(line_vao);
+	glDrawArrays(GL_LINES, 0, 2);
+	//line_draw_list.push_back(drawing);
 }
 
 void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
@@ -215,12 +265,13 @@ void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 si
 	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
 #else
+/*
 renderer::debug::debug_drawing::debug_drawing()
 {}
 
 renderer::debug::debug_drawing::~debug_drawing()
 {}
-
+*/
 void renderer::debug::init_debug()
 {}
 

@@ -22,6 +22,10 @@ player_entity::~player_entity()
 
 void player_entity::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager)
 {
+#ifdef _DEBUG
+	model.index = index;
+#endif
+
 	camera_manager.set_camera("Player");
 
 	if (auto player_cam = camera_manager.get_camera("Player").lock())
@@ -31,7 +35,7 @@ void player_entity::update(double dt, input_manager_t& input_manager, camera_man
 			model.is_paused = true;
 
 			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, .4f, 0));
-			player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
 			vel = { 0,0,0 };
 
 			if (!(input_manager.button_pressed("MoveUp") && input_manager.button_pressed("MoveDown")))
@@ -58,7 +62,7 @@ void player_entity::update(double dt, input_manager_t& input_manager, camera_man
 				}
 			}
 
-			vel = common::sqrt_magnitude(vel);
+			vel = sqrt_magnitude(vel);
 			vel *= 0.1f;
 			vel *= dt;
 
@@ -75,7 +79,7 @@ void player_entity::update(double dt, input_manager_t& input_manager, camera_man
 				fp_look_rotation.y = 360.0f;
 			// TODO: dont allow rotation until camera has reached first-person position
 			player_cam->rotation = fp_look_rotation;
-			//player_cam->rotation = common::lerp(player_cam->rotation, fp_look_rotation, camera_speed * dt);
+			//player_cam->rotation = lerp(player_cam->rotation, fp_look_rotation, camera_speed * dt);
 		}
 		else
 		{
@@ -84,14 +88,14 @@ void player_entity::update(double dt, input_manager_t& input_manager, camera_man
 			glm::vec3 offset = glm::vec3(0, 6, 5);
 
 			glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
-			player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
-			player_cam->rotation = common::lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
+			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
+			player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
 		}
 
 		/* TOP DOWN CAMERA
 		glm::vec3 offset = glm::vec3(0, 4, 0);
 		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
-		player_cam->position = common::lerp(player_cam->position, target_pos, camera_speed * dt);
+		player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
 		player_cam->rotation = glm::vec3(-89, -90, 0);
 		*/
 	}
@@ -148,10 +152,17 @@ void player_entity::update(double dt, input_manager_t& input_manager, camera_man
 			{
 				interp_speed = run_speed;
 			}
-		}
 
-		move_grid_pos(vel);
+			move_grid_pos(vel);
+		}
 	}
 
 	interp_visuals(dt, interp_speed);
+}
+
+void player_entity::draw()
+{
+	model.draw();
+
+	renderer::debug::draw_box_wireframe(previous_grid_pos, glm::vec3(1), colour::red);
 }

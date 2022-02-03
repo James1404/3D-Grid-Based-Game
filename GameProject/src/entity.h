@@ -43,12 +43,16 @@ struct entity_manager_t {
 
 	std::vector<std::shared_ptr<entity>> entities;
 	std::map<uuid, std::weak_ptr<entity>> entity_id_lookup;
+	std::map<int, std::weak_ptr<entity>> entity_index_lookup;
 	std::multimap<std::string, std::weak_ptr<entity>> entities_tag_lookup;
+
+	int current_entity_index = 0;
 
 	entity_manager_t();
 	~entity_manager_t();
 
 	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager);
+	void draw();
 
 	void clear_data();
 
@@ -63,6 +67,7 @@ struct entity_manager_t {
 
 	std::weak_ptr<entity> find_entity_by_tag(std::string _tag) const;
 	std::weak_ptr<entity> find_entity_by_id(uuid _id) const;
+	std::weak_ptr<entity> find_entity_by_index(int _index) const;
 	std::weak_ptr<entity> find_entity_by_position(glm::vec3 _pos) const;
 
 	bool is_entity_at_position(glm::vec3 _pos) const;
@@ -87,6 +92,8 @@ struct entity_manager_t {
 struct entity {
 	// TODO: implement Entity ID for entity referencing
 	uuid id;
+	int index;
+
 	ENTITY_FLAGS flags;
 	std::string name;
 
@@ -95,9 +102,9 @@ struct entity {
 	glm::ivec3 grid_pos, previous_grid_pos;
 	glm::vec3 visual_pos;
 
-		entity()
-		: id(0), flags(0), name(""),
-		grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0), visual_pos(0, 0, 0)
+	entity()
+		: id(0), flags(0), name(""), grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0),
+		visual_pos(0, 0, 0)
 	{
 		//log_info("INITIALIZED ENTITY ", this);
 	}
@@ -107,6 +114,7 @@ struct entity {
 	}
 
 	virtual void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) {}
+	virtual void draw() {}
 
 	bool is_grounded(glm::ivec3 _pos) {
 		return manager->check_collisions(_pos + glm::ivec3(0, -1, 0), this);
@@ -155,7 +163,7 @@ struct entity {
 
 	void interp_visuals(double dt, float interp_speed) {
 		// TODO: implement lerping instead of move_towards
-		//visual_pos = common::lerp(visual_pos, (glm::vec3)grid_pos, interp_speed * dt);
-		visual_pos = common::move_towards(visual_pos, grid_pos, interp_speed * dt);
+		//visual_pos = lerp(visual_pos, (glm::vec3)grid_pos, interp_speed * dt);
+		visual_pos = move_towards(visual_pos, grid_pos, interp_speed * dt);
 	}
 };

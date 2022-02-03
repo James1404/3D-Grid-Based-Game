@@ -3,7 +3,8 @@
 #include "entity.h"
 #include "pathfinding.h"
 
-struct block_entity : public entity {
+struct block_entity : public entity
+{
 	renderer::model_entity_t model;
 
 	block_entity()
@@ -12,12 +13,22 @@ struct block_entity : public entity {
 		name = "block";
 	}
 
-	~block_entity() {
+	~block_entity()
+	{
 
 	}
 
 	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) override
 	{
+#ifdef _DEBUG
+		model.index = index;
+#endif
+
 		visual_pos = grid_pos;
+	}
+
+	void draw() override
+	{
+		model.draw();
 	}
 };

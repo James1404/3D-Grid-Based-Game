@@ -36,11 +36,22 @@ float currentTime = SDL_GetTicks() / 1000.0f;
 float accumulator = 0.0f;
 float tick_rate = 1.0f / 24.0f;
 
-void entity_manager_t::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) {
-	if (!is_paused) {
-		for (auto& _entity : entities) {
+void entity_manager_t::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager)
+{
+	if (!is_paused)
+	{
+		for (auto& _entity : entities)
+		{
 			_entity->update(dt, input_manager, camera_manager);
 		}
+	}
+}
+
+void entity_manager_t::draw()
+{
+	for(auto& _entity : entities)
+	{
+		_entity->draw();
 	}
 }
 
@@ -124,19 +135,21 @@ void entity_manager_t::add_entity(std::string _type, uuid _id, ENTITY_FLAGS _fla
 		log_warning("ENTITY TYPE UNKOWN : ", _type);
 		return;
 	}
-	
+
 	if (_id == 0)
 		_id = uuid();
 
 	_new_entity->manager = this;
 
 	_new_entity->id = _id;
+	_new_entity->index = ++current_entity_index;
 	_new_entity->flags = _flags;
 	_new_entity->grid_pos = _grid_pos;
 	_new_entity->visual_pos = _new_entity->grid_pos;
 
 	entities.push_back(_new_entity);
 	entity_id_lookup.emplace(_new_entity->id, _new_entity);
+	entity_index_lookup.emplace(_new_entity->index, _new_entity);
 	entities_tag_lookup.emplace(_new_entity->name, _new_entity);
 }
 
@@ -194,17 +207,32 @@ std::weak_ptr<entity> entity_manager_t::find_entity_by_tag(std::string _tag) con
 	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager_t::find_entity_by_id(uuid _id) const {
+std::weak_ptr<entity> entity_manager_t::find_entity_by_id(uuid _id) const
+{
 	auto it = entity_id_lookup.find(_id);
 	if (it != entity_id_lookup.end())
 		return it->second;
 
-	log_warning("ENTITY WITH ID DOES NOT EXIST");
+	//log_warning("ENTITY WITH ID DOES NOT EXIST");
+	return std::weak_ptr<entity>();
 }
 
-std::weak_ptr<entity> entity_manager_t::find_entity_by_position(glm::vec3 _pos) const {
-	for (auto& entity : entities) {
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+std::weak_ptr<entity> entity_manager_t::find_entity_by_index(int _index) const
+{
+	auto it = entity_index_lookup.find(_index);
+	if (it != entity_index_lookup.end())
+		return it->second;
+
+	log_warning("Entity with index does not exist");
+	return std::weak_ptr<entity>();
+}
+
+std::weak_ptr<entity> entity_manager_t::find_entity_by_position(glm::vec3 _pos) const
+{
+	for (auto& entity : entities)
+	{
+		if (entity->grid_pos == vec_to_ivec(_pos))
+		{
 			return entity;
 		}
 	}
@@ -214,7 +242,7 @@ std::weak_ptr<entity> entity_manager_t::find_entity_by_position(glm::vec3 _pos) 
 
 bool entity_manager_t::is_entity_at_position(glm::vec3 _pos) const {
 	for (auto& entity : entities) {
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -282,7 +310,7 @@ bool entity_manager_t::check_collisions(glm::vec3 _pos) const {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -298,7 +326,7 @@ bool entity_manager_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity)
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -314,7 +342,7 @@ bool entity_manager_t::check_collisions(glm::vec3 _pos, std::string _tag) const 
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -333,7 +361,7 @@ bool entity_manager_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity,
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return true;
 		}
 	}
@@ -350,7 +378,7 @@ std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos) {
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return entity;
 		}
 	}
@@ -366,7 +394,7 @@ std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, entity* _
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return entity;
 		}
 	}
@@ -382,7 +410,7 @@ std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, std::stri
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return entity;
 		}
 	}
@@ -401,7 +429,7 @@ std::weak_ptr<entity> entity_manager_t::get_collisions(glm::vec3 _pos, entity* _
 		if (entity->flags & ENTITY_NO_COLLISION)
 			continue;
 
-		if (entity->grid_pos == common::vec_to_ivec(_pos)) {
+		if (entity->grid_pos == vec_to_ivec(_pos)) {
 			return entity;
 		}
 	}

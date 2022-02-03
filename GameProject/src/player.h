@@ -24,4 +24,5 @@ struct player_entity : public entity {
 	player_entity();
 	~player_entity();
 	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) override;
+	void draw() override;
 };

@@ -47,11 +47,12 @@ namespace renderer {
 	extern int screen_resolution_x, screen_resolution_y;
 
 	void init();
-	void clean();
+	void shutdown();
 
-	void start_drawing_frame();
+	void clear_screen();
+	void swap_screen_buffers();
+
 	void draw_models();
-	void stop_drawing_frame();
 
 	// TODO: Add Sprite Sheet
 	// TODO: Batch Rendering
@@ -67,6 +68,9 @@ namespace renderer {
 
 		bool is_paused;
 
+#ifdef _DEBUG
+		int index;
+#endif
 		model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position);
 		~model_entity_t();
 
@@ -74,6 +78,7 @@ namespace renderer {
 	};
 
 	namespace debug {
+		/*
 		struct debug_drawing {
 			unsigned int vao, vbo, ebo;
 
@@ -81,8 +86,10 @@ namespace renderer {
 
 			debug_drawing();
 			~debug_drawing();
-		};
 
+			void draw();
+		};
+		*/
 		void init_debug();
 		void clean_debug();
 
