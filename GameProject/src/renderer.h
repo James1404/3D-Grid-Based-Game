@@ -35,68 +35,41 @@ namespace colour {
 	static const glm::vec3 pink = glm::vec3(1, 0.75f, 0.75f);
 };
 
-namespace renderer {
-	extern SDL_Window* window;
-	extern SDL_GLContext context;
+extern SDL_GLContext context;
 
-	extern glm::mat4 projection;
-	extern glm::mat4 view;
+extern glm::mat4 projection_matrix;
+extern glm::mat4 view_matrix;
 
-	extern asset_manager_t asset_manager;
+extern int screen_resolution_x, screen_resolution_y;
 
-	extern int screen_resolution_x, screen_resolution_y;
+void init_renderer();
+void shutdown_renderer();
 
-	void init();
-	void shutdown();
+void renderer_clear_screen();
+void renderer_swap_screen_buffers();
 
-	void clear_screen();
-	void swap_screen_buffers();
+void renderer_draw();
 
-	void draw_models();
+struct model_entity_t {
+	std::shared_ptr<model_t> model;
+	std::shared_ptr<shader_t> shader;
+	std::shared_ptr<texture_t> texture;
 
-	// TODO: Add Sprite Sheet
-	// TODO: Batch Rendering
+	glm::vec3* position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
 
-	struct model_entity_t {
-		std::shared_ptr<model_t> model;
-		std::shared_ptr<shader_t> shader;
-		std::shared_ptr<texture_t> texture;
-
-		glm::vec3* position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
-
-		bool is_paused;
+	bool is_paused;
 
 #ifdef _DEBUG
-		int index;
+	int index;
 #endif
-		model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position);
-		~model_entity_t();
+	model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position);
+	~model_entity_t();
 
-		void draw();
-	};
+	void draw();
+};
 
-	namespace debug {
-		/*
-		struct debug_drawing {
-			unsigned int vao, vbo, ebo;
-
-			glm::vec3 colour;
-
-			debug_drawing();
-			~debug_drawing();
-
-			void draw();
-		};
-		*/
-		void init_debug();
-		void clean_debug();
-
-		void clear_debug_list();
-		void draw_debug();
-
-		void draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
-		void draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
-	}
-}
+void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
+void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
+void draw_primitives();

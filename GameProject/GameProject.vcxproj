@@ -177,6 +177,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\uuid.cpp" />
+    <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\assimp\include\assimp\aabb.h" />
@@ -262,6 +263,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\event.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\window.h" />
     <ClInclude Include="src\world_entities.h" />
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="includes\imgui\imconfig.h" />

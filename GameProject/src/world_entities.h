@@ -5,7 +5,7 @@
 
 struct block_entity : public entity
 {
-	renderer::model_entity_t model;
+	model_entity_t model;
 
 	block_entity()
 		: model("data/models/block.gltf", "data/models/diffuse.jpg", &visual_pos)
@@ -18,17 +18,12 @@ struct block_entity : public entity
 
 	}
 
-	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) override
+	void update(double dt) override
 	{
 #ifdef _DEBUG
 		model.index = index;
 #endif
 
 		visual_pos = grid_pos;
-	}
-
-	void draw() override
-	{
-		model.draw();
 	}
 };

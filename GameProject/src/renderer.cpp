@@ -1,60 +1,72 @@
 #include "renderer.h"
 
+#include "window.h"
+
 #include <memory>
 #include <map>
+#include <stack>
 
 //
 // ----- RENDERER -----
 //
 
-SDL_Window* renderer::window;
-SDL_GLContext renderer::context;
+SDL_GLContext context;
 
-glm::mat4 renderer::projection;
-glm::mat4 renderer::view = glm::mat4(1.0f);
+glm::mat4 projection_matrix;
+glm::mat4 view_matrix = glm::mat4(1.0f);
 
-int renderer::screen_resolution_x = 1280, renderer::screen_resolution_y = 720;
+int screen_resolution_x = 1280, screen_resolution_y = 720;
 
-asset_manager_t renderer::asset_manager;
+static std::vector<model_entity_t*> model_list;
 
-static std::vector<renderer::model_entity_t*> model_list;
+std::shared_ptr<shader_t> line_shader;
+unsigned int line_vao, line_vbo, line_ebo;
 
-void renderer::init() {
+void init_renderer() {
 	log_info("STARTING RENDERER INITIALIZATION");
 	
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
-	{
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-		window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_resolution_x, screen_resolution_y, SDL_WINDOW_OPENGL /*| SDL_WINDOW_RESIZABLE*/);
-		context = SDL_GL_CreateContext(window);
+	context = SDL_GL_CreateContext(window);
 
-
-		if (context != NULL) {
-			glewExperimental = GL_TRUE;
-			GLenum glewError = glewInit();
-			if (glewError != GLEW_OK) {
-				log_error("Error initializing GLEW! ", glewGetErrorString(glewError));
-			}
+	if (context != NULL) {
+		glewExperimental = GL_TRUE;
+		GLenum glewError = glewInit();
+		if (glewError != GLEW_OK) {
+			log_error("Error initializing GLEW! ", glewGetErrorString(glewError));
 		}
 	}
 
 	glEnable(GL_DEPTH_TEST);
 
-	projection = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
+	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
 
 	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
+
+	line_shader	= asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
+
+	glGenVertexArrays(1, &line_vao);
+	glBindVertexArray(line_vao);
+
+	glGenBuffers(1, &line_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+
+	glGenBuffers(1, &line_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
 }
 
-void renderer::shutdown() {
+void shutdown_renderer() {
+	glDeleteProgram(line_shader->id);
+	glDeleteBuffers(1, &line_vbo);
+	glDeleteBuffers(1, &line_ebo);
+	glDeleteVertexArrays(1, &line_vao);
+
 	SDL_GL_DeleteContext(context);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
 }
 
-void renderer::clear_screen() {
+void renderer_clear_screen() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -63,17 +75,19 @@ void renderer::clear_screen() {
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 }
 
-void renderer::swap_screen_buffers() {
+void renderer_swap_screen_buffers() {
 	SDL_GL_SwapWindow(window);
 }
 
-void renderer::draw_models() {
+void renderer_draw() {
 	for (auto& i : model_list) {
 		i->draw();
 	}
+
+	draw_primitives();
 }
 
-renderer::model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position)
+model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position)
 {
 	position = _position;
 	rotation = glm::vec3(0);
@@ -86,13 +100,13 @@ renderer::model_entity_t::model_entity_t(std::string _model_path,std::string _te
 	texture = asset_manager.load_texture_from_file(_texture_path);
 
 	glUseProgram(shader->id);
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection_matrix));
 	glUniform1i(glGetUniformLocation(shader->id, "Texture"), 0);
 
 	model_list.push_back(this);
 }
 
-renderer::model_entity_t::~model_entity_t() {
+model_entity_t::~model_entity_t() {
 	for (auto it = model_list.begin(); it != model_list.end();) {
 		if (*it == this)
 			it = model_list.erase(it);
@@ -101,7 +115,7 @@ renderer::model_entity_t::~model_entity_t() {
 	}
 }
 
-void renderer::model_entity_t::draw() {
+void model_entity_t::draw() {
 	if (is_paused)
 		return;
 
@@ -119,7 +133,7 @@ void renderer::model_entity_t::draw() {
 
 	new_model = glm::scale(new_model, scale);
 
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
 
 #ifdef _DEBUG
@@ -129,89 +143,11 @@ void renderer::model_entity_t::draw() {
 	model->draw(*shader);
 }
 
-#ifdef _DEBUG
 //
-// ----- DEBUG RENDERER -----
+// ----- PRIMITIVES -----
 //
 
-std::shared_ptr<shader_t> line_shader;
-unsigned int line_vao, line_vbo, line_ebo;
-/*
-renderer::debug::debug_drawing::debug_drawing() {
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-}
-
-renderer::debug::debug_drawing::~debug_drawing() {
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ebo);
-	glDeleteVertexArrays(1, &vao);
-}
-
-void renderer::debug::debug_drawing::draw()
-{
-	glUseProgram(line_shader->id);
-
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view));
-
-	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
-
-	glBindVertexArray(vao);
-	glDrawArrays(GL_LINES, 0, 2);
-}
-*/
-
-void renderer::debug::init_debug() {
-	line_shader	= asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
-
-	glGenVertexArrays(1, &line_vao);
-	glBindVertexArray(line_vao);
-
-	glGenBuffers(1, &line_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
-
-	glGenBuffers(1, &line_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
-}
-
-void renderer::debug::clean_debug() {
-	//clear_debug_list();
-	glDeleteProgram(line_shader->id);
-	glDeleteBuffers(1, &line_vbo);
-	glDeleteBuffers(1, &line_ebo);
-	glDeleteVertexArrays(1, &line_vao);
-}
-
-/*
-std::vector<std::shared_ptr<renderer::debug::debug_drawing>> line_draw_list;
-
-void renderer::debug::clear_debug_list () {
-	line_draw_list.clear();
-}
-
-void renderer::debug::draw_debug() {
-	for(auto& line : line_draw_list) {
-		glUseProgram(line_shader->id);
-
-		glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view));
-
-		glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(line->colour));
-
-		glBindVertexArray(line->vao);
-		glDrawArrays(GL_LINES, 0, 2);
-	}
-}
-
-*/
-void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
+static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF
 	float vertices[] = {
 		p1.x, p1.y, p1.z,	// first point
@@ -235,8 +171,8 @@ void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const gl
 
 	glUseProgram(line_shader->id);
 
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view_matrix));
 
 	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
 
@@ -245,48 +181,86 @@ void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const gl
 	//line_draw_list.push_back(drawing);
 }
 
-void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
+static void renderer_draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
 	glm::vec3 new_pos = pos + -.5f;
-	draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
-	draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
-	draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
+	renderer_draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
+	renderer_draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
+	renderer_draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
 
-	draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
-	draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
+	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
+	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
+	renderer_draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	renderer_draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
-	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
+	renderer_draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
+	renderer_draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
 
-	draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
-	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
+	renderer_draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
+	renderer_draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
-#else
-/*
-renderer::debug::debug_drawing::debug_drawing()
-{}
 
-renderer::debug::debug_drawing::~debug_drawing()
-{}
-*/
-void renderer::debug::init_debug()
-{}
+enum class primitive_data_type { line, wireframe_cube };
+struct primitive_data
+{
+	primitive_data_type type;
 
-void renderer::debug::clean_debug()
-{}
+	struct
+	{
+		glm::vec3 pos, size;
+	} wireframe_cube;
+	struct
+	{
+		glm::vec3 p1, p2;
+	} line;
 
-void renderer::debug::clear_debug_list()
-{}
+	glm::vec3 colour;
 
-void renderer::debug::draw_debug()
-{}
+	static primitive_data new_primitive_data(primitive_data_type type)
+	{
+		primitive_data data;
+		data.type = type;
+		return data;
+	}
+};
 
-void renderer::debug::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour)
-{}
+std::stack<primitive_data> primitive_draw_stack;
 
-void renderer::debug::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour)
-{}
-#endif // _DEBUG
+void draw_primitives()
+{
+	while (!primitive_draw_stack.empty())
+	{
+		const auto& primitive = primitive_draw_stack.top();
+
+		switch (primitive.type)
+		{
+		case primitive_data_type::line:
+			renderer_draw_line(primitive.line.p1, primitive.line.p2, primitive.colour);
+			break;
+		case primitive_data_type::wireframe_cube:
+			renderer_draw_box_wireframe(primitive.wireframe_cube.pos, primitive.wireframe_cube.size, primitive.colour);
+			break;
+		}
+
+		primitive_draw_stack.pop();
+	}
+}
+
+void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour)
+{
+	auto data = primitive_data::new_primitive_data(primitive_data_type::line);
+	data.line.p1 = p1;
+	data.line.p2 = p2;
+	data.colour = colour;
+	primitive_draw_stack.push(data);
+}
+
+void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour)
+{
+	auto data = primitive_data::new_primitive_data(primitive_data_type::wireframe_cube);
+	data.wireframe_cube.pos = pos;
+	data.wireframe_cube.size = size;
+	data.colour = colour;
+	primitive_draw_stack.push(data);
+}

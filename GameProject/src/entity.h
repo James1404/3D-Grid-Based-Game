@@ -51,8 +51,7 @@ struct entity_manager_t {
 	entity_manager_t();
 	~entity_manager_t();
 
-	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager);
-	void draw();
+	void update(double dt);
 
 	void clear_data();
 
@@ -103,18 +102,17 @@ struct entity {
 	glm::vec3 visual_pos;
 
 	entity()
-		: id(0), flags(0), name(""), grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0),
-		visual_pos(0, 0, 0)
+		: id(0), index(0), flags(0), name(""), grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0),
+		visual_pos(0, 0, 0), manager(nullptr)
 	{
-		//log_info("INITIALIZED ENTITY ", this);
+		log_info("INITIALIZED ENTITY ", this);
 	}
 
 	virtual ~entity() {
 		log_info("DESTROYED ENTITY ", this);
 	}
 
-	virtual void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) {}
-	virtual void draw() {}
+	virtual void update(double dt) {}
 
 	bool is_grounded(glm::ivec3 _pos) {
 		return manager->check_collisions(_pos + glm::ivec3(0, -1, 0), this);

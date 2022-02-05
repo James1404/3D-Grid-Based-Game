@@ -36,22 +36,14 @@ float currentTime = SDL_GetTicks() / 1000.0f;
 float accumulator = 0.0f;
 float tick_rate = 1.0f / 24.0f;
 
-void entity_manager_t::update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager)
+void entity_manager_t::update(double dt)
 {
 	if (!is_paused)
 	{
 		for (auto& _entity : entities)
 		{
-			_entity->update(dt, input_manager, camera_manager);
+			_entity->update(dt);
 		}
-	}
-}
-
-void entity_manager_t::draw()
-{
-	for(auto& _entity : entities)
-	{
-		_entity->draw();
 	}
 }
 

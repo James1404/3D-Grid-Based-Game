@@ -5,6 +5,9 @@
 
 const glm::vec3 worldUp = glm::vec3(0, 1, 0);
 
+static std::map<std::string, std::shared_ptr<camera_t>> cameras;
+static std::weak_ptr<camera_t> current_camera;
+
 camera_t::camera_t()
 	: position(0, 0, 0), rotation(0, -90, 0),
 	  front(0,0,-1), right(0), up(worldUp)
@@ -27,14 +30,7 @@ glm::mat4 camera_t::getViewMatrix() {
 	return glm::lookAt(position, position + front, up);
 }
 
-void camera_manager_t::set_camera(std::string _id) {
-	glm::vec3 pos{}, rot{};
-	if (auto temp_camera = current_camera.lock())
-	{
-		pos = temp_camera->position;
-		rot = temp_camera->rotation;
-	}
-
+void set_camera(std::string _id) {
 	auto it = cameras.find(_id);
 	if (it == cameras.end()) {
 		cameras.emplace(_id, std::make_shared<camera_t>());
@@ -49,12 +45,9 @@ void camera_manager_t::set_camera(std::string _id) {
 			current_camera = it->second;
 		}
 	}
-
-	current_camera.lock()->position = pos;
-	current_camera.lock()->rotation = rot;
 }
 
-std::weak_ptr<camera_t> camera_manager_t::get_camera(std::string _id) {
+std::weak_ptr<camera_t> get_camera(std::string _id) {
 	auto it = cameras.find(_id);
 	if (it != cameras.end()) {
 		return it->second;
@@ -63,8 +56,8 @@ std::weak_ptr<camera_t> camera_manager_t::get_camera(std::string _id) {
 	return std::weak_ptr<camera_t>();
 }
 
-void camera_manager_t::update(double dt) {
+void update_camera() {
 	if (auto tmp_cam = current_camera.lock()) {
-		renderer::view = tmp_cam->getViewMatrix();
+		view_matrix = tmp_cam->getViewMatrix();
 	}
 }

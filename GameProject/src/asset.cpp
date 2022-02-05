@@ -300,3 +300,5 @@ std::shared_ptr<model_t> asset_manager_t::load_model_from_file(std::string path)
 
 	return result;
 }
+
+asset_manager_t asset_manager;

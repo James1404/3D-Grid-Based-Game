@@ -4,10 +4,23 @@
 #include <sstream>
 #include <memory>
 
+#include "window.h"
 #include "renderer.h"
 #include "log.h"
 
-input_manager_t::input_manager_t() {
+static const uint8_t* keyboard_state;
+static uint8_t* previous_keyboard_state;
+static int keyboard_state_size;
+
+static Uint32 mouse_state;
+static Uint32 previous_mouse_state;
+static glm::ivec2 mouse_position;
+static glm::ivec2 previous_mouse_position;
+
+static std::multimap<std::string, unsigned int> mapped_inputs;
+
+void init_input()
+{
 	keyboard_state = SDL_GetKeyboardState(&keyboard_state_size);
 	previous_keyboard_state = new Uint8[keyboard_state_size];
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
@@ -15,22 +28,27 @@ input_manager_t::input_manager_t() {
 	log_info("INITIALIZED INPUT");
 }
 
-input_manager_t::~input_manager_t() {
+void shutdown_input()
+{
 	delete[] previous_keyboard_state;
 	previous_keyboard_state = NULL;
 }
 
-void input_manager_t::update() {
+void update_input()
+{
 	previous_mouse_state = mouse_state;
 	previous_mouse_position = mouse_position;
 	mouse_state = SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 }
 
-bool input_manager_t::button_down(std::string button) {
+bool input_button_down(std::string button)
+{
 	auto range = mapped_inputs.equal_range(button);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (keyboard_state[i->second] && !previous_keyboard_state[i->second]) {
+	for (auto i = range.first; i != range.second; ++i)
+	{
+		if (keyboard_state[i->second] && !previous_keyboard_state[i->second])
+		{
 			return true;
 		}
 	}
@@ -38,7 +56,7 @@ bool input_manager_t::button_down(std::string button) {
 	return false;
 }
 
-bool input_manager_t::button_pressed(std::string button) {
+bool input_button_pressed(std::string button) {
 	auto range = mapped_inputs.equal_range(button);
 	for (auto i = range.first; i != range.second; ++i) {
 		if (keyboard_state[i->second]) {
@@ -49,7 +67,7 @@ bool input_manager_t::button_pressed(std::string button) {
 	return false;
 }
 
-bool input_manager_t::button_released(std::string button) {
+bool input_button_released(std::string button) {
 	auto range = mapped_inputs.equal_range(button);
 	for (auto i = range.first; i != range.second; ++i) {
 		if (!keyboard_state[i->second] && previous_keyboard_state[i->second]) {
@@ -60,19 +78,19 @@ bool input_manager_t::button_released(std::string button) {
 	return false;
 }
 
-bool input_manager_t::key_down(SDL_Scancode key) {
+bool input_key_down(SDL_Scancode key) {
 	return keyboard_state[key] && !previous_keyboard_state[key];
 }
 
-bool input_manager_t::key_pressed(SDL_Scancode key) {
+bool input_key_pressed(SDL_Scancode key) {
 	return keyboard_state[key];
 }
 
-bool input_manager_t::key_released(SDL_Scancode key) {
+bool input_key_released(SDL_Scancode key) {
 	return !keyboard_state[key] && previous_keyboard_state[key];
 }
 
-bool input_manager_t::mouse_button_down(mouse_button button) {
+bool input_mouse_button_down(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
@@ -86,7 +104,7 @@ bool input_manager_t::mouse_button_down(mouse_button button) {
 	return (mouse_state & mask) && !(previous_mouse_state & mask);
 }
 
-bool input_manager_t::mouse_button_pressed(mouse_button button) {
+bool input_mouse_button_pressed(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
@@ -100,7 +118,7 @@ bool input_manager_t::mouse_button_pressed(mouse_button button) {
 	return (mouse_state & mask);
 }
 
-bool input_manager_t::mouse_button_released(mouse_button button) {
+bool input_mouse_button_released(mouse_button button) {
 	Uint32 mask = 0;
 
 	switch (button) {
@@ -114,50 +132,50 @@ bool input_manager_t::mouse_button_released(mouse_button button) {
 	return !(mouse_state & mask) && (previous_mouse_state & mask);
 }
 
-const glm::ivec2 input_manager_t::get_mouse_pos() {
+const glm::ivec2 input_get_mouse_pos() {
 	return mouse_position;
 }
 
-const glm::ivec2 input_manager_t::get_previous_mouse_pos() {
+const glm::ivec2 input_get_previous_mouse_pos() {
 	return previous_mouse_position;
 }
 
-const glm::ivec2 input_manager_t::get_mouse_delta() {
+const glm::ivec2 input_get_mouse_delta() {
 	return previous_mouse_position - mouse_position;
 }
 
-const glm::ivec2 input_manager_t::get_relative_mouse_pos() {
+const glm::ivec2 input_get_relative_mouse_pos() {
 	// return mouse pos relative to resolution;
 	glm::ivec2 relative_mouse_pos;
-	relative_mouse_pos.x = mouse_position.x / (renderer::screen_resolution_x / 2) - 1;
-	relative_mouse_pos.y = mouse_position.y / (renderer::screen_resolution_y / 2) - 1;
+	relative_mouse_pos.x = mouse_position.x / (screen_resolution_x / 2) - 1;
+	relative_mouse_pos.y = mouse_position.y / (screen_resolution_y / 2) - 1;
 
 	return relative_mouse_pos;
 }
 
-const glm::ivec2 input_manager_t::get_relative_previous_mouse_pos() {
+const glm::ivec2 input_get_relative_previous_mouse_pos() {
 	// return previous mouse pos relative to resolution;
  	glm::ivec2 previous_relative_mouse_pos;
-	previous_relative_mouse_pos.x = previous_mouse_position.x / (renderer::screen_resolution_x / 2) - 1;
-	previous_relative_mouse_pos.y = previous_mouse_position.y / (renderer::screen_resolution_y / 2) - 1;
+	previous_relative_mouse_pos.x = previous_mouse_position.x / (screen_resolution_x / 2) - 1;
+	previous_relative_mouse_pos.y = previous_mouse_position.y / (screen_resolution_y / 2) - 1;
 
 	return previous_relative_mouse_pos;
 }
 
-const glm::ivec2 input_manager_t::get_relative_mouse_delta() {
+const glm::ivec2 input_get_relative_mouse_delta() {
 	// return mouse delta relative to resolution;
 	glm::ivec2 relative_mouse_pos;
-	relative_mouse_pos.x = mouse_position.x / renderer::screen_resolution_x - 1;
-	relative_mouse_pos.y = mouse_position.y / renderer::screen_resolution_y - 1;
+	relative_mouse_pos.x = mouse_position.x / screen_resolution_x - 1;
+	relative_mouse_pos.y = mouse_position.y / screen_resolution_y - 1;
 
  	glm::ivec2 previous_relative_mouse_pos;
-	previous_relative_mouse_pos.x = previous_mouse_position.x / renderer::screen_resolution_x - 1;
-	previous_relative_mouse_pos.y = previous_mouse_position.y / renderer::screen_resolution_y - 1;
+	previous_relative_mouse_pos.x = previous_mouse_position.x / screen_resolution_x - 1;
+	previous_relative_mouse_pos.y = previous_mouse_position.y / screen_resolution_y - 1;
 
 	return previous_relative_mouse_pos - relative_mouse_pos;
 }
 
-void input_manager_t::save() {
+void save_input() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {
 		for (auto input : mapped_inputs) {
@@ -169,7 +187,7 @@ void input_manager_t::save() {
 	log_info("SAVED INPUT");
 }
 
-void input_manager_t::load() {
+void load_input() {
 	mapped_inputs.clear();
 
 	log_info("RETRIEVING INPUT FILE");
@@ -219,8 +237,8 @@ void input_manager_t::load() {
 
 		mapped_inputs.insert({ "Exit", SDL_SCANCODE_ESCAPE });
 
-		save();
-		load();
+		save_input();
+		load_input();
 	}
 
 	ifs.close();

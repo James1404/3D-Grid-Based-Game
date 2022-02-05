@@ -21,13 +21,6 @@ struct camera_t {
 	~camera_t();
 };
 
-struct camera_manager_t {
-	// TODO: change from shared to weak ptr
-	std::map<std::string, std::shared_ptr<camera_t>> cameras;
-	std::weak_ptr<camera_t> current_camera;
-
-	void set_camera(std::string _id);
-	std::weak_ptr<camera_t> get_camera(std::string _id);
-
-	void update(double dt);
-};
+void set_camera(std::string _id);
+std::weak_ptr<camera_t> get_camera(std::string _id);
+void update_camera();

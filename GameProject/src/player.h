@@ -6,7 +6,7 @@
 #include "common.h"
 
 struct player_entity : public entity {
-	renderer::model_entity_t model;
+	model_entity_t model;
 
 	glm::vec3 vel;
 
@@ -23,6 +23,5 @@ struct player_entity : public entity {
 
 	player_entity();
 	~player_entity();
-	void update(double dt, input_manager_t& input_manager, camera_manager_t& camera_manager) override;
-	void draw() override;
+	void update(double dt) override;
 };

@@ -78,3 +78,5 @@ struct asset_manager_t
 	std::shared_ptr<texture_t> load_texture_from_file(std::string path);
 	std::shared_ptr<model_t> load_model_from_file(std::string path);
 };
+
+extern asset_manager_t asset_manager;
