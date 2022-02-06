@@ -9,7 +9,7 @@
 #include <memory>
 
 player_entity::player_entity()
-	: model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos),
+	: model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale),
 	vel(0, 0, 0), interp_speed(walk_speed)
 {
 	name = "player";

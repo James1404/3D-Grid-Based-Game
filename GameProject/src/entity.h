@@ -99,11 +99,12 @@ struct entity {
 	entity_manager_t* manager;
 
 	glm::ivec3 grid_pos, previous_grid_pos;
-	glm::vec3 visual_pos;
+	glm::vec3 visual_pos, visual_rotation, visual_scale;
 
 	entity()
 		: id(0), index(0), flags(0), name(""), grid_pos(0, 0, 0), previous_grid_pos(0, 0, 0),
-		visual_pos(0, 0, 0), manager(nullptr)
+		visual_pos(0, 0, 0), visual_rotation(0, 0, 0), visual_scale(1, 1, 1),
+		manager(nullptr)
 	{
 		log_info("INITIALIZED ENTITY ", this);
 	}

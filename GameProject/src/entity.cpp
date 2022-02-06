@@ -215,7 +215,7 @@ std::weak_ptr<entity> entity_manager_t::find_entity_by_index(int _index) const
 	if (it != entity_index_lookup.end())
 		return it->second;
 
-	log_warning("Entity with index does not exist");
+	//log_warning("Entity with index does not exist");
 	return std::weak_ptr<entity>();
 }
 

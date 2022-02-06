@@ -19,9 +19,6 @@ int screen_resolution_x = 1280, screen_resolution_y = 720;
 
 static std::vector<model_entity_t*> model_list;
 
-std::shared_ptr<shader_t> line_shader;
-unsigned int line_vao, line_vbo, line_ebo;
-
 void init_renderer() {
 	log_info("STARTING RENDERER INITIALIZATION");
 	
@@ -45,23 +42,14 @@ void init_renderer() {
 
 	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 
-	line_shader	= asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
+	// Set aspect ratio
+	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 
-	glGenVertexArrays(1, &line_vao);
-	glBindVertexArray(line_vao);
-
-	glGenBuffers(1, &line_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
-
-	glGenBuffers(1, &line_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+	init_primitives();
 }
 
 void shutdown_renderer() {
-	glDeleteProgram(line_shader->id);
-	glDeleteBuffers(1, &line_vbo);
-	glDeleteBuffers(1, &line_ebo);
-	glDeleteVertexArrays(1, &line_vao);
+	shutdown_primitives();
 
 	SDL_GL_DeleteContext(context);
 }
@@ -70,9 +58,6 @@ void renderer_clear_screen() {
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Set aspect ratio
-	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 }
 
 void renderer_swap_screen_buffers() {
@@ -87,11 +72,11 @@ void renderer_draw() {
 	draw_primitives();
 }
 
-model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position)
+model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale)
 {
 	position = _position;
-	rotation = glm::vec3(0);
-	scale = glm::vec3(1);
+	rotation = _rotation;
+	scale = _scale;
 
 	is_paused = false;
 
@@ -127,11 +112,11 @@ void model_entity_t::draw() {
 	glm::mat4 new_model = glm::mat4(1.0f);
 	new_model = glm::translate(new_model, *position);
 	//new_model = glm::rotate(new_model, rotation);
-	new_model = glm::rotate(new_model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-	new_model = glm::rotate(new_model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-	new_model = glm::rotate(new_model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+	new_model = glm::rotate(new_model, glm::radians(rotation->x), glm::vec3(1, 0, 0));
+	new_model = glm::rotate(new_model, glm::radians(rotation->y), glm::vec3(0, 1, 0));
+	new_model = glm::rotate(new_model, glm::radians(rotation->z), glm::vec3(0, 0, 1));
 
-	new_model = glm::scale(new_model, scale);
+	new_model = glm::scale(new_model, *scale);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
@@ -146,6 +131,31 @@ void model_entity_t::draw() {
 //
 // ----- PRIMITIVES -----
 //
+
+static std::shared_ptr<shader_t> line_shader;
+static unsigned int line_vao, line_vbo, line_ebo;
+
+void init_primitives()
+{
+	line_shader = asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
+
+	glGenVertexArrays(1, &line_vao);
+	glBindVertexArray(line_vao);
+
+	glGenBuffers(1, &line_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
+
+	glGenBuffers(1, &line_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+}
+
+void shutdown_primitives()
+{
+	glDeleteProgram(line_shader->id);
+	glDeleteBuffers(1, &line_vbo);
+	glDeleteBuffers(1, &line_ebo);
+	glDeleteVertexArrays(1, &line_vao);
+}
 
 static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF

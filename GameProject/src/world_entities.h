@@ -8,7 +8,7 @@ struct block_entity : public entity
 	model_entity_t model;
 
 	block_entity()
-		: model("data/models/block.gltf", "data/models/diffuse.jpg", &visual_pos)
+		: model("data/models/block.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale)
 	{
 		name = "block";
 	}

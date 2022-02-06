@@ -56,15 +56,15 @@ struct model_entity_t {
 	std::shared_ptr<texture_t> texture;
 
 	glm::vec3* position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
+	glm::vec3* rotation;
+	glm::vec3* scale;
 
 	bool is_paused;
 
 #ifdef _DEBUG
 	int index;
 #endif
-	model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position);
+	model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale);
 	~model_entity_t();
 
 	void draw();
@@ -73,3 +73,5 @@ struct model_entity_t {
 void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
 void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
 void draw_primitives();
+void init_primitives();
+void shutdown_primitives();

@@ -11,6 +11,8 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include <ImGuizmo.h>
+
 #include <string>
 
 #include "window.h"
@@ -19,16 +21,16 @@
 #include "entity.h"
 #include "camera.h"
 #include "log.h"
+#include "common.h"
 
 #include "player.h"
 #include "world_entities.h"
 
 static entity_manager_t* entity_manager;
 
-static glm::vec3 cursor_pos{ 0 };
+//static glm::vec3 cursor_pos{ 0 };
 
 static std::vector<std::weak_ptr<entity>> selected_entities;
-static bool is_grabbed = false;
 
 enum class editor_mode {
 	placement_cam = 0,
@@ -43,6 +45,8 @@ static bool is_cam_control = false;
 static bool can_use_keyboard = true;
 static bool can_use_mouse = true;
 
+static int gizmo_type = -1;
+
 static int read_framebuffer_pixel(int x, int y)
 {
 	bind_editor_framebuffer();
@@ -53,26 +57,6 @@ static int read_framebuffer_pixel(int x, int y)
 
 	unbind_editor_framebuffer();
 	return pixel_data;
-}
-
-static void move_cursor(glm::ivec3 _vel)
-{
-	if (_vel == glm::ivec3(0))
-		return;
-
-	cursor_pos += _vel;
-
-	if (is_grabbed)
-	{
-		for (auto selected : selected_entities)
-		{
-			if (auto tmp_entity = selected.lock())
-			{
-				tmp_entity->grid_pos += _vel;
-				tmp_entity->visual_pos = tmp_entity->grid_pos;
-			}
-		}
-	}
 }
 
 static void clear_selected_entities()
@@ -116,8 +100,10 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 
 		ImGui::Text("Index: %i", tmp_entity->index);
 		ImGui::Text("ID: %llu", tmp_entity->id);
-		ImGui::Text("flags: %i", tmp_entity->flags);
 
+		// GRID POSITIONS
+		ImGui::Separator();
+		ImGui::Text("----- grid transforms -----");
 		int vec3i[3] = { tmp_entity->grid_pos.x, tmp_entity->grid_pos.y, tmp_entity->grid_pos.z };
 		ImGui::DragInt3("grid pos", vec3i, 0.03f);
 		glm::ivec3 new_grid_pos = { vec3i[0], vec3i[1], vec3i[2] };
@@ -127,11 +113,27 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 			tmp_entity->visual_pos = tmp_entity->grid_pos;
 		}
 
-		float vec3f[3] = { tmp_entity->visual_pos.x, tmp_entity->visual_pos.y, tmp_entity->visual_pos.z };
-		ImGui::DragFloat3("visual pos", vec3f, 0.03f);
-		glm::vec3 new_visual_pos = { vec3f[0], vec3f[1], vec3f[2] };
+		// VISUAL POSITIONS
+		ImGui::Separator();
+		ImGui::Text("----- visual transforms -----");
+		float pos_vec3f[3] = { tmp_entity->visual_pos.x, tmp_entity->visual_pos.y, tmp_entity->visual_pos.z };
+		ImGui::DragFloat3("position", pos_vec3f, 0.03f);
+		glm::vec3 new_visual_pos = { pos_vec3f[0], pos_vec3f[1], pos_vec3f[2] };
 		tmp_entity->visual_pos = new_visual_pos;
 
+		float rot_vec3f[3] = { tmp_entity->visual_rotation.x, tmp_entity->visual_rotation.y, tmp_entity->visual_rotation.z };
+		ImGui::DragFloat3("rotation", rot_vec3f);
+		glm::vec3 new_visual_rot = { rot_vec3f[0], rot_vec3f[1], rot_vec3f[2] };
+		tmp_entity->visual_rotation = new_visual_rot;
+
+		float scl_vec3f[3] = { tmp_entity->visual_scale.x, tmp_entity->visual_scale.y, tmp_entity->visual_scale.z };
+		ImGui::DragFloat3("scale", scl_vec3f, 0.03f);
+		glm::vec3 new_visual_scl = { scl_vec3f[0], scl_vec3f[1], scl_vec3f[2] };
+		tmp_entity->visual_scale = new_visual_scl;
+
+		// FLAGS
+		ImGui::Separator();
+		ImGui::Text("flags: %i", tmp_entity->flags);
 		if (ImGui::Button("DISABLED", { ImGui::GetWindowSize().x * button_width, 0.0f }))
 			ENTITY_FLAG_TOGGLE(tmp_entity->flags, ENTITY_DISABLED);
 
@@ -156,6 +158,112 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 	}
 }
 
+enum transform_type_t
+{
+	GRID_EDITING,
+	VISUAL_EDITING
+};
+
+static transform_type_t transform_type = GRID_EDITING;
+
+static void draw_gizmo_at_selected_entity()
+{
+	if (!selected_entities.empty())
+	{
+		if (auto entity = selected_entities.front().lock())
+		{
+			ImGuizmo::SetOrthographic(false);
+			//ImGuizmo::SetDrawlist();
+
+			float width = (float)ImGui::GetWindowWidth();
+			float height = (float)ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(0, 0, screen_resolution_x, screen_resolution_y);
+
+			if (transform_type == GRID_EDITING)
+			{
+				glm::mat4 transform = glm::mat4(1.0f);
+
+				transform = glm::translate(transform, (glm::vec3)entity->grid_pos);
+
+				float snap_values[3] = { 1.0f, 1.0f, 1.0f };
+
+				ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
+					ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::WORLD, glm::value_ptr(transform),
+					nullptr, snap_values);
+
+				auto og_pos = entity->grid_pos;
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 pos, rot, scl;
+					if (decompose_transform(transform, pos, rot, scl))
+					{
+						for (auto& _entity : selected_entities)
+						{
+							if (auto tmp_entity = _entity.lock())
+							{
+								auto offset = pos - (glm::vec3)og_pos;
+								tmp_entity->grid_pos += vec_to_ivec(offset);
+								tmp_entity->visual_pos = tmp_entity->grid_pos;
+							}
+						}
+					}
+				}
+			}
+			else if (transform_type == VISUAL_EDITING)
+			{
+				glm::mat4 transform = glm::mat4(1.0f);
+
+				transform = glm::translate(transform, entity->visual_pos);
+
+				transform = glm::rotate(transform, glm::radians(entity->visual_rotation.x), glm::vec3(1, 0, 0));
+				transform = glm::rotate(transform, glm::radians(entity->visual_rotation.y), glm::vec3(0, 1, 0));
+				transform = glm::rotate(transform, glm::radians(entity->visual_rotation.z), glm::vec3(0, 0, 1));
+
+				transform = glm::scale(transform, entity->visual_scale);
+
+				bool snap = input_key_pressed(SDL_SCANCODE_LCTRL);
+				float snap_value = 0.5f;
+
+				if (gizmo_type == ImGuizmo::OPERATION::ROTATE)
+				{
+					snap_value = 45.0f;
+				}
+
+				float snap_values[3] = { snap_value, snap_value, snap_value };
+
+				ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
+					(ImGuizmo::OPERATION)gizmo_type, ImGuizmo::WORLD, glm::value_ptr(transform),
+					nullptr, snap ? snap_values : nullptr);
+
+				auto og_pos = entity->visual_pos;
+				auto og_rot = entity->visual_rotation;
+				auto og_scl = entity->visual_scale;
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 pos, rot, scl;
+					if (decompose_transform(transform, pos, rot, scl))
+					{
+						for (auto& _entity : selected_entities)
+						{
+							if (auto tmp_entity = _entity.lock())
+							{
+								auto offset = pos - og_pos;
+
+								entity->visual_pos += offset;
+
+								//auto delta_rot = rot - entity->visual_rotation;
+								entity->visual_rotation = rot;
+								//entity->visual_rotation += delta_rot;
+
+								entity->visual_scale = scl;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 void init_editor(entity_manager_t& _entity_manager)
 {
@@ -301,6 +409,7 @@ void draw_editor_framebuffer()
 	glEnable(GL_DEPTH_TEST);
 }
 
+/*
 static void placement_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 {
 	cursor_pos = vec_to_ivec(cursor_pos);
@@ -374,6 +483,7 @@ static void placement_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 		}
 	}
 }
+*/
 
 static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 {
@@ -383,12 +493,11 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 	is_cam_control = input_mouse_button_pressed(mouse_button::MOUSE_RIGHT);
 	if (is_cam_control)
 	{
-		glm::vec3 new_pos = cursor_pos;
 		float cam_speed = cam_movement_speed;
 		if (input_key_pressed(SDL_SCANCODE_LSHIFT))
-			cam_speed = 0.3f;
+			cam_speed = 0.1f;
 		else if (input_key_pressed(SDL_SCANCODE_LALT))
-			cam_speed = 0.005f;
+			cam_speed = 0.003f;
 
 		cam_speed *= dt;
 
@@ -426,9 +535,7 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 			cam->position -= cam->up * cam_speed;
 		}
 
-		cursor_pos = cam->position;
-
-		SDL_SetRelativeMouseMode(SDL_TRUE);
+		//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 		glm::vec3 camera_rotation = glm::vec3(input_get_mouse_delta().y, -input_get_mouse_delta().x, 0.0f);
 		camera_rotation *= cam_rotation_speed;
@@ -447,7 +554,7 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 	}
 	else
 	{
-		SDL_SetRelativeMouseMode(SDL_FALSE);
+		//SDL_SetRelativeMouseMode(SDL_FALSE);
 
 		if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
 		{
@@ -456,21 +563,54 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
 
 			auto entity = entity_manager->find_entity_by_index(entity_index);
-			if(entity.lock())
+			if (input_key_pressed(SDL_SCANCODE_LSHIFT))
 			{
-				if (input_key_pressed(SDL_SCANCODE_LSHIFT))
+				if (entity.lock())
 				{
 					add_multiselect_entity(entity);
-				}
-				else
-				{
-					select_entity(entity);
 				}
 			}
 			else
 			{
-				clear_selected_entities();
+				if (entity.lock())
+				{
+					clear_selected_entities();
+					select_entity(entity);
+				}
+				else
+				{
+					clear_selected_entities();
+				}
 			}
+		}
+
+		if (input_key_down(SDL_SCANCODE_TAB))
+		{
+			if (transform_type == GRID_EDITING)
+			{
+				transform_type = VISUAL_EDITING;
+			}
+			else if (transform_type == VISUAL_EDITING)
+			{
+				transform_type = GRID_EDITING;
+			}
+		}
+
+		if (input_key_down(SDL_SCANCODE_Q))
+		{
+			gizmo_type = -1;
+		}
+		else if (input_key_down(SDL_SCANCODE_W))
+		{
+			gizmo_type = ImGuizmo::OPERATION::TRANSLATE;
+		}
+		else if (input_key_down(SDL_SCANCODE_E))
+		{
+			gizmo_type = ImGuizmo::OPERATION::ROTATE;
+		}
+		else if (input_key_down(SDL_SCANCODE_R))
+		{
+			gizmo_type = ImGuizmo::OPERATION::SCALE;
 		}
 	}
 }
@@ -484,46 +624,10 @@ void update_editor(double dt)
 
 	if (auto editor_cam = get_camera("Editor").lock())
 	{
-		if (input_key_down(SDL_SCANCODE_TAB))
-		{
-			if (mode == editor_mode::free_cam)
-			{
-				mode = editor_mode::placement_cam;
-			}
-			else if (mode == editor_mode::placement_cam)
-			{
-				mode = editor_mode::free_cam;
-			}
-		}
-
-		switch (mode)
-		{
-		case editor_mode::free_cam:
-			free_cam_mode_update(dt, editor_cam);
-			break;
-		case editor_mode::placement_cam:
-			placement_cam_mode_update(dt, editor_cam);
-			break;
-		default:
-			break;
-		}
+		free_cam_mode_update(dt, editor_cam);
 	}
 
-	if (input_key_down(SDL_SCANCODE_G))
-	{
-		if (!selected_entities.empty())
-			is_grabbed = !is_grabbed;
-		else
-			is_grabbed = false;
-	}
-
-	if (input_key_down(SDL_SCANCODE_R))
-	{
-		clear_selected_entities();
-		is_grabbed = false;
-	}
-
-	if (input_key_down(SDL_SCANCODE_X))
+	if (input_key_down(SDL_SCANCODE_X) || input_key_down(SDL_SCANCODE_DELETE))
 	{
 		if (!selected_entities.empty())
 		{
@@ -533,10 +637,6 @@ void update_editor(double dt)
 			}
 			clear_selected_entities();
 		}
-		else
-		{
-			entity_manager->remove_entity(entity_manager->find_entity_by_position(cursor_pos));
-		}
 	}
 
 	for (auto selected : selected_entities)
@@ -544,6 +644,14 @@ void update_editor(double dt)
 		if (auto tmp_entity = selected.lock())
 		{
 			add_primitive_wireframe_cube(tmp_entity->grid_pos, glm::vec3(1), colour::white);
+
+			if (transform_type == VISUAL_EDITING)
+			{
+				if (tmp_entity->visual_pos != (glm::vec3)tmp_entity->grid_pos)
+				{
+					add_primitive_wireframe_cube(tmp_entity->visual_pos, glm::vec3(1), colour::red);
+				}
+			}
 		}
 	}
 }
@@ -553,11 +661,14 @@ void draw_editor()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window);
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	ImGuiIO& io = ImGui::GetIO();
 
 	can_use_mouse = !io.WantCaptureMouse;
 	can_use_keyboard = !io.WantCaptureKeyboard;
+	
+	draw_gizmo_at_selected_entity();
 
 	static bool p_open = false;
 
@@ -578,6 +689,23 @@ void draw_editor()
 			ImGui::Text("Resolution: %i / %i", screen_resolution_x, screen_resolution_y);
 			ImGui::Text("Number of entities %i", entity_manager->entities.size());
 
+			ImGui::End();
+		}
+	}
+
+	/* GIZMO SETTINGS */ {
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+		float window_size_x = 200.0f;
+		ImGui::SetNextWindowPos(ImVec2(work_size.x / 2 - (window_size_x / 2), 0), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+		ImGui::SetNextWindowSize(ImVec2(window_size_x, 30.0f), ImGuiCond_Always);
+
+		if (ImGui::Begin("GIZMO SETTINGS", &p_open, window_flags)) {
 			ImGui::End();
 		}
 	}
