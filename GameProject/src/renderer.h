@@ -42,6 +42,8 @@ extern glm::mat4 view_matrix;
 
 extern int screen_resolution_x, screen_resolution_y;
 
+extern float near_clip_plane, far_clip_plane;
+
 void init_renderer();
 void shutdown_renderer();
 

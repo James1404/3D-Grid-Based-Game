@@ -68,6 +68,38 @@ inline glm::vec3 sqrt_magnitude(glm::vec3 vec)
 	return vec;
 }
 
+inline glm::vec3 shortest_vector_value(glm::vec3 vec)
+{
+	glm::vec3 abs_vec = glm::abs(vec);
+
+	if (abs_vec.x > abs_vec.y && abs_vec.x > abs_vec.z)
+	{
+		vec.y = 0;
+		vec.z = 0;
+	}
+	else if (abs_vec.y > abs_vec.x && abs_vec.y > abs_vec.z)
+	{
+		vec.x = 0;
+		vec.z = 0;
+	}
+	else if (abs_vec.z > abs_vec.y && abs_vec.z > abs_vec.x)
+	{
+		vec.x = 0;
+		vec.y = 0;
+	}
+
+	return vec;
+}
+
+inline glm::vec3 round_vec_up_to_nearest(glm::vec3 vec)
+{
+	vec.x = (vec.x > 0) ? std::ceil(vec.x) : std::floor(vec.x);
+	vec.y = (vec.y > 0) ? std::ceil(vec.y) : std::floor(vec.y);
+	vec.z = (vec.z > 0) ? std::ceil(vec.z) : std::floor(vec.z);
+
+	return vec;
+}
+
 inline bool decompose_transform(const glm::mat4& transform, glm::vec3& out_translation, glm::vec3& out_rotation, glm::vec3& out_scale)
 {
 	using namespace glm;

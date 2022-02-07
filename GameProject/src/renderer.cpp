@@ -16,6 +16,7 @@ glm::mat4 projection_matrix;
 glm::mat4 view_matrix = glm::mat4(1.0f);
 
 int screen_resolution_x = 1280, screen_resolution_y = 720;
+float near_clip_plane = 0.1f, far_clip_plane = 100.0f;
 
 static std::vector<model_entity_t*> model_list;
 
@@ -38,7 +39,7 @@ void init_renderer() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, 0.1f, 100.0f);
+	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 
 	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 

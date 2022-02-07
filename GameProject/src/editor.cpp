@@ -59,6 +59,19 @@ static int read_framebuffer_pixel(int x, int y)
 	return pixel_data;
 }
 
+static float read_framebuffer_depth_pixel(int x, int y)
+{
+	bind_editor_framebuffer();
+	glReadBuffer(GL_DEPTH_STENCIL_ATTACHMENT);
+
+	float pixel_data;
+	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &pixel_data);
+	glReadBuffer(GL_NONE);
+
+	unbind_editor_framebuffer();
+	return pixel_data;
+}
+
 static void clear_selected_entities()
 {
 	selected_entities.clear();
@@ -174,6 +187,8 @@ static void draw_gizmo_at_selected_entity()
 		{
 			ImGuizmo::SetOrthographic(false);
 			//ImGuizmo::SetDrawlist();
+
+			// TODO: mouse cursor gets locked if it goes over gizmo when controlling camera.
 
 			float width = (float)ImGui::GetWindowWidth();
 			float height = (float)ImGui::GetWindowHeight();
@@ -409,81 +424,15 @@ void draw_editor_framebuffer()
 	glEnable(GL_DEPTH_TEST);
 }
 
-/*
-static void placement_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
+static bool placement_mode = false;
+static glm::vec3 placement_position{ 0 };
+enum class entity_type
 {
-	cursor_pos = vec_to_ivec(cursor_pos);
-	glm::ivec3 vel{ 0 };
-	if (!(input_key_down(SDL_SCANCODE_W) && input_key_down(SDL_SCANCODE_S)))
-	{
-		if (input_key_down(SDL_SCANCODE_W))
-		{
-			vel = { 0,0, -1 };
-		}
-		else if (input_key_down(SDL_SCANCODE_S))
-		{
-			vel = { 0,0, 1 };
-		}
-	}
-
-	if (!(input_key_down(SDL_SCANCODE_A) && input_key_down(SDL_SCANCODE_D)))
-	{
-		if (input_key_down(SDL_SCANCODE_A))
-		{
-			vel = { -1,0,0 };
-		}
-		else if (input_key_down(SDL_SCANCODE_D))
-		{
-			vel = { 1,0,0 };
-		}
-	}
-
-	if (input_key_down(SDL_SCANCODE_E))
-	{
-		vel = { 0,1,0 };
-	}
-	else if (input_key_down(SDL_SCANCODE_Q))
-	{
-		vel = { 0,-1,0 };
-	}
-
-	glm::vec3 offset = glm::vec3(0, 6, 5);
-	cam->position = ((glm::vec3)cursor_pos + offset);
-
-	cam->rotation.x = -50;
-	cam->rotation.y = -90;
-
-	move_cursor(vel);
-
-	//renderer::debug::draw_box_wireframe(cursor_pos, glm::vec3(1), colour::white);
-
-	if (input_key_down(SDL_SCANCODE_F))
-	{
-		// TODO: skip collision testing instead for simple position testing
-		// because entites with NO_COLLISION flag arent selected.
-		add_multiselect_entity(entity_manager->find_entity_by_position(cursor_pos));
-	}
-
-	if (input_key_down(SDL_SCANCODE_1))
-	{
-		if (!entity_manager->is_entity_at_position(cursor_pos))
-		{
-			entity_manager->add_entity("block", uuid(), 0, cursor_pos);
-		}
-	}
-	else if (input_key_down(SDL_SCANCODE_2))
-	{
-		if (!entity_manager->is_entity_at_position(cursor_pos))
-		{
-			entity_manager->add_entity("player", uuid(), 0, cursor_pos);
-		}
-		else
-		{
-			log_warning("Entity already in position");
-		}
-	}
-}
-*/
+	NONE = 0,
+	PLAYER,
+	BLOCK
+};
+static entity_type placement_type = entity_type::NONE;
 
 static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 {
@@ -535,7 +484,9 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 			cam->position -= cam->up * cam_speed;
 		}
 
-		//SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetWindowGrab(window, SDL_TRUE);
+		//SDL_WarpMouseInWindow(window, window_size_x / 2, window_size_y / 2);
 
 		glm::vec3 camera_rotation = glm::vec3(input_get_mouse_delta().y, -input_get_mouse_delta().x, 0.0f);
 		camera_rotation *= cam_rotation_speed;
@@ -554,32 +505,87 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 	}
 	else
 	{
-		//SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetWindowGrab(window, SDL_FALSE);
 
-		if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
+		if (input_key_down(SDL_SCANCODE_Q))
 		{
-			glm::vec2 mouse_pos = glm::vec2(input_get_mouse_pos().x, screen_resolution_y - 1.0f - input_get_mouse_pos().y);
+			placement_mode = false;
+		}
+
+		glm::vec2 mouse_pos = glm::vec2(input_get_mouse_pos().x, screen_resolution_y - 1.0f - input_get_mouse_pos().y);
+
+		if (placement_mode)
+		{
+			clear_selected_entities();
+
+			auto depth_value = read_framebuffer_depth_pixel(mouse_pos.x, mouse_pos.y);
+
+			glm::vec4 viewport = { 0,0,screen_resolution_x, screen_resolution_y };
+			placement_position = glm::unProject({ mouse_pos.x, mouse_pos.y, depth_value }, view_matrix, projection_matrix, viewport);
 
 			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
-
 			auto entity = entity_manager->find_entity_by_index(entity_index);
-			if (input_key_pressed(SDL_SCANCODE_LSHIFT))
+			if (auto tmp_entity = entity.lock())
 			{
-				if (entity.lock())
+				glm::vec3 offset = placement_position - (glm::vec3)tmp_entity->grid_pos;
+
+				offset = shortest_vector_value(offset);
+
+				//log_info("offset: ", offset.x, ", ", offset.y, ", ", offset.z);
+
+				offset = round_vec_up_to_nearest(offset);
+				offset = glm::normalize(offset);
+
+				//log_info("offset: ", offset.x, ", ", offset.y, ", ", offset.z);
+
+				glm::ivec3 grid_position = tmp_entity->grid_pos + vec_to_ivec(offset);
+				add_primitive_wireframe_cube(grid_position, glm::vec3(1.0f), colour::green);
+
+				if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
 				{
-					add_multiselect_entity(entity);
+					switch (placement_type)
+					{
+					case entity_type::PLAYER:
+						entity_manager->add_entity("player", uuid(), 0, grid_position);
+						break;
+					case entity_type::BLOCK:
+						entity_manager->add_entity("block", uuid(), 0, grid_position);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
+			auto entity = entity_manager->find_entity_by_index(entity_index);
+
+			if (auto tmp_entity = entity.lock())
+			{
+				add_primitive_wireframe_cube(tmp_entity->grid_pos, glm::vec3(1.0f), colour::green);
+
+				if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
+				{
+					if (input_key_pressed(SDL_SCANCODE_LSHIFT))
+					{
+						add_multiselect_entity(entity);
+					}
+					else
+					{
+						clear_selected_entities();
+						select_entity(entity);
+					}
 				}
 			}
 			else
 			{
-				if (entity.lock())
+				if (!input_key_pressed(SDL_SCANCODE_LSHIFT))
 				{
-					clear_selected_entities();
-					select_entity(entity);
-				}
-				else
-				{
-					clear_selected_entities();
+					if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
+					{
+						clear_selected_entities();
+					}
 				}
 			}
 		}
@@ -645,12 +651,9 @@ void update_editor(double dt)
 		{
 			add_primitive_wireframe_cube(tmp_entity->grid_pos, glm::vec3(1), colour::white);
 
-			if (transform_type == VISUAL_EDITING)
+			if (tmp_entity->visual_pos != (glm::vec3)tmp_entity->grid_pos)
 			{
-				if (tmp_entity->visual_pos != (glm::vec3)tmp_entity->grid_pos)
-				{
-					add_primitive_wireframe_cube(tmp_entity->visual_pos, glm::vec3(1), colour::red);
-				}
+				add_primitive_wireframe_cube(tmp_entity->visual_pos, glm::vec3(1), colour::red);
 			}
 		}
 	}
@@ -689,23 +692,6 @@ void draw_editor()
 			ImGui::Text("Resolution: %i / %i", screen_resolution_x, screen_resolution_y);
 			ImGui::Text("Number of entities %i", entity_manager->entities.size());
 
-			ImGui::End();
-		}
-	}
-
-	/* GIZMO SETTINGS */ {
-		ImGuiWindowFlags window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoDecoration;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		window_flags |= ImGuiWindowFlags_NoNav;
-		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
-
-		float window_size_x = 200.0f;
-		ImGui::SetNextWindowPos(ImVec2(work_size.x / 2 - (window_size_x / 2), 0), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
-		ImGui::SetNextWindowSize(ImVec2(window_size_x, 30.0f), ImGuiCond_Always);
-
-		if (ImGui::Begin("GIZMO SETTINGS", &p_open, window_flags)) {
 			ImGui::End();
 		}
 	}
@@ -762,6 +748,57 @@ void draw_editor()
 				draw_entity_data(selected_entities.front());
 			}
 			
+			ImGui::End();
+		}
+	}
+
+	/* NEW ENTITES */ {
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoDecoration;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
+
+		ImGui::SetNextWindowPos(ImVec2(0, work_size.y), ImGuiCond_Always, ImVec2(0.0f, 1.0f));
+		ImGui::SetNextWindowSize(ImVec2(300.0f, work_size.y / 2), ImGuiCond_Always);
+
+		if (ImGui::Begin("NEW ENTITES", &p_open, window_flags))
+		{
+			ImGui::Text("Create new entities");
+
+			if (placement_mode)
+			{
+				if (ImGui::Button("Cancel"))
+				{
+					placement_type = entity_type::NONE;
+					placement_mode = false;
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Blocks"))
+			{
+				if (ImGui::Button("Block"))
+				{
+					placement_type = entity_type::BLOCK;
+					placement_mode = true;
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("Player"))
+				{
+					placement_type = entity_type::PLAYER;
+					placement_mode = true;
+				}
+			}
+
+			if (ImGui::CollapsingHeader("Nodes"))
+			{
+				if (ImGui::Button("Player Spawn"))
+				{
+
+				}
+			}
 			ImGui::End();
 		}
 	}
