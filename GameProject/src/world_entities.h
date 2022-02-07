@@ -27,3 +27,5 @@ struct block_entity : public entity
 		visual_pos = grid_pos;
 	}
 };
+
+// TODO: Add room system and doors.
