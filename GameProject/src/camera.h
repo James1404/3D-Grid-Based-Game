@@ -21,6 +21,10 @@ struct camera_t {
 	~camera_t();
 };
 
-void set_camera(std::string _id);
-std::weak_ptr<camera_t> get_camera(std::string _id);
+
 void update_camera();
+
+void set_camera(std::string _id);
+
+std::weak_ptr<camera_t> get_camera(std::string _id);
+std::weak_ptr<camera_t> get_current_camera();

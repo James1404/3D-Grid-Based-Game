@@ -17,7 +17,8 @@ camera_t::camera_t()
 
 camera_t::~camera_t() { }
 
-glm::mat4 camera_t::getViewMatrix() {
+glm::mat4 camera_t::getViewMatrix()
+{
 	// pitch = rotation.x | yaw = rotation.y
 	front.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 	front.y = sin(glm::radians(rotation.x));
@@ -30,34 +31,52 @@ glm::mat4 camera_t::getViewMatrix() {
 	return glm::lookAt(position, position + front, up);
 }
 
-void set_camera(std::string _id) {
+void update_camera()
+{
+	if (auto tmp_cam = current_camera.lock())
+	{
+		view_matrix = tmp_cam->getViewMatrix();
+	}
+}
+
+void set_camera(std::string _id)
+{
 	auto it = cameras.find(_id);
-	if (it == cameras.end()) {
+	if (it == cameras.end())
+	{
 		cameras.emplace(_id, std::make_shared<camera_t>());
 
 		it = cameras.find(_id);
-		if (it != cameras.end()) {
+		if (it != cameras.end())
+		{
 			current_camera = it->second;
 		}
 	}
-	else {
-		if (current_camera.lock() != it->second) {
+	else
+	{
+		if (current_camera.lock() != it->second)
+		{
 			current_camera = it->second;
 		}
 	}
 }
 
-std::weak_ptr<camera_t> get_camera(std::string _id) {
+std::weak_ptr<camera_t> get_camera(std::string _id)
+{
 	auto it = cameras.find(_id);
-	if (it != cameras.end()) {
+	if (it != cameras.end())
+	{
 		return it->second;
 	}
 
 	return std::weak_ptr<camera_t>();
 }
 
-void update_camera() {
-	if (auto tmp_cam = current_camera.lock()) {
-		view_matrix = tmp_cam->getViewMatrix();
+std::weak_ptr<camera_t> get_current_camera()
+{
+	if (current_camera.lock())
+	{
+		return current_camera;
 	}
+	return std::weak_ptr<camera_t>();
 }
