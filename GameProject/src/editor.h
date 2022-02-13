@@ -1,9 +1,7 @@
 #pragma once
-#include "camera.h"
-#include "entity.h"
-#include "input.h"
+#include "world.h"
 
-void init_editor(entity_manager_t& _manager);
+void init_editor(world_t& _world);
 void shutdown_editor();
 
 void handle_editor_events();

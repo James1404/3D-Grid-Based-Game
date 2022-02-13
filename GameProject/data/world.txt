@@ -1,4 +1,28 @@
-file_version 10 
+file_version 10
+/*
+chunk og_test_chunk
+	entity block
+		id 3578163573668865784
+		flags 0
+		grid_pos 2 3 2
+	end_entity
+	entity block
+		id 1697252549352115943
+		flags 0
+		grid_pos 2 2 3
+	end_entity
+	entity block
+		id 8512402442711291812
+		flags 0
+		grid_pos 2 1 4
+	end_entity
+	entity player
+		id 6430967330067598699
+		flags 0
+		grid_pos 2 3 3
+	end_entity
+end_chunk
+*/
 chunk world
 	entity block
 		id 3578163573668865784
@@ -781,7 +805,7 @@ chunk world
 		grid_pos 3 7 6
 	end_entity
 	entity player
-		id  6130870522106770686
+		id 6130870522106770686
 		flags 0
 		grid_pos 3 8 2
 	end_entity

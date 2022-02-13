@@ -1,11 +1,11 @@
 #include "editor.h"
 
-#include <SDL.h>
-
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_stdlib.h>
+
+#include <SDL.h>
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -18,7 +18,6 @@
 #include "window.h"
 #include "input.h"
 #include "renderer.h"
-#include "entity.h"
 #include "camera.h"
 #include "log.h"
 #include "common.h"
@@ -26,13 +25,14 @@
 #include "player.h"
 #include "world_entities.h"
 
-static entity_manager_t* entity_manager;
+static world_t* world;
 
 //static glm::vec3 cursor_pos{ 0 };
 
 static std::vector<std::weak_ptr<entity>> selected_entities;
 
-enum class editor_mode {
+enum class editor_mode
+{
 	placement_cam = 0,
 	free_cam
 };
@@ -148,22 +148,22 @@ static void draw_entity_data(std::weak_ptr<entity> _entity)
 		ImGui::Separator();
 		ImGui::Text("flags: %i", tmp_entity->flags);
 		if (ImGui::Button("DISABLED", { ImGui::GetWindowSize().x * button_width, 0.0f }))
-			ENTITY_FLAG_TOGGLE(tmp_entity->flags, ENTITY_DISABLED);
+			tmp_entity->flags.toggle(entity_flags_disabled);
 
 		ImGui::SameLine();
-		ImGui::Text((tmp_entity->flags & ENTITY_DISABLED) ? "ON" : "OFF");
+		ImGui::Text(tmp_entity->flags.has(entity_flags_disabled) ? "ON" : "OFF");
 
 		if (ImGui::Button("NO_COLLISION", { ImGui::GetWindowSize().x * button_width, 0.0f }))
-			ENTITY_FLAG_TOGGLE(tmp_entity->flags, ENTITY_NO_COLLISION);
+			tmp_entity->flags.toggle(entity_flags_no_collision);
 
 		ImGui::SameLine();
-		ImGui::Text((tmp_entity->flags & ENTITY_NO_COLLISION) ? "ON" : "OFF");
+		ImGui::Text(tmp_entity->flags.has(entity_flags_no_collision) ? "ON" : "OFF");
 
 		if (ImGui::Button("NO_CLIMB", { ImGui::GetWindowSize().x * button_width, 0.0f }))
-			ENTITY_FLAG_TOGGLE(tmp_entity->flags, ENTITY_NO_CLIMB);
+			tmp_entity->flags.toggle(entity_flags_no_climb);
 
 		ImGui::SameLine();
-		ImGui::Text((tmp_entity->flags & ENTITY_NO_CLIMB) ? "ON" : "OFF");
+		ImGui::Text(tmp_entity->flags.has(entity_flags_no_climb) ? "ON" : "OFF");
 
 		ImGui::Separator();
 
@@ -262,15 +262,14 @@ static void draw_gizmo_at_selected_entity()
 						{
 							if (auto tmp_entity = _entity.lock())
 							{
-								auto offset = pos - og_pos;
+								auto offset_pos = pos - og_pos;
+								auto offset_rot = rot - og_rot;
+								auto offset_scl = scl - og_scl;
 
-								entity->visual_pos += offset;
+								entity->visual_pos += offset_pos;
+								entity->visual_rotation += offset_rot;
 
-								//auto delta_rot = rot - entity->visual_rotation;
-								entity->visual_rotation = rot;
-								//entity->visual_rotation += delta_rot;
-
-								entity->visual_scale = scl;
+								entity->visual_scale += offset_scl;
 							}
 						}
 					}
@@ -280,7 +279,7 @@ static void draw_gizmo_at_selected_entity()
 	}
 }
 
-void init_editor(entity_manager_t& _entity_manager)
+void init_editor(world_t& _world)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -290,7 +289,7 @@ void init_editor(entity_manager_t& _entity_manager)
 	ImGui_ImplSDL2_InitForOpenGL(window, context);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
-	entity_manager = &_entity_manager;
+	world = &_world;
 
 	init_editor_framebuffer();
 
@@ -525,7 +524,7 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 			placement_position = glm::unProject({ mouse_pos.x, mouse_pos.y, depth_value }, view_matrix, projection_matrix, viewport);
 
 			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
-			auto entity = entity_manager->find_entity_by_index(entity_index);
+			auto entity = world->get_current_chunk()->find_entity_by_index(entity_index);
 			if (auto tmp_entity = entity.lock())
 			{
 				glm::vec3 offset = placement_position - (glm::vec3)tmp_entity->grid_pos;
@@ -542,15 +541,15 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 				glm::ivec3 grid_position = tmp_entity->grid_pos + vec_to_ivec(offset);
 				add_primitive_wireframe_cube(grid_position, glm::vec3(1.0f), colour::green);
 
-				if (input_mouse_button_down(mouse_button::MOUSE_LEFT))
+				if (input_mouse_button_released(mouse_button::MOUSE_LEFT))
 				{
 					switch (placement_type)
 					{
 					case entity_type::PLAYER:
-						entity_manager->add_entity("player", uuid(), 0, grid_position);
+						add_entity(*world->get_current_chunk(), "player", uuid(), entity_flags_t(), grid_position);
 						break;
 					case entity_type::BLOCK:
-						entity_manager->add_entity("block", uuid(), 0, grid_position);
+						add_entity(*world->get_current_chunk(), "block", uuid(), entity_flags_t(), grid_position);
 						break;
 					}
 				}
@@ -559,7 +558,7 @@ static void free_cam_mode_update(double dt, std::shared_ptr<camera_t> cam)
 		else
 		{
 			int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
-			auto entity = entity_manager->find_entity_by_index(entity_index);
+			auto entity = world->get_current_chunk()->find_entity_by_index(entity_index);
 
 			if (auto tmp_entity = entity.lock())
 			{
@@ -639,7 +638,7 @@ void update_editor(double dt)
 		{
 			for (auto selected : selected_entities)
 			{
-				entity_manager->remove_entity(selected);
+				remove_entity(*world->get_current_chunk(), selected);
 			}
 			clear_selected_entities();
 		}
@@ -690,7 +689,8 @@ void draw_editor()
 		if (ImGui::Begin("OVERLAY", &p_open, window_flags))
 		{
 			ImGui::Text("Resolution: %i / %i", screen_resolution_x, screen_resolution_y);
-			ImGui::Text("Number of entities %i", entity_manager->entities.size());
+
+			ImGui::Text("Number of chunks%i", world->chunks.size());
 
 			ImGui::End();
 		}
@@ -709,36 +709,24 @@ void draw_editor()
 		ImGui::SetNextWindowSize(ImVec2(300.0f, work_size.y), ImGuiCond_Always);
 
 		if (ImGui::Begin("LEVEL DATA", &p_open, window_flags)) {
-			ImGui::InputText("Level Name", &entity_manager->name);
+			ImGui::InputText("Level Name", &world->get_current_chunk()->name);
 
 			if (ImGui::Button("Save")) {
-				if (!entity_manager->name.empty()) {
-					entity_manager->save();
-				}
-				else {
-					log_warning("Name Empty\n");
-				}
+				world->save();
 			}
 			
 			ImGui::SameLine();
 
 			if (ImGui::Button("Load"))
 			{
-				if (!entity_manager->name.empty())
-				{
-					entity_manager->load(entity_manager->name);
-				}
-				else
-				{
-					log_warning("Name Empty\n");
-				}
+				world->load();
 			}
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Clear"))
+			if (ImGui::Button("Clear Chunk"))
 			{
-				entity_manager->clear_data();
+				world->get_current_chunk()->clear_data();
 			}
 
 			ImGui::Separator();

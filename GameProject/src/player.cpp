@@ -8,24 +8,21 @@
 #include <gtc/type_ptr.hpp>
 #include <memory>
 
-player_entity::player_entity()
-	: model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale),
-	vel(0, 0, 0), interp_speed(walk_speed)
+void player_entity::init()
 {
 	name = "player";
-}
+	vel = glm::vec3(0, 0, 0);
+	interp_speed = walk_speed;
 
-player_entity::~player_entity()
-{
+	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale);
 
+#ifdef _DEBUG
+	model.index = index;
+#endif
 }
 
 void player_entity::update(double dt)
 {
-#ifdef _DEBUG
-	model.index = index;
-#endif
-
 	set_camera("Player");
 
 	if (auto player_cam = get_camera("Player").lock())

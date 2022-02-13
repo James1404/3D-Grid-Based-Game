@@ -9,12 +9,13 @@
 #include "window.h"
 #include "input.h"
 #include "log.h"
-#include "entity.h"
 #include "editor.h"
 #include "camera.h"
 #include "event.h"
+#include "world.h"
 
-enum engine_state {
+enum engine_state
+{
 	engine_state_gameplay,
 	engine_state_editor
 };
@@ -23,7 +24,7 @@ int main(int argc, char* args[])
 {
 	init_window("Game", 1280, 720);
 
-	entity_manager_t entity_manager;
+	world_t game_world;
 	event_manager_t event_manager;
 
 	engine_state current_engine_state;
@@ -35,16 +36,17 @@ int main(int argc, char* args[])
 	
 	// LEVEL NAMES :
 	// combattestlevel
-	entity_manager.load("combattestlevel");
+	game_world.load();
 
 	current_engine_state = engine_state_gameplay;
 
 #ifdef _DEBUG
-	init_editor(entity_manager);
+	init_editor(game_world);
 #endif // _DEBUG
 
 	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
-	while (window_is_running) {
+	while (window_is_running)
+	{
 		/* ----- HANDLE EVENTS ----- */
 		if (handle_window_events())
 		{
@@ -59,15 +61,17 @@ int main(int argc, char* args[])
 		NOW = SDL_GetPerformanceCounter();
 		double dt = ((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-		entity_manager.update(dt);
+		game_world.update(dt);
 
 #ifdef _DEBUG
-		if (current_engine_state == engine_state_editor) {
-			entity_manager.is_paused = true;
+		if (current_engine_state == engine_state_editor)
+		{
+			game_world.is_paused = true;
 			update_editor(dt);
 		}
-		else {
-			entity_manager.is_paused = false;
+		else
+		{
+			game_world.is_paused = false;
 		}
 
 		if (input_key_down(SDL_SCANCODE_ESCAPE)) {
@@ -93,7 +97,8 @@ int main(int argc, char* args[])
 
 		draw_editor_framebuffer();
 
-		if (current_engine_state == engine_state_editor) {
+		if (current_engine_state == engine_state_editor)
+		{
 			draw_editor();
 		}
 
@@ -113,6 +118,8 @@ int main(int argc, char* args[])
 #ifdef _DEBUG
 	shutdown_editor();
 #endif // _DEBUG
+
+	game_world.shutdown();
 
 	shutdown_input();
 

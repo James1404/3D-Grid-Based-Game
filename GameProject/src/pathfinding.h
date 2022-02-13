@@ -3,8 +3,6 @@
 #include <queue>
 #include <unordered_map>
 
-#include "entity.h"
-
 template<typename T, typename priority_t>
 struct PriorityQueue {
 	typedef std::pair<priority_t, T> PQElement;

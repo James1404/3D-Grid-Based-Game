@@ -1,11 +1,12 @@
 #pragma once
 #include <memory>
 
-#include "entity.h"
+#include "world.h"
 #include "renderer.h"
 #include "common.h"
 
-struct player_entity : public entity {
+struct player_entity : public entity
+{
 	model_entity_t model;
 
 	glm::vec3 vel;
@@ -21,7 +22,6 @@ struct player_entity : public entity {
 	glm::vec3 fp_look_direction = { 0, 270, 0 };
 	bool is_first_person = false;
 
-	player_entity();
-	~player_entity();
+	void init() override;
 	void update(double dt) override;
 };
