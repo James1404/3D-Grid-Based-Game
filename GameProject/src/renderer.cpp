@@ -38,6 +38,7 @@ void init_renderer() {
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 
@@ -73,7 +74,7 @@ void renderer_draw() {
 	draw_primitives();
 }
 
-model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale)
+void model_entity_t::define_model(std::string _model_path,std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale)
 {
 	position = _position;
 	rotation = _rotation;
@@ -86,9 +87,12 @@ model_entity_t::model_entity_t(std::string _model_path,std::string _texture_path
 	texture = asset_manager.load_texture_from_file(_texture_path);
 
 	glUseProgram(shader->id);
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection_matrix));
 	glUniform1i(glGetUniformLocation(shader->id, "Texture"), 0);
+}
 
+model_entity_t::model_entity_t()
+{
 	model_list.push_back(this);
 }
 
@@ -112,15 +116,18 @@ void model_entity_t::draw() {
 
 	glm::mat4 new_model = glm::mat4(1.0f);
 	new_model = glm::translate(new_model, *position);
-	//new_model = glm::rotate(new_model, rotation);
+
 	new_model = glm::rotate(new_model, glm::radians(rotation->x), glm::vec3(1, 0, 0));
 	new_model = glm::rotate(new_model, glm::radians(rotation->y), glm::vec3(0, 1, 0));
 	new_model = glm::rotate(new_model, glm::radians(rotation->z), glm::vec3(0, 0, 1));
 
 	new_model = glm::scale(new_model, *scale);
 
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
+	auto mvp = projection_matrix * view_matrix * new_model;
+
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "mvp"), 1, false, glm::value_ptr(mvp));
+	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
 
 #ifdef _DEBUG
 	glUniform1i(glGetUniformLocation(shader->id, "entity_index"), index);

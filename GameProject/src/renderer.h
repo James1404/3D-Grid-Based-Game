@@ -66,9 +66,11 @@ struct model_entity_t {
 #ifdef _DEBUG
 	int index;
 #endif
-	model_entity_t(std::string _model_path, std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale);
+
+	model_entity_t();
 	~model_entity_t();
 
+	void define_model(std::string _model_path, std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale);
 	void draw();
 };
 
