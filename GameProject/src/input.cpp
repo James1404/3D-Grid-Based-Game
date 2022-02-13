@@ -144,37 +144,6 @@ const glm::ivec2 input_get_mouse_delta() {
 	return previous_mouse_position - mouse_position;
 }
 
-const glm::ivec2 input_get_relative_mouse_pos() {
-	// return mouse pos relative to resolution;
-	glm::ivec2 relative_mouse_pos;
-	relative_mouse_pos.x = mouse_position.x / (screen_resolution_x / 2) - 1;
-	relative_mouse_pos.y = mouse_position.y / (screen_resolution_y / 2) - 1;
-
-	return relative_mouse_pos;
-}
-
-const glm::ivec2 input_get_relative_previous_mouse_pos() {
-	// return previous mouse pos relative to resolution;
- 	glm::ivec2 previous_relative_mouse_pos;
-	previous_relative_mouse_pos.x = previous_mouse_position.x / (screen_resolution_x / 2) - 1;
-	previous_relative_mouse_pos.y = previous_mouse_position.y / (screen_resolution_y / 2) - 1;
-
-	return previous_relative_mouse_pos;
-}
-
-const glm::ivec2 input_get_relative_mouse_delta() {
-	// return mouse delta relative to resolution;
-	glm::ivec2 relative_mouse_pos;
-	relative_mouse_pos.x = mouse_position.x / screen_resolution_x - 1;
-	relative_mouse_pos.y = mouse_position.y / screen_resolution_y - 1;
-
- 	glm::ivec2 previous_relative_mouse_pos;
-	previous_relative_mouse_pos.x = previous_mouse_position.x / screen_resolution_x - 1;
-	previous_relative_mouse_pos.y = previous_mouse_position.y / screen_resolution_y - 1;
-
-	return previous_relative_mouse_pos - relative_mouse_pos;
-}
-
 void save_input() {
 	std::ofstream ofs("inputSettings.input");
 	if (ofs.is_open()) {

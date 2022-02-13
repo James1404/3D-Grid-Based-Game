@@ -33,9 +33,5 @@ const glm::ivec2 input_get_mouse_pos();
 const glm::ivec2 input_get_previous_mouse_pos();
 const glm::ivec2 input_get_mouse_delta();
 
-const glm::ivec2 input_get_relative_mouse_pos();
-const glm::ivec2 input_get_relative_previous_mouse_pos();
-const glm::ivec2 input_get_relative_mouse_delta();
-
 void save_input();
 void load_input();
