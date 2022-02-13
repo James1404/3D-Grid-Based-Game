@@ -168,7 +168,6 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClCompile Include="src\asset.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="includes\imgui\imgui_stdlib.cpp" />
-    <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\event.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\renderer.cpp" />
@@ -185,6 +184,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\uuid.cpp" />
     <ClCompile Include="src\window.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\assimp\include\assimp\aabb.h" />
@@ -277,6 +277,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClInclude Include="src\event.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\window.h" />
+    <ClInclude Include="src\world.h" />
     <ClInclude Include="src\world_entities.h" />
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="includes\imgui\imconfig.h" />
@@ -294,7 +295,6 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\editor.h" />
     <ClInclude Include="src\player.h" />
-    <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\uuid.h" />
   </ItemGroup>
