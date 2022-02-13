@@ -39,7 +39,7 @@ struct entity {
 	entity_flags_t flags;
 	std::string name = "";
 
-	chunk_t* chunk = nullptr;
+	std::shared_ptr<chunk_t> chunk;
 
 	glm::ivec3 grid_pos = glm::vec3(0), previous_grid_pos = glm::vec3(0);
 	glm::vec3 visual_pos = glm::vec3(0), visual_rotation = glm::vec3(0), visual_scale = glm::vec3(1);
@@ -61,6 +61,11 @@ struct entity_data_t
 	uuid id;
 	entity_flags_t flags;
 	glm::ivec3 grid_pos;
+
+	entity_data_t()
+		: type(""), id(0), flags(0), grid_pos(0,0,0)
+	{
+	}
 };
 
 struct chunk_t
@@ -95,26 +100,29 @@ struct world_t
 {
 	bool is_paused = false;
 
-	std::vector<chunk_t> chunks;
+	std::vector<std::shared_ptr<chunk_t>> chunks;
 	int current_chunk = 0;
 
 	void init();
 	void shutdown();
 
-	chunk_t* get_current_chunk();
+	std::weak_ptr<chunk_t> get_current_chunk();
 
 	void clear_world_data();
 	void update(double dt);
 
 	void save();
 	void load();
+
+	int new_chunk();
+	void delete_chunk(int index);
 };
 
 template<typename T>
-std::weak_ptr<entity> new_entity(chunk_t& chunk);
+std::weak_ptr<entity> new_entity(std::shared_ptr<chunk_t> chunk);
 
-void add_entity(chunk_t& chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos);
-void add_entity(chunk_t& chunk, entity_data_t& data);
-void remove_entity(chunk_t& chunk, std::weak_ptr<entity> _entity);
+void add_entity(std::shared_ptr<chunk_t> chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos);
+void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t& data);
+void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity> _entity);
 
-void transition_chunk(chunk_t& next_chunk, entity& entity);
+void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity& entity);

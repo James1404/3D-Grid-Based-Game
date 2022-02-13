@@ -116,7 +116,7 @@ void world_t::init()
 {
 	for(auto& _chunk : chunks)
 	{
-		for (auto& _entity : _chunk.entities)
+		for (auto& _entity : _chunk->entities)
 		{
 			_entity->init();
 		}
@@ -130,9 +130,9 @@ void world_t::shutdown()
 	log_info("CLEANED LEVEL DATA");
 }
 
-chunk_t* world_t::get_current_chunk()
+std::weak_ptr<chunk_t> world_t::get_current_chunk()
 {
-	return &chunks[current_chunk];
+	return chunks[current_chunk];
 }
 
 void world_t::update(double dt)
@@ -140,18 +140,29 @@ void world_t::update(double dt)
 	if (is_paused)
 		return;
 
+	for(auto& chunk : chunks)
+	{
+		for(auto& _entity : chunk->entities)
+		{
+			_entity->update(dt);
+		}
+	}
+	/*
 	for (auto& _entity : chunks[current_chunk].entities)
 	{
 		_entity->update(dt);
 	}
+	*/
 }
 
 void world_t::clear_world_data()
 {
 	for(auto& _chunk : chunks)
 	{
-		_chunk.clear_data();
+		_chunk->clear_data();
 	}
+
+	chunks.clear();
 }
 
 int fileVersion = 10;
@@ -166,8 +177,8 @@ void world_t::save()
 
 		for (auto& chunk : chunks)
 		{
-			ofs << "chunk " << chunk.name << std::endl;
-			for(auto& _entity : chunk.entities)
+			ofs << "chunk " << chunk->name << std::endl;
+			for(auto& _entity : chunk->entities)
 			{
 				ofs << "\tentity " << _entity->name << std::endl;
 				ofs << "\t\tid " << _entity->id << std::endl;
@@ -243,8 +254,8 @@ void world_t::load()
 			}
 			else if(type == "chunk")
 			{
-				chunk_t chunk;
-				ss >> chunk.name;
+				auto chunk = std::make_shared<chunk_t>();
+				ss >> chunk->name;
 				chunks.push_back(chunk);
 
 				in_chunk = true;
@@ -253,7 +264,7 @@ void world_t::load()
 			{
 				if(type == "entity")
 				{
-					//add_entity(type, id, flags, grid_pos);
+					entity_data = entity_data_t();
 					ss >> entity_data.type;
 
 					in_entity = true;
@@ -304,6 +315,39 @@ void world_t::load()
 	}
 
 	ifs.close();
+}
+
+int world_t::new_chunk()
+{
+	auto chunk = std::make_shared<chunk_t>();
+	chunks.push_back(chunk);
+	return chunks.size() - 1;
+}
+
+void world_t::delete_chunk(int index)
+{
+	if(chunks.empty())
+		return;
+
+	chunks[index]->clear_data();
+	if(index < chunks.size() - 1)
+	{
+		chunks.erase(chunks.begin() + index);
+	}
+	else
+	{
+		if(index == current_chunk)
+		{
+			current_chunk--;
+		}
+
+		chunks.pop_back();
+
+		if(chunks.size() < 1)
+		{
+			current_chunk = new_chunk();
+		}
+	}
 }
 
 //
@@ -567,24 +611,24 @@ std::weak_ptr<entity> chunk_t::get_collisions(glm::vec3 _pos, entity* _ignored_e
 //
 
 template<typename T>
-std::weak_ptr<entity> new_entity(chunk_t& chunk)
+std::weak_ptr<entity> new_entity(std::shared_ptr<chunk_t> chunk)
 {
 	std::shared_ptr<entity> entity = std::make_shared<T>();
 	
-	entity->chunk = &chunk;
+	entity->chunk = chunk;
 
 	entity->id = uuid();
 	entity->flags = entity_flags_t();
 	entity->index = ++current_entity_index;
 
-	entity->init();
+	//entity->init();
 
-	chunk.entities.push_back(entity);
+	chunk->entities.push_back(entity);
 
 	return entity;
 }
 
-void add_entity(chunk_t& chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos)
+void add_entity(std::shared_ptr<chunk_t> chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos)
 {
 	std::weak_ptr<entity> entity;
 
@@ -617,7 +661,7 @@ void add_entity(chunk_t& chunk, std::string _type, uuid _id, entity_flags_t _fla
 	}
 }
 
-void add_entity(chunk_t& chunk, entity_data_t& data)
+void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t& data)
 {
 	std::weak_ptr<entity> entity;
 
@@ -650,12 +694,12 @@ void add_entity(chunk_t& chunk, entity_data_t& data)
 	}
 }
 
-void remove_entity(chunk_t& chunk, std::weak_ptr<entity> _entity)
+void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity> _entity)
 {
-	chunk.entities.erase(std::remove(chunk.entities.begin(), chunk.entities.end(), _entity.lock()), chunk.entities.end());
+	chunk->entities.erase(std::remove(chunk->entities.begin(), chunk->entities.end(), _entity.lock()), chunk->entities.end());
 }
 
-void transition_chunk(chunk_t& next_chunk, entity& entity)
+void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity& entity)
 {
 
 }
