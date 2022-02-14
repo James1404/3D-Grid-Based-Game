@@ -52,6 +52,8 @@ void renderer_swap_screen_buffers();
 
 void renderer_draw();
 
+void renderer_set_resolution(int x, int y);
+
 struct model_entity_t {
 	std::shared_ptr<model_t> model;
 	std::shared_ptr<shader_t> shader;
@@ -76,6 +78,8 @@ struct model_entity_t {
 
 void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
 void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
+void add_primitive_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour);
+
 void draw_primitives();
 void init_primitives();
 void shutdown_primitives();

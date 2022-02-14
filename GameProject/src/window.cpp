@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include "renderer.h"
+
 SDL_Window* window;
 SDL_Event window_event;
 

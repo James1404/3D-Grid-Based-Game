@@ -74,6 +74,15 @@ void renderer_draw() {
 	draw_primitives();
 }
 
+void renderer_set_resolution(int x, int y)
+{
+	screen_resolution_x = x; 
+	screen_resolution_y = y;
+	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
+	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
+}
+
+
 void model_entity_t::define_model(std::string _model_path,std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale)
 {
 	position = _position;
@@ -140,11 +149,13 @@ void model_entity_t::draw() {
 // ----- PRIMITIVES -----
 //
 
-static std::shared_ptr<shader_t> line_shader;
+static std::shared_ptr<shader_t> line_shader, quad_shader;
 static unsigned int line_vao, line_vbo, line_ebo;
+static unsigned int quad_vao, quad_vbo, quad_ebo;
 
 void init_primitives()
 {
+	// Line
 	line_shader = asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
 
 	glGenVertexArrays(1, &line_vao);
@@ -155,14 +166,33 @@ void init_primitives()
 
 	glGenBuffers(1, &line_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+
+	// Quad
+	quad_shader = asset_manager.load_shader_from_file("data/shaders/debug/debug_quad.glsl");
+
+	glGenVertexArrays(1, &quad_vao);
+	glBindVertexArray(quad_vao);
+
+	glGenBuffers(1, &quad_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+
+	glGenBuffers(1, &quad_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad_ebo);
 }
 
 void shutdown_primitives()
 {
+	// Line
 	glDeleteProgram(line_shader->id);
 	glDeleteBuffers(1, &line_vbo);
 	glDeleteBuffers(1, &line_ebo);
 	glDeleteVertexArrays(1, &line_vao);
+	
+	// Quad
+	glDeleteProgram(quad_shader->id);
+	glDeleteBuffers(1, &quad_vbo);
+	glDeleteBuffers(1, &quad_ebo);
+	glDeleteVertexArrays(1, &quad_vao);
 }
 
 static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
@@ -171,13 +201,6 @@ static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm
 		p1.x, p1.y, p1.z,	// first point
 		p2.x, p2.y, p2.z	// second point
 	};
-	/*
-	auto drawing = std::make_shared<debug_drawing>();
-
-	drawing->colour = colour;
-
-	*/
-	//drawing->draw();
 
 	glBindVertexArray(line_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
@@ -219,7 +242,59 @@ static void renderer_draw_box_wireframe(const glm::vec3 pos, const glm::vec3 siz
 	renderer_draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
 
-enum class primitive_data_type { line, wireframe_cube };
+static void renderer_draw_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour) {
+	// SETUP STUFF
+	float vertices[] =
+	{
+		 0.5f,  0.5f, // top right
+		 0.5f, -0.5f, // bottom right
+		-0.5f, -0.5f, // bottom left
+		-0.5f,  0.5f  // top left
+	};
+
+	glBindVertexArray(quad_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+
+	unsigned int indices[] =
+	{
+		0, 1, 3,
+		1, 2, 3
+	};
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glUseProgram(quad_shader->id);
+
+	auto model = glm::mat4(1.0f);
+	model = glm::translate(model, pos);
+
+	model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0, 1, 0));
+	model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0, 0, 1));
+
+	model = glm::scale(model, glm::vec3(scl, 0));
+
+	auto mvp = projection_matrix * view_matrix * model;
+
+	glUniformMatrix4fv(glGetUniformLocation(quad_shader->id, "u_mvp"), 1, false, glm::value_ptr(mvp));
+
+	glUniform3fv(glGetUniformLocation(quad_shader->id, "u_color"), 1, glm::value_ptr(colour));
+
+	glDisable(GL_CULL_FACE);
+
+	glBindVertexArray(quad_vao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glEnable(GL_CULL_FACE);
+}
+
+enum class primitive_data_type { line, wireframe_cube, quad };
 struct primitive_data
 {
 	primitive_data_type type;
@@ -228,10 +303,17 @@ struct primitive_data
 	{
 		glm::vec3 pos, size;
 	} wireframe_cube;
+
 	struct
 	{
 		glm::vec3 p1, p2;
 	} line;
+
+	struct
+	{
+		glm::vec3 pos, rot;
+		glm::vec2 scl;
+	} quad;
 
 	glm::vec3 colour;
 
@@ -259,6 +341,9 @@ void draw_primitives()
 		case primitive_data_type::wireframe_cube:
 			renderer_draw_box_wireframe(primitive.wireframe_cube.pos, primitive.wireframe_cube.size, primitive.colour);
 			break;
+		case primitive_data_type::quad:
+			renderer_draw_quad(primitive.quad.pos, primitive.quad.rot, primitive.quad.scl, primitive.colour);
+			break;
 		}
 
 		primitive_draw_stack.pop();
@@ -279,6 +364,16 @@ void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, con
 	auto data = primitive_data::new_primitive_data(primitive_data_type::wireframe_cube);
 	data.wireframe_cube.pos = pos;
 	data.wireframe_cube.size = size;
+	data.colour = colour;
+	primitive_draw_stack.push(data);
+}
+
+void add_primitive_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour)
+{
+	auto data = primitive_data::new_primitive_data(primitive_data_type::quad);
+	data.quad.pos = pos;
+	data.quad.rot = rot;
+	data.quad.scl = scl;
 	data.colour = colour;
 	primitive_draw_stack.push(data);
 }
