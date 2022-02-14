@@ -63,6 +63,8 @@ int main(int argc, char* args[])
 
 		game_world.update(dt);
 
+		add_primitive_quad(glm::vec3(0), glm::vec3(0), glm::vec2(1), colour::green);
+
 #ifdef _DEBUG
 		if (current_engine_state == engine_state_editor)
 		{
@@ -76,9 +78,14 @@ int main(int argc, char* args[])
 
 		if (input_key_down(SDL_SCANCODE_ESCAPE)) {
 			if (current_engine_state == engine_state_gameplay)
+			{
+				game_world.load();
 				current_engine_state = engine_state_editor;
+			}
 			else if (current_engine_state == engine_state_editor)
+			{
 				current_engine_state = engine_state_gameplay;
+			}
 		}
 #endif // _DEBUG
 
