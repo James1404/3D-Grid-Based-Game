@@ -14,7 +14,7 @@ void player_entity::init()
 	vel = glm::vec3(0, 0, 0);
 	interp_speed = walk_speed;
 
-	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale);
+	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rot, &visual_scl);
 
 #ifdef _DEBUG
 	model.index = index;
@@ -31,7 +31,7 @@ void player_entity::update(double dt)
 		{
 			model.is_paused = true;
 
-			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, .4f, 0));
+			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, 1, 0));
 			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
 			vel = { 0,0,0 };
 
@@ -74,27 +74,49 @@ void player_entity::update(double dt)
 				fp_look_rotation.y = 0.0f;
 			if (fp_look_rotation.y < 0.0f)
 				fp_look_rotation.y = 360.0f;
-			// TODO: dont allow rotation until camera has reached first-person position
+
 			player_cam->rotation = fp_look_rotation;
-			//player_cam->rotation = lerp(player_cam->rotation, fp_look_rotation, camera_speed * dt);
 		}
 		else
 		{
 			model.is_paused = false;
 
-			glm::vec3 offset = glm::vec3(0, 6, 5);
+			bool is_wall_collision = false;
+			for (int i = 0; i < 5; i++)
+			{
+				if (chunk->check_collisions(grid_pos + glm::ivec3(0, i, i), this))
+				{
+					is_wall_collision = true;
+				}
+			}
 
-			glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
-			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
-			player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
+			if (is_wall_collision)
+			{
+				camera_view_type = camera_view_wall_infront;
+			}
+			else
+			{
+				camera_view_type = camera_view_default;
+			}
+
+			switch(camera_view_type)
+			{
+			case camera_view_default:
+				{
+					glm::vec3 offset = glm::vec3(0, 6, 5);
+					glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
+					player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
+					player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
+				} break;
+			case camera_view_wall_infront:
+				{
+					glm::vec3 offset = glm::vec3(0, 6, 0);
+					glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
+					player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
+					player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-89, -90, 0), camera_speed * dt);
+				} break;
+			}
 		}
-
-		/* TOP DOWN CAMERA
-		glm::vec3 offset = glm::vec3(0, 4, 0);
-		glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
-		player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
-		player_cam->rotation = glm::vec3(-89, -90, 0);
-		*/
 	}
 
 	if (!is_moving())
