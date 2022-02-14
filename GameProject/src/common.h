@@ -1,6 +1,7 @@
 #pragma once
 #include <glm.hpp>
 #include <queue>
+#include <tuple>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/matrix_decompose.hpp>
@@ -89,6 +90,32 @@ inline glm::vec3 shortest_vector_value(glm::vec3 vec)
 	}
 
 	return vec;
+}
+
+inline std::tuple<glm::vec3,glm::vec3> swap_for_smallest_vector(glm::vec3 vec1, glm::vec3 vec2)
+{
+	if(vec1.x < vec2.x)
+	{
+		float start = vec1.x;
+		vec1.x = vec2.x;
+		vec2.x = start;
+	}
+
+	if(vec1.y < vec2.y)
+	{
+		float start = vec1.y;
+		vec1.y = vec2.y;
+		vec2.y = start;
+	}
+
+	if(vec1.z < vec2.z)
+	{
+		float start = vec1.z;
+		vec1.z = vec2.z;
+		vec2.z = start;
+	}
+
+	return std::make_tuple(vec1, vec2);
 }
 
 inline glm::vec3 round_vec_up_to_nearest(glm::vec3 vec)
