@@ -42,7 +42,7 @@ struct entity {
 	std::shared_ptr<chunk_t> chunk;
 
 	glm::ivec3 grid_pos = glm::vec3(0), previous_grid_pos = glm::vec3(0);
-	glm::vec3 visual_pos = glm::vec3(0), visual_rotation = glm::vec3(0), visual_scale = glm::vec3(1);
+	glm::vec3 visual_pos = glm::vec3(0), visual_rot = glm::vec3(0), visual_scl = glm::vec3(1);
 
 	virtual void init() {}
 	virtual void update(double dt) {}
@@ -61,11 +61,38 @@ struct entity_data_t
 	uuid id;
 	entity_flags_t flags;
 	glm::ivec3 grid_pos;
+	glm::vec3 visual_pos;
+	glm::vec3 visual_rot;
+	glm::vec3 visual_scl;
 
 	entity_data_t()
-		: type(""), id(0), flags(0), grid_pos(0,0,0)
-	{
-	}
+		: type(""), id(0), flags(0), grid_pos(0), visual_pos(0), visual_rot(0), visual_scl(1)
+	{}
+
+	entity_data_t(std::string type, uuid id, entity_flags_t flags, glm::ivec3 grid_pos)
+		: type(type), id(id), flags(flags), grid_pos(grid_pos), visual_pos(grid_pos), visual_rot(0), visual_scl(1)
+	{}
+};
+
+struct node_t
+{
+	std::string type;
+
+	glm::ivec3 pos;
+
+	virtual void init();
+	virtual void update(double dt);
+};
+
+struct volume_t
+{
+	std::string type;
+
+	std::string event;
+	glm::ivec3 pos, size;
+
+	virtual void init();
+	virtual void update(double dt);
 };
 
 struct chunk_t
@@ -73,6 +100,8 @@ struct chunk_t
 	std::string name;
 
 	std::vector<std::shared_ptr<entity>> entities;
+	std::vector<std::shared_ptr<node_t>> nodes;
+	std::vector<std::shared_ptr<volume_t>> volumes;
 
 	bool check_collisions(glm::vec3 _pos) const;
 	bool check_collisions(glm::vec3 _pos, entity* _ignored_entity) const;
@@ -92,6 +121,7 @@ struct chunk_t
 	std::weak_ptr<entity> find_entity_by_position(glm::vec3 _pos) const;
 
 	bool is_entity_at_position(glm::vec3 _pos) const;
+	std::weak_ptr<entity> get_entity_at_position(glm::vec3 _pos);
 
 	void clear_data();
 };
@@ -106,7 +136,7 @@ struct world_t
 	void init();
 	void shutdown();
 
-	std::weak_ptr<chunk_t> get_current_chunk();
+	std::shared_ptr<chunk_t> get_current_chunk();
 
 	void clear_world_data();
 	void update(double dt);
@@ -121,8 +151,8 @@ struct world_t
 template<typename T>
 std::weak_ptr<entity> new_entity(std::shared_ptr<chunk_t> chunk);
 
-void add_entity(std::shared_ptr<chunk_t> chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos);
-void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t& data);
+void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data);
+void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data);
 void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity> _entity);
 
 void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity& entity);

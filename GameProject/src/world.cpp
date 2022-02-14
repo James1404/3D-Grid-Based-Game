@@ -130,7 +130,7 @@ void world_t::shutdown()
 	log_info("CLEANED LEVEL DATA");
 }
 
-std::weak_ptr<chunk_t> world_t::get_current_chunk()
+std::shared_ptr<chunk_t> world_t::get_current_chunk()
 {
 	return chunks[current_chunk];
 }
@@ -184,6 +184,9 @@ void world_t::save()
 				ofs << "\t\tid " << _entity->id << std::endl;
 				ofs << "\t\tflags " << _entity->flags << std::endl;
 				ofs << "\t\tgrid_pos " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
+				ofs << "\t\tvisual_pos " << _entity->visual_pos.x << " " << _entity->visual_pos.y << " " << _entity->visual_pos.z << std::endl;
+				ofs << "\t\tvisual_rot " << _entity->visual_rot.x << " " << _entity->visual_rot.y << " " << _entity->visual_rot.z << std::endl;
+				ofs << "\t\tvisual_scl " << _entity->visual_scl.x << " " << _entity->visual_scl.y << " " << _entity->visual_scl.z << std::endl;
 				ofs << "\tend_entity" << std::endl;
 			}
 			ofs << "end_chunk" << std::endl;
@@ -205,7 +208,7 @@ void world_t::load()
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open())
 	{
-		log_info("PARSING SCENE FILE");
+		log_info("PARSING WORLD DATA");
 
 		entity_data_t entity_data;
 
@@ -294,6 +297,29 @@ void world_t::load()
 						ss >> entity_data.grid_pos.x;
 						ss >> entity_data.grid_pos.y;
 						ss >> entity_data.grid_pos.z;
+
+						if(entity_data.visual_pos == glm::vec3(0))
+						{
+							entity_data.visual_pos = entity_data.grid_pos;
+						}
+					}
+					else if(type == "visual_pos")
+					{
+						ss >> entity_data.visual_pos.x;
+						ss >> entity_data.visual_pos.y;
+						ss >> entity_data.visual_pos.z;
+					}
+					else if(type == "visual_rot")
+					{
+						ss >> entity_data.visual_rot.x;
+						ss >> entity_data.visual_rot.y;
+						ss >> entity_data.visual_rot.z;
+					}
+					else if(type == "visual_scl")
+					{
+						ss >> entity_data.visual_scl.x;
+						ss >> entity_data.visual_scl.y;
+						ss >> entity_data.visual_scl.z;
 					}
 					else if(type == "end_entity")
 					{
@@ -301,20 +327,21 @@ void world_t::load()
 						in_entity = false;
 					}
 				}
-
 			}
 		}
 
 		//name = level_name;
 
-		log_info("FINISHED LOADING SCENE DATA");
+		log_info("FINISHED LOADING WORLD DATA");
 	}
 	else
 	{
-		log_error("CANNOT FIND SCENE FILE");
+		log_error("CANNOT FIND WORLD FILE");
 	}
 
 	ifs.close();
+
+	init();
 }
 
 int world_t::new_chunk()
@@ -448,6 +475,19 @@ bool chunk_t::is_entity_at_position(glm::vec3 _pos) const
 	}
 
 	return false;
+}
+
+std::weak_ptr<entity> chunk_t::get_entity_at_position(glm::vec3 _pos)
+{
+	for (auto& entity : entities)
+	{
+		if (entity->grid_pos == vec_to_ivec(_pos))
+		{
+			return entity;
+		}
+	}
+
+	return std::weak_ptr<entity>();
 }
 
 bool chunk_t::check_collisions(glm::vec3 _pos) const
@@ -628,40 +668,7 @@ std::weak_ptr<entity> new_entity(std::shared_ptr<chunk_t> chunk)
 	return entity;
 }
 
-void add_entity(std::shared_ptr<chunk_t> chunk, std::string _type, uuid _id, entity_flags_t _flags, glm::ivec3 _grid_pos)
-{
-	std::weak_ptr<entity> entity;
-
-	if (_type == "player")
-	{
-		entity = new_entity<player_entity>(chunk);
-	}
-	else if (_type == "block")
-	{
-		entity = new_entity<block_entity>(chunk);
-	}
-	else
-	{
-		log_warning("ENTITY TYPE UNKOWN : ", _type);
-		return;
-	}
-
-	if (auto tmp_entity = entity.lock())
-	{
-		if (_id != 0)
-		{
-			tmp_entity->id = _id;
-		}
-
-		tmp_entity->flags = _flags;
-		tmp_entity->grid_pos = _grid_pos;
-		tmp_entity->visual_pos = tmp_entity->grid_pos;
-
-		tmp_entity->init();
-	}
-}
-
-void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t& data)
+void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 {
 	std::weak_ptr<entity> entity;
 
@@ -688,7 +695,42 @@ void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t& data)
 
 		tmp_entity->flags = data.flags;
 		tmp_entity->grid_pos = data.grid_pos;
-		tmp_entity->visual_pos = tmp_entity->grid_pos;
+		tmp_entity->visual_pos = data.visual_pos;
+		tmp_entity->visual_rot = data.visual_rot;
+		tmp_entity->visual_scl = data.visual_scl;
+	}
+}
+
+void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data)
+{
+	std::weak_ptr<entity> entity;
+
+	if (data.type == "player")
+	{
+		entity = new_entity<player_entity>(chunk);
+	}
+	else if (data.type == "block")
+	{
+		entity = new_entity<block_entity>(chunk);
+	}
+	else
+	{
+		log_warning("ENTITY TYPE UNKOWN : ", data.type);
+		return;
+	}
+
+	if (auto tmp_entity = entity.lock())
+	{
+		if (data.id != 0)
+		{
+			tmp_entity->id = data.id;
+		}
+
+		tmp_entity->flags = data.flags;
+		tmp_entity->grid_pos = data.grid_pos;
+		tmp_entity->visual_pos = data.visual_pos;
+		tmp_entity->visual_rot = data.visual_rot;
+		tmp_entity->visual_scl = data.visual_scl;
 
 		tmp_entity->init();
 	}
@@ -701,5 +743,5 @@ void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity> _entity
 
 void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity& entity)
 {
-
+	entity.chunk = next_chunk;
 }

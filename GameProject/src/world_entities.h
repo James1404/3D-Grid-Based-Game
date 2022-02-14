@@ -10,7 +10,7 @@ struct block_entity : public entity
 	void init() override
 	{
 		name = "block";
-		model.define_model("data/models/block.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rotation, &visual_scale);
+		model.define_model("data/models/block.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rot, &visual_scl);
 
 #ifdef _DEBUG
 		model.index = index;
@@ -19,7 +19,7 @@ struct block_entity : public entity
 
 	void update(double dt) override
 	{
-		visual_pos = grid_pos;
+		//visual_pos = grid_pos;
 	}
 };
 
