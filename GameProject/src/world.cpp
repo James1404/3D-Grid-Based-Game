@@ -1,119 +1,15 @@
 #include "world.h"
 
-#include "player.h"
 #include "world_entities.h"
-
-//
-// ENTITY FLAGS
-//
-
-entity_flags_t::entity_flags_t()
-	: m_flags(0)
-{
-}
-
-entity_flags_t::entity_flags_t(uint32_t flags)
-	: m_flags(flags)
-{
-}
-
-void entity_flags_t::set(entity_flags mask)
-{
-	m_flags |= mask;
-}
-
-void entity_flags_t::clear(entity_flags mask)
-{
-	m_flags &= ~mask;
-}
-
-void entity_flags_t::toggle(entity_flags mask)
-{
-	m_flags ^= mask;
-}
-
-bool entity_flags_t::has(entity_flags mask)
-{
-	return m_flags & mask;
-}
-
-//
-// ENTITY
-//
-
-bool entity::is_grounded(glm::ivec3 _pos)
-{
-	return chunk->check_collisions(_pos + glm::ivec3(0, -1, 0), this);
-}
-
-bool entity::is_moving() const
-{
-	return (visual_pos != (glm::vec3)grid_pos);
-}
-
-void entity::move_grid_pos(glm::ivec3 _dir)
-{
-	if (is_moving())
-		return;
-
-	glm::ivec3 new_pos = grid_pos + _dir;
-	if (is_grounded(grid_pos))
-	{
-		if (!chunk->check_collisions(new_pos, this))
-		{
-			if (is_grounded(new_pos))
-			{
-				set_grid_pos(new_pos);
-			}
-			else
-			{
-				if (!chunk->check_collisions(new_pos + glm::ivec3(0, -1, 0)))
-				{
-					if (is_grounded(new_pos + glm::ivec3(0, -1, 0)))
-						set_grid_pos(new_pos + glm::ivec3(0, -1, 0));
-				}
-			}
-		}
-		else
-		{
-			// TODO: make no climb work
-			if (!chunk->check_collisions(grid_pos + glm::ivec3(0, 1, 0)))
-			{
-				if (!chunk->check_collisions(new_pos + glm::ivec3(0, 1, 0)))
-				{
-					set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
-				}
-			}
-		}
-	}
-}
-
-void entity::set_grid_pos(glm::vec3 _pos)
-{
-	previous_grid_pos = grid_pos;
-	grid_pos = _pos;
-}
-
-void entity::revert_grid_pos()
-{
-	grid_pos = previous_grid_pos;
-}
-
-void entity::interp_visuals(double dt, float interp_speed)
-{
-	// TODO: implement lerping instead of move_towards
-	//visual_pos = lerp(visual_pos, (glm::vec3)grid_pos, interp_speed * dt);
-	visual_pos = move_towards(visual_pos, grid_pos, interp_speed * dt);
-}
-
-//
-// WORLD
-//
 
 static int current_entity_index = 0;
 
 void world_t::init()
 {
+	player = *new_entity<player_entity>();
+	player.chunk = chunks[current_chunk];
+	player.init();
+
 	for(auto& _chunk : chunks)
 	{
 		for (auto& _entity : _chunk->entities)
@@ -121,6 +17,8 @@ void world_t::init()
 			_entity->init();
 		}
 	}
+
+	log_info("INITIALIZED WORLD");
 }
 
 void world_t::shutdown()
@@ -147,6 +45,8 @@ void world_t::update(double dt)
 			_entity->update(dt);
 		}
 	}
+
+	player.update(dt);
 	/*
 	for (auto& _entity : chunks[current_chunk].entities)
 	{
@@ -184,9 +84,9 @@ void world_t::save()
 				ofs << "\t\tid " << _entity->id << std::endl;
 				ofs << "\t\tflags " << _entity->flags << std::endl;
 				ofs << "\t\tgrid_pos " << _entity->grid_pos.x << " " << _entity->grid_pos.y << " " << _entity->grid_pos.z << std::endl;
-				ofs << "\t\tvisual_pos " << _entity->visual_pos.x << " " << _entity->visual_pos.y << " " << _entity->visual_pos.z << std::endl;
-				ofs << "\t\tvisual_rot " << _entity->visual_rot.x << " " << _entity->visual_rot.y << " " << _entity->visual_rot.z << std::endl;
-				ofs << "\t\tvisual_scl " << _entity->visual_scl.x << " " << _entity->visual_scl.y << " " << _entity->visual_scl.z << std::endl;
+				ofs << "\t\tvisual_pos " << _entity->visual_transform.position.x << " " << _entity->visual_transform.position.y << " " << _entity->visual_transform.position.z << std::endl;
+				ofs << "\t\tvisual_rot " << _entity->visual_transform.rotation.x << " " << _entity->visual_transform.rotation.y << " " << _entity->visual_transform.rotation.z << std::endl;
+				ofs << "\t\tvisual_scl " << _entity->visual_transform.scale.x << " " << _entity->visual_transform.scale.y << " " << _entity->visual_transform.scale.z << std::endl;
 				ofs << "\tend_entity" << std::endl;
 			}
 			ofs << "end_chunk" << std::endl;
@@ -199,7 +99,7 @@ void world_t::save()
 
 void world_t::load()
 {
-	log_info("RETRIEVING WORLD DATA FROM FILE");
+	//log_info("RETRIEVING WORLD DATA FROM FILE");
 
 	clear_world_data();
 
@@ -208,7 +108,7 @@ void world_t::load()
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open())
 	{
-		log_info("PARSING WORLD DATA");
+		//log_info("PARSING WORLD DATA");
 
 		entity_data_t entity_data;
 
@@ -298,28 +198,28 @@ void world_t::load()
 						ss >> entity_data.grid_pos.y;
 						ss >> entity_data.grid_pos.z;
 
-						if(entity_data.visual_pos == glm::vec3(0))
+						if(entity_data.visual_transform.position == glm::vec3(0))
 						{
-							entity_data.visual_pos = entity_data.grid_pos;
+							entity_data.visual_transform.position = entity_data.grid_pos;
 						}
 					}
 					else if(type == "visual_pos")
 					{
-						ss >> entity_data.visual_pos.x;
-						ss >> entity_data.visual_pos.y;
-						ss >> entity_data.visual_pos.z;
+						ss >> entity_data.visual_transform.position.x;
+						ss >> entity_data.visual_transform.position.y;
+						ss >> entity_data.visual_transform.position.z;
 					}
 					else if(type == "visual_rot")
 					{
-						ss >> entity_data.visual_rot.x;
-						ss >> entity_data.visual_rot.y;
-						ss >> entity_data.visual_rot.z;
+						ss >> entity_data.visual_transform.rotation.x;
+						ss >> entity_data.visual_transform.rotation.y;
+						ss >> entity_data.visual_transform.rotation.z;
 					}
 					else if(type == "visual_scl")
 					{
-						ss >> entity_data.visual_scl.x;
-						ss >> entity_data.visual_scl.y;
-						ss >> entity_data.visual_scl.z;
+						ss >> entity_data.visual_transform.scale.x;
+						ss >> entity_data.visual_transform.scale.y;
+						ss >> entity_data.visual_transform.scale.z;
 					}
 					else if(type == "end_entity")
 					{
@@ -378,307 +278,32 @@ void world_t::delete_chunk(int index)
 }
 
 //
-// CHUNK 
-//
-
-void chunk_t::clear_data()
-{
-	entities.clear();
-}
-
-std::vector<glm::ivec3> chunk_t::neighbors(glm::ivec3 _pos) const
-{
-	std::vector<glm::ivec3> results;
-
-	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0} };
-	for (auto dir : DIRS)
-	{
-		glm::ivec3 next = _pos + glm::ivec3(dir,0);
-		
-		results.push_back(next);
-	}
-
-	if ((_pos.x + _pos.y) % 2 == 0)
-		std::reverse(results.begin(), results.end());
-
-	return results;
-}
-
-std::vector<glm::ivec3> chunk_t::diagonal_neighbors(glm::ivec3 _pos) const
-{
-	std::vector<glm::ivec3> results;
-
-	// TODO: change directions to 3D
-	std::vector<glm::ivec2> DIRS = { {0,1}, {0, -1}, {1,0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} };
-	for (auto dir : DIRS)
-	{
-		glm::ivec3 next = _pos + glm::ivec3(dir, 0);
-
-		results.push_back(next);
-	}
-
-	if ((_pos.x + _pos.y) % 2 == 0)
-		std::reverse(results.begin(), results.end());
-
-	return results;
-}
-
-std::weak_ptr<entity> chunk_t::find_entity_by_id(uuid _id) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity->id == _id)
-		{
-			return entity;
-		}
-	}
-
-	//log_warning("ENTITY WITH ID DOES NOT EXIST");
-	return std::weak_ptr<entity>();
-}
-
-std::weak_ptr<entity> chunk_t::find_entity_by_index(int _index) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity->index == _index)
-		{
-			return entity;
-		}
-	}
-
-	//log_warning("Entity with index does not exist");
-	return std::weak_ptr<entity>();
-}
-
-std::weak_ptr<entity> chunk_t::find_entity_by_position(glm::vec3 _pos) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-	log_warning("ENTITY AT POSITION DOES NOT EXIST");
-}
-
-bool chunk_t::is_entity_at_position(glm::vec3 _pos) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-std::weak_ptr<entity> chunk_t::get_entity_at_position(glm::vec3 _pos)
-{
-	for (auto& entity : entities)
-	{
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-	return std::weak_ptr<entity>();
-}
-
-bool chunk_t::check_collisions(glm::vec3 _pos) const
-{
-	for(auto& entity : entities)
-	{
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool chunk_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool chunk_t::check_collisions(glm::vec3 _pos, std::string _tag) const
-{
-	for (auto& entity : entities)
-	{
-		if (entity->name != _tag)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool chunk_t::check_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag) const {
-	for (auto& entity : entities)
-	{
-		if (entity->name != _tag)
-			continue;
-
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-//
-// GET COLLISIONS
-//
-
-std::weak_ptr<entity> chunk_t::get_collisions(glm::vec3 _pos)
-{
-	for (auto& entity : entities)
-	{
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-	return std::weak_ptr<entity>();
-}
-
-std::weak_ptr<entity> chunk_t::get_collisions(glm::vec3 _pos, entity* _ignored_entity)
-{
-	for (auto& entity : entities)
-	{
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-	return std::weak_ptr<entity>();
-}
-
-std::weak_ptr<entity> chunk_t::get_collisions(glm::vec3 _pos, std::string _tag)
-{
-	for (auto& entity : entities)
-	{
-		if (entity->name != _tag)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-	return std::weak_ptr<entity>();
-}
-
-std::weak_ptr<entity> chunk_t::get_collisions(glm::vec3 _pos, entity* _ignored_entity, std::string _tag)
-{
-	for (auto& entity : entities)
-	{
-		if (entity->name != _tag)
-			continue;
-
-		if (entity.get() == _ignored_entity)
-			continue;
-
-		if (entity->flags.has(entity_flags_no_collision))
-			continue;
-
-		if (entity->grid_pos == vec_to_ivec(_pos))
-		{
-			return entity;
-		}
-	}
-
-
-	return std::weak_ptr<entity>();
-}
-
-//
 // HELPER FUNCTIONS
 //
 
 template<typename T>
-std::weak_ptr<entity> new_entity(std::shared_ptr<chunk_t> chunk)
+std::shared_ptr<T> new_entity()
 {
-	std::shared_ptr<entity> entity = std::make_shared<T>();
-	
-	entity->chunk = chunk;
+	std::shared_ptr<entity_t> entity = std::make_shared<T>();
 
 	entity->id = uuid();
 	entity->flags = entity_flags_t();
 	entity->index = ++current_entity_index;
 
-	//entity->init();
-
-	chunk->entities.push_back(entity);
-
-	return entity;
+	return std::dynamic_pointer_cast<T> (entity);
 }
 
 void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 {
-	std::weak_ptr<entity> entity;
+	std::shared_ptr<entity_t> entity;
 
-	if (data.type == "player")
+	if (data.type == "player_spawn")
 	{
-		entity = new_entity<player_entity>(chunk);
+		entity = new_entity<player_spawn_entity>();
 	}
 	else if (data.type == "block")
 	{
-		entity = new_entity<block_entity>(chunk);
+		entity = new_entity<block_entity>();
 	}
 	else
 	{
@@ -686,32 +311,31 @@ void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 		return;
 	}
 
-	if (auto tmp_entity = entity.lock())
+	if (data.id != 0)
 	{
-		if (data.id != 0)
-		{
-			tmp_entity->id = data.id;
-		}
-
-		tmp_entity->flags = data.flags;
-		tmp_entity->grid_pos = data.grid_pos;
-		tmp_entity->visual_pos = data.visual_pos;
-		tmp_entity->visual_rot = data.visual_rot;
-		tmp_entity->visual_scl = data.visual_scl;
+		entity->id = data.id;
 	}
+
+	entity->chunk = chunk;
+	entity->flags = data.flags;
+	entity->grid_pos = data.grid_pos;
+	entity->visual_transform.position = data.visual_transform.position;
+	entity->visual_transform.rotation = data.visual_transform.rotation;
+	entity->visual_transform.scale = data.visual_transform.scale;
+	chunk->entities.push_back(entity);
 }
 
 void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 {
-	std::weak_ptr<entity> entity;
+	std::shared_ptr<entity_t> entity;
 
-	if (data.type == "player")
+	if (data.type == "player_spawn")
 	{
-		entity = new_entity<player_entity>(chunk);
+		entity = new_entity<player_spawn_entity>();
 	}
 	else if (data.type == "block")
 	{
-		entity = new_entity<block_entity>(chunk);
+		entity = new_entity<block_entity>();
 	}
 	else
 	{
@@ -719,29 +343,23 @@ void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 		return;
 	}
 
-	if (auto tmp_entity = entity.lock())
-	{
-		if (data.id != 0)
-		{
-			tmp_entity->id = data.id;
-		}
+	entity->chunk = chunk;
+	entity->flags = data.flags;
+	entity->grid_pos = data.grid_pos;
+	entity->visual_transform.position = data.visual_transform.position;
+	entity->visual_transform.rotation = data.visual_transform.rotation;
+	entity->visual_transform.scale = data.visual_transform.scale;
+	chunk->entities.push_back(entity);
 
-		tmp_entity->flags = data.flags;
-		tmp_entity->grid_pos = data.grid_pos;
-		tmp_entity->visual_pos = data.visual_pos;
-		tmp_entity->visual_rot = data.visual_rot;
-		tmp_entity->visual_scl = data.visual_scl;
-
-		tmp_entity->init();
-	}
+	entity->init();
 }
 
-void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity> _entity)
+void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity_t> _entity)
 {
 	chunk->entities.erase(std::remove(chunk->entities.begin(), chunk->entities.end(), _entity.lock()), chunk->entities.end());
 }
 
-void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity& entity)
+void transition_chunk(std::shared_ptr<chunk_t> next_chunk, entity_t& entity)
 {
 	entity.chunk = next_chunk;
 }

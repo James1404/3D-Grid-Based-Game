@@ -14,18 +14,62 @@ void player_entity::init()
 	vel = glm::vec3(0, 0, 0);
 	interp_speed = walk_speed;
 
-	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_pos, &visual_rot, &visual_scl);
+	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_transform);
 
 #ifdef _DEBUG
 	model.index = index;
 #endif
 }
 
+void player_entity::move_grid_pos(glm::ivec3 _dir)
+{
+	if (is_moving())
+		return;
+
+	_dir.y = 0;
+	glm::ivec3 new_pos = grid_pos + _dir;
+	if (is_grounded(grid_pos))
+	{
+		if (!chunk->check_collisions(new_pos, this))
+		{
+			if(!chunk->check_collisions(new_pos + glm::ivec3(0,1,0), this))
+			{
+				if (is_grounded(new_pos))
+				{
+					set_grid_pos(new_pos);
+				}
+				else
+				{
+					if (!chunk->check_collisions(new_pos + glm::ivec3(0, -1, 0)))
+					{
+						if (is_grounded(new_pos + glm::ivec3(0, -1, 0)))
+							set_grid_pos(new_pos + glm::ivec3(0, -1, 0));
+					}
+				}
+			}
+		}
+		else
+		{
+			// TODO: make no climb work
+			if (!chunk->check_collisions(grid_pos + glm::ivec3(0, 1, 0)))
+			{
+				if (!chunk->check_collisions(grid_pos + glm::ivec3(0, 2, 0)))
+				{
+					if (!chunk->check_collisions(new_pos + glm::ivec3(0, 1, 0)))
+					{
+						set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
+					}
+				}
+			}
+		}
+	}
+}
+
 void player_entity::update(double dt)
 {
-	set_camera("Player");
+	camera_manager_t::get().set_camera("Player");
 
-	if (auto player_cam = get_camera("Player").lock())
+	if (auto player_cam = camera_manager_t::get().get_camera("Player").lock())
 	{
 		if (is_first_person)
 		{
@@ -35,25 +79,25 @@ void player_entity::update(double dt)
 			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
 			vel = { 0,0,0 };
 
-			if (!(input_button_pressed("MoveUp") && input_button_pressed("MoveDown")))
+			if (!(input_t::get().button_pressed("MoveUp") && input_t::get().button_pressed("MoveDown")))
 			{
-				if (input_button_pressed("MoveUp"))
+				if (input_t::get().button_pressed("MoveUp"))
 				{
 					vel.x = 1;
 				}
-				else if (input_button_pressed("MoveDown"))
+				else if (input_t::get().button_pressed("MoveDown"))
 				{
 					vel.x = -1;
 				}
 			}
 
-			if (!(input_button_pressed("MoveLeft") && input_button_pressed("MoveRight")))
+			if (!(input_t::get().button_pressed("MoveLeft") && input_t::get().button_pressed("MoveRight")))
 			{
-				if (input_button_pressed("MoveLeft"))
+				if (input_t::get().button_pressed("MoveLeft"))
 				{
 					vel.y = -1;
 				}
-				else if (input_button_pressed("MoveRight"))
+				else if (input_t::get().button_pressed("MoveRight"))
 				{
 					vel.y = 1;
 				}
@@ -82,8 +126,9 @@ void player_entity::update(double dt)
 			model.is_paused = false;
 
 			bool is_wall_collision = false;
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 6; i++)
 			{
+				//add_primitive_wireframe_cube(grid_pos + glm::ivec3(0, i, i), glm::vec3(1), colour::cyan);
 				if (chunk->check_collisions(grid_pos + glm::ivec3(0, i, i), this))
 				{
 					is_wall_collision = true;
@@ -121,7 +166,7 @@ void player_entity::update(double dt)
 
 	if (!is_moving())
 	{
-		if (input_key_pressed(SDL_SCANCODE_SPACE))
+		if (input_t::get().key_pressed(SDL_SCANCODE_SPACE))
 		{
 			if (!is_first_person)
 			{
@@ -138,28 +183,28 @@ void player_entity::update(double dt)
 		{
 			vel = { 0,0,0 };
 
-			if (!(input_button_pressed("MoveUp") && input_button_pressed("MoveDown")))
+			if (!(input_t::get().button_pressed("MoveUp") && input_t::get().button_pressed("MoveDown")))
 			{
-				if (input_button_pressed("MoveUp"))
+				if (input_t::get().button_pressed("MoveUp"))
 				{
 					vel = { 0,0,-1 };
 					fp_look_direction = { 0, 270, 0 };
 				}
-				else if (input_button_pressed("MoveDown"))
+				else if (input_t::get().button_pressed("MoveDown"))
 				{
 					vel = { 0,0,1 };
 					fp_look_direction = { 0, 90, 0 };
 				}
 			}
 
-			if (!(input_button_pressed("MoveLeft") && input_button_pressed("MoveRight")))
+			if (!(input_t::get().button_pressed("MoveLeft") && input_t::get().button_pressed("MoveRight")))
 			{
-				if (input_button_pressed("MoveLeft"))
+				if (input_t::get().button_pressed("MoveLeft"))
 				{
 					vel = { -1,0,0 };
 					fp_look_direction = { 0, 180, 0 };
 				}
-				else if (input_button_pressed("MoveRight"))
+				else if (input_t::get().button_pressed("MoveRight"))
 				{
 					vel = { 1,0,0 };
 					fp_look_direction = { 0, 0, 0 };
@@ -167,7 +212,7 @@ void player_entity::update(double dt)
 			}
 
 			interp_speed = walk_speed;
-			if (input_button_pressed("Run"))
+			if (input_t::get().button_pressed("Run"))
 			{
 				interp_speed = run_speed;
 			}

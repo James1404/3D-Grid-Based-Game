@@ -1,16 +1,13 @@
 #pragma once
 #include <memory>
 
-#include "world.h"
+#include "chunk.h"
 #include "renderer.h"
 #include "common.h"
 
-struct player_entity : public entity
+struct player_entity : public entity_t
 {
-	model_entity_t model;
-
 	glm::vec3 vel;
-
 
 	float walk_speed = 0.003f;
 	float run_speed = 0.006f;
@@ -29,6 +26,8 @@ struct player_entity : public entity
 		camera_view_wall_infront,
 	} camera_view_type = camera_view_default;
 
+	void move_grid_pos(glm::ivec3 _dir);
 	void init() override;
 	void update(double dt) override;
 };
+
