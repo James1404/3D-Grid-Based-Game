@@ -1,15 +1,6 @@
 #include "window.h"
 
-#include "renderer.h"
-
-SDL_Window* window;
-SDL_Event window_event;
-
-bool window_is_running = false;
-
-int window_size_x = 800, window_size_y = 600;
-
-void init_window(std::string title, int size_x, int size_y)
+void window_t::init(std::string title, int size_x, int size_y)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
 	{
@@ -20,15 +11,19 @@ void init_window(std::string title, int size_x, int size_y)
 
 		window_is_running = true;
 	}
+	else
+	{
+		window_is_running = false;
+	}
 }
 
-void shutdown_window()
+void window_t::shutdown()
 {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
-bool handle_window_events()
+bool window_t::handle_events()
 {
 	if(!SDL_PollEvent(&window_event))
 	{

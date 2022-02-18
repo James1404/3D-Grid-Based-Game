@@ -8,18 +8,7 @@
 #include "renderer.h"
 #include "log.h"
 
-static const uint8_t* keyboard_state;
-static uint8_t* previous_keyboard_state;
-static int keyboard_state_size;
-
-static Uint32 mouse_state;
-static Uint32 previous_mouse_state;
-static glm::ivec2 mouse_position;
-static glm::ivec2 previous_mouse_position;
-
-static std::multimap<std::string, unsigned int> mapped_inputs;
-
-void init_input()
+void input_t::init()
 {
 	keyboard_state = SDL_GetKeyboardState(&keyboard_state_size);
 	previous_keyboard_state = new Uint8[keyboard_state_size];
@@ -28,13 +17,13 @@ void init_input()
 	log_info("INITIALIZED INPUT");
 }
 
-void shutdown_input()
+void input_t::shutdown()
 {
 	delete[] previous_keyboard_state;
 	previous_keyboard_state = NULL;
 }
 
-void update_input()
+void input_t::update()
 {
 	previous_mouse_state = mouse_state;
 	previous_mouse_position = mouse_position;
@@ -42,7 +31,7 @@ void update_input()
 	memcpy(previous_keyboard_state, keyboard_state, keyboard_state_size);
 }
 
-bool input_button_down(std::string button)
+bool input_t::button_down(std::string button)
 {
 	auto range = mapped_inputs.equal_range(button);
 	for (auto i = range.first; i != range.second; ++i)
@@ -56,10 +45,13 @@ bool input_button_down(std::string button)
 	return false;
 }
 
-bool input_button_pressed(std::string button) {
+bool input_t::button_pressed(std::string button)
+{
 	auto range = mapped_inputs.equal_range(button);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (keyboard_state[i->second]) {
+	for (auto i = range.first; i != range.second; ++i)
+	{
+		if (keyboard_state[i->second])
+		{
 			return true;
 		}
 	}
@@ -67,10 +59,13 @@ bool input_button_pressed(std::string button) {
 	return false;
 }
 
-bool input_button_released(std::string button) {
+bool input_t::button_released(std::string button)
+{
 	auto range = mapped_inputs.equal_range(button);
-	for (auto i = range.first; i != range.second; ++i) {
-		if (!keyboard_state[i->second] && previous_keyboard_state[i->second]) {
+	for (auto i = range.first; i != range.second; ++i)
+	{
+		if (!keyboard_state[i->second] && previous_keyboard_state[i->second])
+		{
 			return true;
 		}
 	}
@@ -78,22 +73,27 @@ bool input_button_released(std::string button) {
 	return false;
 }
 
-bool input_key_down(SDL_Scancode key) {
+bool input_t::key_down(SDL_Scancode key)
+{
 	return keyboard_state[key] && !previous_keyboard_state[key];
 }
 
-bool input_key_pressed(SDL_Scancode key) {
+bool input_t::key_pressed(SDL_Scancode key) 
+{
 	return keyboard_state[key];
 }
 
-bool input_key_released(SDL_Scancode key) {
+bool input_t::key_released(SDL_Scancode key)
+{
 	return !keyboard_state[key] && previous_keyboard_state[key];
 }
 
-bool input_mouse_button_down(mouse_button button) {
+bool input_t::mouse_button_down(mouse_button button) 
+{
 	Uint32 mask = 0;
 
-	switch (button) {
+	switch (button)
+	{
 	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
 	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
 	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
@@ -104,10 +104,12 @@ bool input_mouse_button_down(mouse_button button) {
 	return (mouse_state & mask) && !(previous_mouse_state & mask);
 }
 
-bool input_mouse_button_pressed(mouse_button button) {
+bool input_t::mouse_button_pressed(mouse_button button)
+{
 	Uint32 mask = 0;
 
-	switch (button) {
+	switch (button)
+	{
 	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
 	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
 	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
@@ -118,10 +120,12 @@ bool input_mouse_button_pressed(mouse_button button) {
 	return (mouse_state & mask);
 }
 
-bool input_mouse_button_released(mouse_button button) {
+bool input_t::mouse_button_released(mouse_button button)
+{
 	Uint32 mask = 0;
 
-	switch (button) {
+	switch (button)
+	{
 	case mouse_button::MOUSE_LEFT: mask = SDL_BUTTON_LMASK; break;
 	case mouse_button::MOUSE_RIGHT: mask = SDL_BUTTON_RMASK; break;
 	case mouse_button::MOUSE_MIDDLE: mask = SDL_BUTTON_MMASK; break;
@@ -132,22 +136,28 @@ bool input_mouse_button_released(mouse_button button) {
 	return !(mouse_state & mask) && (previous_mouse_state & mask);
 }
 
-const glm::ivec2 input_get_mouse_pos() {
+const glm::ivec2 input_t::get_mouse_pos()
+{
 	return mouse_position;
 }
 
-const glm::ivec2 input_get_previous_mouse_pos() {
+const glm::ivec2 input_t::get_previous_mouse_pos()
+{
 	return previous_mouse_position;
 }
 
-const glm::ivec2 input_get_mouse_delta() {
+const glm::ivec2 input_t::get_mouse_delta()
+{
 	return previous_mouse_position - mouse_position;
 }
 
-void save_input() {
+void input_t::save()
+{
 	std::ofstream ofs("inputSettings.input");
-	if (ofs.is_open()) {
-		for (auto input : mapped_inputs) {
+	if (ofs.is_open())
+	{
+		for (auto input : mapped_inputs)
+		{
 			ofs << input.first << " " << input.second << std::endl;
 		}
 	}
@@ -156,16 +166,19 @@ void save_input() {
 	log_info("SAVED INPUT");
 }
 
-void load_input() {
+void input_t::load()
+{
 	mapped_inputs.clear();
 
-	log_info("RETRIEVING INPUT FILE");
+	//log_info("RETRIEVING INPUT FILE");
 	std::ifstream ifs("inputSettings.input");
-	if (ifs.is_open()) {
-		log_info("PARSING INPUT FILE");
+	if (ifs.is_open())
+	{
+		//log_info("PARSING INPUT FILE");
 
 		std::string line;
-		while (std::getline(ifs, line)) {
+		while (std::getline(ifs, line))
+		{
 			std::string key;
 			unsigned int value;
 
@@ -173,11 +186,12 @@ void load_input() {
 			if (!(iss >> key >> value)) { break; }
 
 			mapped_inputs.insert(std::make_pair(key, value));
-			log_info(" - ", key.c_str(), " ", value);
+			//log_info(" - ", key.c_str(), " ", value);
 		}
 		log_info("FINISHED LOADING INPUT DATA");
 	}
-	else {
+	else
+	{
 		// THIS IS CALLED IF NOT INPUT FILE EXISTS AND IT MAKES ONE.
 
 		log_warning("CANNOT FIND INPUT FILE");
@@ -206,8 +220,8 @@ void load_input() {
 
 		mapped_inputs.insert({ "Exit", SDL_SCANCODE_ESCAPE });
 
-		save_input();
-		load_input();
+		save();
+		load();
 	}
 
 	ifs.close();

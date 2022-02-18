@@ -22,36 +22,33 @@ enum engine_state
 
 int main(int argc, char* args[])
 {
-	init_window("Game", 1280, 720);
+	engine_state current_engine_state = engine_state_gameplay;
 
-	world_t game_world;
-	event_manager_t event_manager;
+	window_t::get().init("Game", 1280, 720);
 
-	engine_state current_engine_state;
+	asset_manager_t::get().init();
 
-	init_renderer();
+	renderer_t::get().init();
 
-	init_input();
-	load_input();
+	input_t::get().init();
+	input_t::get().load();
 	
-	// LEVEL NAMES :
-	// combattestlevel
-	game_world.load();
+	world_t::get().load();
 
-	current_engine_state = engine_state_gameplay;
+	event_manager_t::get().init();
 
 #ifdef _DEBUG
-	init_editor(game_world);
+	editor_t::get().init();
 #endif // _DEBUG
 
 	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
-	while (window_is_running)
+	while (window_t::get().window_is_running)
 	{
 		/* ----- HANDLE EVENTS ----- */
-		if (handle_window_events())
+		if (window_t::get().handle_events())
 		{
 #ifdef _DEBUG
-			handle_editor_events();
+			editor_t::get().handle_events();
 #endif // _DEBUG
 		}
 
@@ -61,25 +58,23 @@ int main(int argc, char* args[])
 		NOW = SDL_GetPerformanceCounter();
 		double dt = ((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-		game_world.update(dt);
-
-		add_primitive_quad(glm::vec3(0), glm::vec3(0), glm::vec2(1), colour::green);
+		world_t::get().update(dt);
 
 #ifdef _DEBUG
 		if (current_engine_state == engine_state_editor)
 		{
-			game_world.is_paused = true;
-			update_editor(dt);
+			world_t::get().is_paused = true;
+			editor_t::get().update(dt);
 		}
 		else
 		{
-			game_world.is_paused = false;
+			world_t::get().is_paused = false;
 		}
 
-		if (input_key_down(SDL_SCANCODE_ESCAPE)) {
+		if (input_t::get().key_down(SDL_SCANCODE_ESCAPE)) {
 			if (current_engine_state == engine_state_gameplay)
 			{
-				game_world.load();
+				world_t::get().load();
 				current_engine_state = engine_state_editor;
 			}
 			else if (current_engine_state == engine_state_editor)
@@ -89,49 +84,53 @@ int main(int argc, char* args[])
 		}
 #endif // _DEBUG
 
-		update_camera();
-		update_input();
+		camera_manager_t::get().update();
+		input_t::get().update();
 
 		/* ----- RENDER GAME ----- */
 #ifdef _DEBUG
-		bind_editor_framebuffer();
+		editor_t::get().bind_framebuffer();
 
-		renderer_clear_screen();
+		renderer_t::get().clear_screen();
 
-		renderer_draw();
+		renderer_t::get().draw();
 
-		unbind_editor_framebuffer();
+		editor_t::get().unbind_framebuffer();
 
-		draw_editor_framebuffer();
+		editor_t::get().draw_framebuffer();
 
 		if (current_engine_state == engine_state_editor)
 		{
-			draw_editor();
+			editor_t::get().draw();
 		}
 
-		renderer_swap_screen_buffers();
+		renderer_t::get().swap_screen_buffers();
 #else
-		renderer_clear_screen();
+		renderer_t::get().clear_screen();
 
-		renderer_draw();
+		renderer_t::get().draw();
 
-		renderer_swap_screen_buffers();
+		renderer_t::get().swap_screen_buffers();
 #endif // _DEBUG
 	}
 
 	/* ----- CLEAN GAME ----- */
 	log_info("STARTING CLEANUP");
-
+	
 #ifdef _DEBUG
-	shutdown_editor();
+	editor_t::get().shutdown();
 #endif // _DEBUG
 
-	game_world.shutdown();
+	camera_manager_t::get().shutdown();
 
-	shutdown_input();
+	event_manager_t::get().shutdown();
+	world_t::get().shutdown();
 
-	shutdown_renderer();
-	shutdown_window();
+	input_t::get().shutdown();
+
+	renderer_t::get().shutdown();
+	asset_manager_t::get().shutdown();
+	window_t::get().shutdown();
 
 	log_info("CLEANUP FINISHED");
 

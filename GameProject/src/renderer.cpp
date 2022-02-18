@@ -10,29 +10,22 @@
 // ----- RENDERER -----
 //
 
-SDL_GLContext context;
-
-glm::mat4 projection_matrix;
-glm::mat4 view_matrix = glm::mat4(1.0f);
-
-int screen_resolution_x = 1280, screen_resolution_y = 720;
-float near_clip_plane = 0.1f, far_clip_plane = 100.0f;
-
-static std::vector<model_entity_t*> model_list;
-
-void init_renderer() {
-	log_info("STARTING RENDERER INITIALIZATION");
+void renderer_t::init()
+{
+	//log_info("STARTING RENDERER INITIALIZATION");
 	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	context = SDL_GL_CreateContext(window);
+	context = SDL_GL_CreateContext(window_t::get().window);
 
-	if (context != NULL) {
+	if (context != NULL)
+	{
 		glewExperimental = GL_TRUE;
 		GLenum glewError = glewInit();
-		if (glewError != GLEW_OK) {
+		if (glewError != GLEW_OK)
+		{
 			log_error("Error initializing GLEW! ", glewGetErrorString(glewError));
 		}
 	}
@@ -42,39 +35,45 @@ void init_renderer() {
 
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 
-	log_info("SUCCESFULY COMPLETED RENDERER INITIALIZATION");
 
 	// Set aspect ratio
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 
-	init_primitives();
+	primitive_renderer.init();
+
+	log_info("INITIALIZED RENDERER");
 }
 
-void shutdown_renderer() {
-	shutdown_primitives();
+void renderer_t::shutdown()
+{
+	primitive_renderer.shutdown();
 
 	SDL_GL_DeleteContext(context);
 }
 
-void renderer_clear_screen() {
+void renderer_t::clear_screen()
+{
 	// Clear screen
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void renderer_swap_screen_buffers() {
-	SDL_GL_SwapWindow(window);
+void renderer_t::swap_screen_buffers()
+{
+	SDL_GL_SwapWindow(window_t::get().window);
 }
 
-void renderer_draw() {
-	for (auto& i : model_list) {
+void renderer_t::draw()
+{
+	for (auto& i : model_list)
+	{
 		i->draw();
 	}
 
-	draw_primitives();
+	primitive_renderer.draw();
 }
 
-void renderer_set_resolution(int x, int y)
+void renderer_t::set_resolution(int x, int y)
 {
 	screen_resolution_x = x; 
 	screen_resolution_y = y;
@@ -82,39 +81,41 @@ void renderer_set_resolution(int x, int y)
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 }
 
-
-void model_entity_t::define_model(std::string _model_path,std::string _texture_path, glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale)
+void model_entity_t::define_model(std::string _model_path,std::string _texture_path, transform_t* _transform)
 {
-	position = _position;
-	rotation = _rotation;
-	scale = _scale;
+	transform = _transform;
 
 	is_paused = false;
 
-	model = asset_manager.load_model_from_file(_model_path);
-	shader = asset_manager.load_shader_from_file("data/shaders/model_loading.glsl");
-	texture = asset_manager.load_texture_from_file(_texture_path);
+	model = asset_manager_t::get().load_model_from_file(_model_path);
+	shader = asset_manager_t::get().load_shader_from_file("data/shaders/model_loading.glsl");
+	texture = asset_manager_t::get().load_texture_from_file(_texture_path);
 
 	glUseProgram(shader->id);
 	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection_matrix));
 	glUniform1i(glGetUniformLocation(shader->id, "Texture"), 0);
+
+	renderer_t::get().model_list.push_back(this);
+	//renderer_t::get().unique_draw_calls[*texture][*model].push_back(*this);
 }
 
 model_entity_t::model_entity_t()
 {
-	model_list.push_back(this);
 }
 
-model_entity_t::~model_entity_t() {
-	for (auto it = model_list.begin(); it != model_list.end();) {
+model_entity_t::~model_entity_t()
+{
+	for (auto it = renderer_t::get().model_list.begin(); it != renderer_t::get().model_list.end();)
+	{
 		if (*it == this)
-			it = model_list.erase(it);
+			it = renderer_t::get().model_list.erase(it);
 		else
 			++it;
 	}
 }
 
-void model_entity_t::draw() {
+void model_entity_t::draw()
+{
 	if (is_paused)
 		return;
 
@@ -123,20 +124,10 @@ void model_entity_t::draw() {
 
 	glUseProgram(shader->id);
 
-	glm::mat4 new_model = glm::mat4(1.0f);
-	new_model = glm::translate(new_model, *position);
+	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
 
-	new_model = glm::rotate(new_model, glm::radians(rotation->x), glm::vec3(1, 0, 0));
-	new_model = glm::rotate(new_model, glm::radians(rotation->y), glm::vec3(0, 1, 0));
-	new_model = glm::rotate(new_model, glm::radians(rotation->z), glm::vec3(0, 0, 1));
-
-	new_model = glm::scale(new_model, *scale);
-
-	auto mvp = projection_matrix * view_matrix * new_model;
-
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "mvp"), 1, false, glm::value_ptr(mvp));
-	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "view"), 1, false, glm::value_ptr(view_matrix));
-	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(new_model));
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view_projection"), 1, false, glm::value_ptr(view_projection));
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(transform->get_matrix()));
 
 #ifdef _DEBUG
 	glUniform1i(glGetUniformLocation(shader->id, "entity_index"), index);
@@ -149,14 +140,11 @@ void model_entity_t::draw() {
 // ----- PRIMITIVES -----
 //
 
-static std::shared_ptr<shader_t> line_shader, quad_shader;
-static unsigned int line_vao, line_vbo, line_ebo;
-static unsigned int quad_vao, quad_vbo, quad_ebo;
 
-void init_primitives()
+void primitive_renderer_t::init()
 {
 	// Line
-	line_shader = asset_manager.load_shader_from_file("data/shaders/debug/debug_line.glsl");
+	line_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug/debug_line.glsl");
 
 	glGenVertexArrays(1, &line_vao);
 	glBindVertexArray(line_vao);
@@ -168,7 +156,7 @@ void init_primitives()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
 
 	// Quad
-	quad_shader = asset_manager.load_shader_from_file("data/shaders/debug/debug_quad.glsl");
+	quad_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug/debug_quad.glsl");
 
 	glGenVertexArrays(1, &quad_vao);
 	glBindVertexArray(quad_vao);
@@ -180,7 +168,7 @@ void init_primitives()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad_ebo);
 }
 
-void shutdown_primitives()
+void primitive_renderer_t::shutdown()
 {
 	// Line
 	glDeleteProgram(line_shader->id);
@@ -195,7 +183,7 @@ void shutdown_primitives()
 	glDeleteVertexArrays(1, &quad_vao);
 }
 
-static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
+void primitive_renderer_t::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF
 	float vertices[] = {
 		p1.x, p1.y, p1.z,	// first point
@@ -212,8 +200,8 @@ static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm
 
 	glUseProgram(line_shader->id);
 
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(renderer_t::get().projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(renderer_t::get().view_matrix));
 
 	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
 
@@ -222,27 +210,27 @@ static void renderer_draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm
 	//line_draw_list.push_back(drawing);
 }
 
-static void renderer_draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
+void primitive_renderer_t::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
 	glm::vec3 new_pos = pos + -.5f;
-	renderer_draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
-	renderer_draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
-	renderer_draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
+	draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
+	draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
+	draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
 
-	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
-	renderer_draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
+	draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	renderer_draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	renderer_draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
+	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
+	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
 
-	renderer_draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
-	renderer_draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
+	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
+	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
 
-	renderer_draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
-	renderer_draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
+	draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
+	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
 }
 
-static void renderer_draw_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour) {
+void primitive_renderer_t::draw_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour) {
 	// SETUP STUFF
 	float vertices[] =
 	{
@@ -280,7 +268,7 @@ static void renderer_draw_quad(const glm::vec3 pos, const glm::vec3 rot, const g
 
 	model = glm::scale(model, glm::vec3(scl, 0));
 
-	auto mvp = projection_matrix * view_matrix * model;
+	auto mvp = renderer_t::get().projection_matrix * renderer_t::get().view_matrix * model;
 
 	glUniformMatrix4fv(glGetUniformLocation(quad_shader->id, "u_mvp"), 1, false, glm::value_ptr(mvp));
 
@@ -327,7 +315,7 @@ struct primitive_data
 
 std::stack<primitive_data> primitive_draw_stack;
 
-void draw_primitives()
+void primitive_renderer_t::draw()
 {
 	while (!primitive_draw_stack.empty())
 	{
@@ -336,13 +324,13 @@ void draw_primitives()
 		switch (primitive.type)
 		{
 		case primitive_data_type::line:
-			renderer_draw_line(primitive.line.p1, primitive.line.p2, primitive.colour);
+			draw_line(primitive.line.p1, primitive.line.p2, primitive.colour);
 			break;
 		case primitive_data_type::wireframe_cube:
-			renderer_draw_box_wireframe(primitive.wireframe_cube.pos, primitive.wireframe_cube.size, primitive.colour);
+			draw_box_wireframe(primitive.wireframe_cube.pos, primitive.wireframe_cube.size, primitive.colour);
 			break;
 		case primitive_data_type::quad:
-			renderer_draw_quad(primitive.quad.pos, primitive.quad.rot, primitive.quad.scl, primitive.colour);
+			draw_quad(primitive.quad.pos, primitive.quad.rot, primitive.quad.scl, primitive.colour);
 			break;
 		}
 
@@ -350,7 +338,7 @@ void draw_primitives()
 	}
 }
 
-void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour)
+void primitive_renderer_t::add_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour)
 {
 	auto data = primitive_data::new_primitive_data(primitive_data_type::line);
 	data.line.p1 = p1;
@@ -359,7 +347,7 @@ void add_primitive_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 
 	primitive_draw_stack.push(data);
 }
 
-void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour)
+void primitive_renderer_t::add_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour)
 {
 	auto data = primitive_data::new_primitive_data(primitive_data_type::wireframe_cube);
 	data.wireframe_cube.pos = pos;
@@ -368,7 +356,7 @@ void add_primitive_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, con
 	primitive_draw_stack.push(data);
 }
 
-void add_primitive_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour)
+void primitive_renderer_t::add_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour)
 {
 	auto data = primitive_data::new_primitive_data(primitive_data_type::quad);
 	data.quad.pos = pos;

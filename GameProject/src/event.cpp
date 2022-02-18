@@ -4,10 +4,12 @@
 // EVENT MANAGER
 //
 
-event_manager_t::event_manager_t()
-{}
+void event_manager_t::init()
+{
 
-event_manager_t::~event_manager_t()
+}
+
+void event_manager_t::shutdown()
 {
 	events.clear();
 }

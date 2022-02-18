@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cassert>
 
 #include <GL/glew.h>
 #include <GL/GLU.h>
@@ -22,7 +23,20 @@
 
 #include "log.h"
 
-struct shader_t {
+struct transform_t
+{
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+
+	transform_t();
+	transform_t(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+
+	glm::mat4 get_matrix();
+};
+
+struct shader_t
+{
 	unsigned int id;
 
 	~shader_t()
@@ -31,7 +45,8 @@ struct shader_t {
 	}
 };
 
-struct texture_t {
+struct texture_t
+{
 	unsigned int id;
 
 	~texture_t()
@@ -40,32 +55,45 @@ struct texture_t {
 	}
 };
 
-struct vertex_t {
+struct vertex_t
+{
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 tex_coords;
 };
 
-struct mesh_t {
+/*
+struct mesh_t
+{
 	std::vector<vertex_t> vertices;
 	std::vector<unsigned int> indices;
 
 	mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
+	~mesh_t();
+
 	void draw(shader_t& _shader);
 private:
 	unsigned int vao, vbo, ebo;
 	void setupMesh();
 };
+*/
 
-struct model_t {
-	std::vector<mesh_t> meshes;
+struct model_t
+{
+	std::vector<vertex_t> vertices;
+	std::vector<unsigned int> indices;
+
+	unsigned int vao, vbo, ebo;
+
+	//int mesh_count;
 	std::string directory;
 
 	void draw(shader_t& _shader);
 
 	void load_model(std::string _path);
 	void process_node(aiNode* node, const aiScene* scene);
-	mesh_t process_mesh(aiMesh* mesh, const aiScene* scene);
+	void process_mesh(aiMesh* mesh, const aiScene* scene);
+	void setup_buffers();
 };
 
 struct asset_manager_t
@@ -77,6 +105,18 @@ struct asset_manager_t
 	std::shared_ptr<shader_t> load_shader_from_file(std::string path);
 	std::shared_ptr<texture_t> load_texture_from_file(std::string path);
 	std::shared_ptr<model_t> load_model_from_file(std::string path);
-};
 
-extern asset_manager_t asset_manager;
+	void init();
+	void shutdown();
+
+	static asset_manager_t& get()
+	{
+		static asset_manager_t* instance = NULL;
+		if(instance == NULL)
+		{
+			instance = new asset_manager_t;
+		}
+		assert(instance);
+		return *instance;
+	}
+};

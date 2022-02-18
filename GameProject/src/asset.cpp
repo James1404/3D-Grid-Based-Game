@@ -2,20 +2,57 @@
 
 #include "log.h"
 
-mesh_t::mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices) {
+//
+// transform
+//
+
+transform_t::transform_t()
+	: position(glm::vec3(0)), rotation(glm::vec3(0)), scale(glm::vec3(1)) {}
+
+transform_t::transform_t(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+	: position(position), rotation(rotation), scale(scale) {}
+
+glm::mat4 transform_t::get_matrix()
+{
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, position);
+
+	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+	model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+
+	model = glm::scale(model, scale);
+
+	return model;
+}
+
+//
+// mesh
+//
+
+/*
+mesh_t::mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices)
+{
 	this->vertices = vertices;
 	this->indices = indices;
 
 	setupMesh();
 }
 
-void mesh_t::draw(shader_t& _shader) {
+mesh_t::~mesh_t()
+{
+	// DELETE VAO,VBO,EBO;
+}
+
+void mesh_t::draw(shader_t& _shader)
+{
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
-void mesh_t::setupMesh() {
+void mesh_t::setupMesh()
+{
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &ebo);
@@ -39,42 +76,40 @@ void mesh_t::setupMesh() {
 
 	glBindVertexArray(0);
 }
-void model_t::draw(shader_t& _shader) {
-	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].draw(_shader);
-	}
-}
+*/
 
-void model_t::load_model(std::string _path) {
+void model_t::load_model(std::string _path)
+{
 	Assimp::Importer import;
-	const aiScene* scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_PreTransformVertices);
 
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
 		log_error("ERROR::ASSIMP::", import.GetErrorString());
 		return;
 	}
 	directory = _path.substr(0, _path.find_last_of('/'));
 
 	process_node(scene->mRootNode, scene);
+	setup_buffers();
 }
 
-void model_t::process_node(aiNode* node, const aiScene* scene) {
-	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+void model_t::process_node(aiNode* node, const aiScene* scene)
+{
+	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(process_mesh(mesh, scene));
+		process_mesh(mesh, scene);
 	}
 
-	for (unsigned int i = 0; i < node->mNumChildren; i++) {
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
 		process_node(node->mChildren[i], scene);
 	}
 }
 
-mesh_t model_t::process_mesh(aiMesh* mesh, const aiScene* scene)
+void model_t::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
-	std::vector<vertex_t> vertices;
-	std::vector<unsigned int> indices;
-	std::vector<texture_t> textures;
-
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
 		vertex_t vertex;
@@ -98,22 +133,66 @@ mesh_t model_t::process_mesh(aiMesh* mesh, const aiScene* scene)
 			vertex.tex_coords = vec;
 		}
 		else
+		{
 			vertex.tex_coords = glm::vec2(0);
+		}
 
 		vertices.push_back(vertex);
 	}
 
+	int indices_count = indices.size();
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 		{
-			indices.push_back(face.mIndices[j]);
+			indices.push_back(face.mIndices[j] + indices_count);
 		}
 	}
-
-	return mesh_t(vertices, indices);
 }
+
+void model_t::setup_buffers()
+{
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex_t), &vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coords));
+
+	glBindVertexArray(0);
+}
+
+void model_t::draw(shader_t& _shader)
+{
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	/*
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
+		meshes[i].draw(_shader);
+	}
+	*/
+}
+
+//
+// ASSET MANAGER
+//
 
 std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string path)
 {
@@ -301,4 +380,13 @@ std::shared_ptr<model_t> asset_manager_t::load_model_from_file(std::string path)
 	return result;
 }
 
-asset_manager_t asset_manager;
+void asset_manager_t::init()
+{
+}
+
+void asset_manager_t::shutdown()
+{
+	shaders.clear();
+	textures.clear();
+	models.clear();
+}

@@ -4,6 +4,7 @@
 #include <glm.hpp>
 #include <SDL.h>
 #include <map>
+#include <cassert>
 
 enum class mouse_button {
 	MOUSE_LEFT = 0,
@@ -13,25 +14,50 @@ enum class mouse_button {
 	MOUSE_FORWARD
 };
 
-void init_input();
-void shutdown_input();
-void update_input();
+struct input_t
+{
+	const uint8_t* keyboard_state;
+	uint8_t* previous_keyboard_state;
+	int keyboard_state_size;
 
-bool input_button_down(std::string button);
-bool input_button_pressed(std::string button);
-bool input_button_released(std::string button);
+	Uint32 mouse_state;
+	Uint32 previous_mouse_state;
+	glm::ivec2 mouse_position;
+	glm::ivec2 previous_mouse_position;
 
-bool input_key_down(SDL_Scancode key);
-bool input_key_pressed(SDL_Scancode key);
-bool input_key_released(SDL_Scancode key);
+	std::multimap<std::string, unsigned int> mapped_inputs;
 
-bool input_mouse_button_down(mouse_button button);
-bool input_mouse_button_pressed(mouse_button button);
-bool input_mouse_button_released(mouse_button button);
+	void init();
+	void shutdown();
+	void update();
 
-const glm::ivec2 input_get_mouse_pos();
-const glm::ivec2 input_get_previous_mouse_pos();
-const glm::ivec2 input_get_mouse_delta();
+	bool button_down(std::string button);
+	bool button_pressed(std::string button);
+	bool button_released(std::string button);
 
-void save_input();
-void load_input();
+	bool key_down(SDL_Scancode key);
+	bool key_pressed(SDL_Scancode key);
+	bool key_released(SDL_Scancode key);
+
+	bool mouse_button_down(mouse_button button);
+	bool mouse_button_pressed(mouse_button button);
+	bool mouse_button_released(mouse_button button);
+
+	const glm::ivec2 get_mouse_pos();
+	const glm::ivec2 get_previous_mouse_pos();
+	const glm::ivec2 get_mouse_delta();
+
+	void save();
+	void load();
+
+	static input_t& get()
+	{
+		static input_t* instance = NULL;
+		if(instance == NULL)
+		{
+			instance = new input_t;
+		}
+		assert(instance);
+		return *instance;
+	}
+};
