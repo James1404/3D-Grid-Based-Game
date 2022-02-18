@@ -168,6 +168,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClCompile Include="src\asset.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="includes\imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="src\chunk.cpp" />
     <ClCompile Include="src\event.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\renderer.cpp" />
@@ -273,6 +274,7 @@ xcopy "$(ProjectDir)assimp-vc142-mtd.dll" "$(SolutionDir)x64\Release\" /Y</Comma
     <ClInclude Include="includes\imguizmo\ImSequencer.h" />
     <ClInclude Include="includes\imguizmo\ImZoomSlider.h" />
     <ClInclude Include="src\asset.h" />
+    <ClInclude Include="src\chunk.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\event.h" />
     <ClInclude Include="src\log.h" />
