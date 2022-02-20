@@ -62,38 +62,37 @@ struct vertex_t
 	glm::vec2 tex_coords;
 };
 
-/*
-struct mesh_t
+struct model_instance_data_t
 {
-	std::vector<vertex_t> vertices;
-	std::vector<unsigned int> indices;
+	transform_t* transform;
 
-	mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices);
-	~mesh_t();
-
-	void draw(shader_t& _shader);
-private:
-	unsigned int vao, vbo, ebo;
-	void setupMesh();
+#ifdef _DEBUG
+	int index;
+#endif
 };
-*/
 
 struct model_t
 {
 	std::vector<vertex_t> vertices;
 	std::vector<unsigned int> indices;
 
-	unsigned int vao, vbo, ebo;
+	unsigned int vao, vbo, ebo, instance_vbo;
+	std::vector<model_instance_data_t> instance_data;
+	int instance_buffer_size;
 
-	//int mesh_count;
 	std::string directory;
 
-	void draw(shader_t& _shader);
+	void draw();
 
 	void load_model(std::string _path);
 	void process_node(aiNode* node, const aiScene* scene);
 	void process_mesh(aiMesh* mesh, const aiScene* scene);
 	void setup_buffers();
+
+	void add_instance(transform_t* transform, int entity_index = 0);
+	void construct_instance_buffers();
+
+	void update_instance_buffers();
 };
 
 struct asset_manager_t

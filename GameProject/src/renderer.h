@@ -26,37 +26,6 @@
 
 #include "log.h"
 
-struct model_instance_data_t
-{
-	transform_t* transform;
-
-#ifdef _DEBUG
-	int index;
-#endif
-	void define_model(glm::vec3* _position, glm::vec3* _rotation, glm::vec3* _scale);
-};
-
-struct model_entity_t
-{
-	std::shared_ptr<model_t> model;
-	std::shared_ptr<shader_t> shader;
-	std::shared_ptr<texture_t> texture;
-
-	transform_t* transform;
-
-	bool is_paused;
-
-#ifdef _DEBUG
-	int index;
-#endif
-
-	model_entity_t();
-	~model_entity_t();
-
-	void define_model(std::string _model_path, std::string _texture_path, transform_t* _transform);
-	void draw();
-};
-
 namespace colour {
 	static const glm::vec3 black = glm::vec3(0, 0, 0);
 	static const glm::vec3 white = glm::vec3(1, 1, 1);
@@ -89,26 +58,6 @@ struct primitive_renderer_t
 	void shutdown();
 };
 
-/*
-namespace std
-{
-	template<> struct less<texture_t>
-	{
-		bool operator() (const texture_t& lhs, const texture_t& rhs)
-		{
-			return lhs.id < rhs.id;
-		}
-	};
-
-	template<> struct less<model_t>
-	{
-		bool operator() (const model_t& lhs, const model_t& rhs)
-		{
-			return lhs.id < rhs.id;
-		}
-	};
-}
-*/
 
 struct renderer_t
 {
@@ -122,9 +71,6 @@ struct renderer_t
 	float near_clip_plane = 0.1f, far_clip_plane = 100.0f;
 
 	primitive_renderer_t primitive_renderer;
-
-	std::vector<model_entity_t*> model_list;
-	//std::map<texture_t, std::map<model_t, std::vector<model_entity_t>>> unique_draw_calls;
 
 	void init();
 	void shutdown();

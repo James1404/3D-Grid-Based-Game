@@ -27,56 +27,8 @@ glm::mat4 transform_t::get_matrix()
 }
 
 //
-// mesh
+// MODEL
 //
-
-/*
-mesh_t::mesh_t(std::vector<vertex_t> vertices, std::vector<unsigned int> indices)
-{
-	this->vertices = vertices;
-	this->indices = indices;
-
-	setupMesh();
-}
-
-mesh_t::~mesh_t()
-{
-	// DELETE VAO,VBO,EBO;
-}
-
-void mesh_t::draw(shader_t& _shader)
-{
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-
-void mesh_t::setupMesh()
-{
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
-
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex_t), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, normal));
-
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (void*)offsetof(vertex_t, tex_coords));
-
-	glBindVertexArray(0);
-}
-*/
 
 void model_t::load_model(std::string _path)
 {
@@ -177,17 +129,85 @@ void model_t::setup_buffers()
 	glBindVertexArray(0);
 }
 
-void model_t::draw(shader_t& _shader)
+void model_t::add_instance(transform_t* transform, int entity_index)
 {
+	model_instance_data_t data;
+	data.transform = transform;
+
+#ifdef _DEBUG
+	data.index = entity_index;
+#endif // _DEBUG
+
+	instance_data.push_back(data);
+}
+
+void model_t::construct_instance_buffers()
+{
+	instance_buffer_size = instance_data.size();
+
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	/*
-	for (unsigned int i = 0; i < meshes.size(); i++)
+
+	glGenBuffers(1, &instance_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+
+#ifdef _DEBUG
+	glBufferData(GL_ARRAY_BUFFER, ((sizeof(float) * 3) + sizeof(int)) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
+#else
+	glBufferData(GL_ARRAY_BUFFER, (sizeof(float) * 3) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
+#endif
+
+	std::vector<glm::vec3> positions;
+#ifdef _DEBUG
+	std::vector<int> indexs;
+#endif // _DEBUG
+	for(int i = 0; i < instance_buffer_size; i++)
 	{
-		meshes[i].draw(_shader);
+		positions.push_back(instance_data[i].transform->position);
+#ifdef _DEBUG
+		indexs.push_back(instance_data[i].index);
+#endif // _DEBUG
 	}
-	*/
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * positions.size(), &positions[0]);
+#ifdef _DEBUG
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * positions.size(), sizeof(int) * indexs.size(), &indexs[0]);
+#endif // _DEBUG
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+	glVertexAttribDivisor(3, 1);
+
+#ifdef _DEBUG
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 1, GL_INT, GL_FALSE, sizeof(int), (void*)(sizeof(glm::vec3) * positions.size()));
+	glVertexAttribDivisor(4, 1);
+#endif // _DEBUG
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void model_t::update_instance_buffers()
+{
+	std::vector<glm::vec3> positions;
+
+	for(int i = 0; i < instance_buffer_size; i++)
+	{
+		positions.push_back(instance_data[i].transform->position);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * positions.size(), &positions[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void model_t::draw()
+{
+	update_instance_buffers();
+
+	glBindVertexArray(vao);
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, instance_buffer_size);
+	glBindVertexArray(0);
 }
 
 //

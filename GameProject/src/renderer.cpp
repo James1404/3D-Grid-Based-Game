@@ -7,8 +7,11 @@
 #include <stack>
 
 //
-// ----- RENDERER -----
+// RENDERER
 //
+
+std::shared_ptr<shader_t> shader;
+std::shared_ptr<texture_t> texture;
 
 void renderer_t::init()
 {
@@ -33,6 +36,8 @@ void renderer_t::init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	SDL_GL_SetSwapInterval(1);
+
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 
 
@@ -42,6 +47,12 @@ void renderer_t::init()
 	primitive_renderer.init();
 
 	log_info("INITIALIZED RENDERER");
+
+	shader = asset_manager_t::get().load_shader_from_file("data/shaders/model_loading.glsl");
+	texture = asset_manager_t::get().load_texture_from_file("data/models/diffuse.jpg");
+
+	glUseProgram(shader->id);
+	glUniform1i(glGetUniformLocation(shader->id, "texture"), 0);
 }
 
 void renderer_t::shutdown()
@@ -65,9 +76,18 @@ void renderer_t::swap_screen_buffers()
 
 void renderer_t::draw()
 {
-	for (auto& i : model_list)
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->id);
+
+	glUseProgram(shader->id);
+
+	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view_projection"), 1, false, glm::value_ptr(view_projection));
+
+	for(auto& [path, model] : asset_manager_t::get().models)
 	{
-		i->draw();
+		model->draw();
 	}
 
 	primitive_renderer.draw();
@@ -81,65 +101,9 @@ void renderer_t::set_resolution(int x, int y)
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 }
 
-void model_entity_t::define_model(std::string _model_path,std::string _texture_path, transform_t* _transform)
-{
-	transform = _transform;
-
-	is_paused = false;
-
-	model = asset_manager_t::get().load_model_from_file(_model_path);
-	shader = asset_manager_t::get().load_shader_from_file("data/shaders/model_loading.glsl");
-	texture = asset_manager_t::get().load_texture_from_file(_texture_path);
-
-	glUseProgram(shader->id);
-	//glUniformMatrix4fv(glGetUniformLocation(shader->id, "projection"), 1, false, glm::value_ptr(projection_matrix));
-	glUniform1i(glGetUniformLocation(shader->id, "Texture"), 0);
-
-	renderer_t::get().model_list.push_back(this);
-	//renderer_t::get().unique_draw_calls[*texture][*model].push_back(*this);
-}
-
-model_entity_t::model_entity_t()
-{
-}
-
-model_entity_t::~model_entity_t()
-{
-	for (auto it = renderer_t::get().model_list.begin(); it != renderer_t::get().model_list.end();)
-	{
-		if (*it == this)
-			it = renderer_t::get().model_list.erase(it);
-		else
-			++it;
-	}
-}
-
-void model_entity_t::draw()
-{
-	if (is_paused)
-		return;
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture->id);
-
-	glUseProgram(shader->id);
-
-	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
-
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view_projection"), 1, false, glm::value_ptr(view_projection));
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "model"), 1, false, glm::value_ptr(transform->get_matrix()));
-
-#ifdef _DEBUG
-	glUniform1i(glGetUniformLocation(shader->id, "entity_index"), index);
-#endif
-
-	model->draw(*shader);
-}
-
 //
 // ----- PRIMITIVES -----
 //
-
 
 void primitive_renderer_t::init()
 {

@@ -41,6 +41,11 @@ int main(int argc, char* args[])
 	editor_t::get().init();
 #endif // _DEBUG
 
+	for(auto& [path, model] : asset_manager_t::get().models)
+	{
+		model->construct_instance_buffers();
+	}
+
 	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
 	while (window_t::get().window_is_running)
 	{
@@ -74,8 +79,13 @@ int main(int argc, char* args[])
 		if (input_t::get().key_down(SDL_SCANCODE_ESCAPE)) {
 			if (current_engine_state == engine_state_gameplay)
 			{
-				world_t::get().load();
+				//world_t::get().load();
 				current_engine_state = engine_state_editor;
+
+				//for(auto& [path, model] : asset_manager_t::get().models)
+				//{
+				//	model->construct_instance_buffers();
+				//}
 			}
 			else if (current_engine_state == engine_state_editor)
 			{

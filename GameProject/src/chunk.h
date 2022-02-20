@@ -58,8 +58,6 @@ struct entity_t {
 	entity_flags_t flags;
 	std::string name = "";
 
-	model_entity_t model;
-
 	std::shared_ptr<chunk_t> chunk;
 
 	glm::ivec3 grid_pos = glm::vec3(0), previous_grid_pos = glm::vec3(0);

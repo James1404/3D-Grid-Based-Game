@@ -14,11 +14,7 @@ void player_entity::init()
 	vel = glm::vec3(0, 0, 0);
 	interp_speed = walk_speed;
 
-	model.define_model("data/models/player.gltf", "data/models/diffuse.jpg", &visual_transform);
-
-#ifdef _DEBUG
-	model.index = index;
-#endif
+	asset_manager_t::get().load_model_from_file("data/models/player.gltf")->add_instance(&visual_transform, index);
 }
 
 void player_entity::move_grid_pos(glm::ivec3 _dir)
@@ -73,7 +69,7 @@ void player_entity::update(double dt)
 	{
 		if (is_first_person)
 		{
-			model.is_paused = true;
+			//model.is_paused = true;
 
 			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, 1, 0));
 			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
@@ -123,7 +119,7 @@ void player_entity::update(double dt)
 		}
 		else
 		{
-			model.is_paused = false;
+			//model.is_paused = false;
 
 			bool is_wall_collision = false;
 			for (int i = 0; i < 6; i++)
