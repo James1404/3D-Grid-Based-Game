@@ -5,9 +5,11 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoords;
-//layout (location = 3) in mat4 transform;
-layout (location = 3) in vec3 transform;
-layout (location = 4) in int entity_index;
+layout (location = 3) in mat4 transform;
+// 4
+// 5
+// 6 RESERVED FOR TRANSFORM MATRIX
+layout (location = 7) in int entity_index;
 
 out vec2 TexCoords;
 out int EntityIndex;
@@ -18,7 +20,7 @@ void main()
 {
 	TexCoords = texCoords;
 	EntityIndex = entity_index;
-	gl_Position = view_projection * vec4(pos + transform, 1.0);
+	gl_Position = view_projection * transform * vec4(pos, 1.0);
 }
 
 [fragment]
