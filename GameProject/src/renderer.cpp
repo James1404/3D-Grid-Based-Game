@@ -7,16 +7,167 @@
 #include <stack>
 
 //
+// MODEL INSTANCE DATA
+//
+
+instance_container_t::~instance_container_t()
+{
+	// DELETE VBO AND OTHER STUFF
+}
+
+void instance_container_t::construct_instance_buffers()
+{
+	instance_buffer_size = instance_data.size();
+
+	glBindVertexArray(model->vao);
+
+	glGenBuffers(1, &instance_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+
+#ifdef _DEBUG
+	glBufferData(GL_ARRAY_BUFFER, (sizeof(glm::mat4) + sizeof(int)) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
+#else
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
+#endif
+
+	std::vector<glm::mat4> transforms;
+#ifdef _DEBUG
+	std::vector<int> indexs;
+#endif // _DEBUG
+	for(int i = 0; i < instance_buffer_size; i++)
+	{
+		transforms.push_back(instance_data[i].transform->get_matrix());
+#ifdef _DEBUG
+		indexs.push_back(instance_data[i].index);
+#endif // _DEBUG
+	}
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
+#ifdef _DEBUG
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * transforms.size(), sizeof(int) * indexs.size(), &indexs[0]);
+#endif // _DEBUG
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)sizeof(glm::vec4));
+
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 2));
+
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 3));
+
+	glVertexAttribDivisor(3, 1);
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+
+#ifdef _DEBUG
+	glEnableVertexAttribArray(7);
+	glVertexAttribIPointer(7, 1, GL_INT, sizeof(int), (void*)(sizeof(glm::mat4) * transforms.size()));
+	glVertexAttribDivisor(7, 1);
+#endif // _DEBUG
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+//
 // RENDERER
 //
+
+void renderer_t::add_instance(std::string model_path, std::string texture_path, std::string shader_path, bool is_static, transform_t* transform, int index)
+{
+	model_instance_data_t data = {transform, index};
+
+	auto model = asset_manager_t::get().load_model_from_file(model_path);
+	auto texture = asset_manager_t::get().load_texture_from_file(texture_path);
+	auto shader = asset_manager_t::get().load_shader_from_file(shader_path);
+	for(auto& container : instance_containers)
+	{
+		if(container.model == model && container.texture == texture && container.shader == shader && container.is_static == is_static)
+		{
+			container.instance_data.push_back(data);
+			return;
+		}
+	}
+
+	// it seems that the first model_instance isnt used for some reason???
+	//
+	// Instance container is being added to the containers list.
+	// Draw call is being called....? (Thats a stupid way of writing it)
+	// Model, Texture, and Shader are all loaded and used.
+	//
+	// It might be because one model is being used with multiple different textures and shaders.
+	// (Maybe....???)
+
+	instance_container_t container;
+	container.model = model;
+	container.texture = texture;
+	container.shader = shader;
+	container.is_static = is_static;
+
+	glUseProgram(container.shader->id);
+	glUniform1i(glGetUniformLocation(container.shader->id, "texture"), 0);
+
+	container.instance_data.push_back(data);
+	instance_containers.push_back(container);
+}
+
+void renderer_t::construct_all_instance_buffers()
+{
+	for(auto& container : instance_containers)
+	{
+		container.construct_instance_buffers();
+	}
+}
+
+void renderer_t::update_non_static_instance_buffers()
+{
+	for(auto& container : instance_containers)
+	{
+		if(container.is_static)
+		{
+			continue;
+		}
+
+		std::vector<glm::mat4> transforms;
+
+		for(int i = 0; i < container.instance_buffer_size; i++)
+		{
+			transforms.push_back(container.instance_data[i].transform->get_matrix());
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, container.instance_vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+}
+
+void renderer_t::update_all_instance_buffers()
+{
+	for(auto& container : instance_containers)
+	{
+		std::vector<glm::mat4> transforms;
+
+		for(int i = 0; i < container.instance_buffer_size; i++)
+		{
+			transforms.push_back(container.instance_data[i].transform->get_matrix());
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, container.instance_vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+}
 
 std::shared_ptr<shader_t> shader;
 std::shared_ptr<texture_t> texture;
 
 void renderer_t::init()
 {
-	//log_info("STARTING RENDERER INITIALIZATION");
-	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -36,27 +187,22 @@ void renderer_t::init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	SDL_GL_SetSwapInterval(1);
+	//SDL_GL_SetSwapInterval(1);
 
 	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
-
 
 	// Set aspect ratio
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
 
 	primitive_renderer.init();
 
-	log_info("INITIALIZED RENDERER");
-
-	shader = asset_manager_t::get().load_shader_from_file("data/shaders/model_loading.glsl");
-	texture = asset_manager_t::get().load_texture_from_file("data/models/diffuse.jpg");
-
-	glUseProgram(shader->id);
-	glUniform1i(glGetUniformLocation(shader->id, "texture"), 0);
+	log_info("Initialized Renderer");
 }
 
 void renderer_t::shutdown()
 {
+	instance_containers.clear();
+
 	primitive_renderer.shutdown();
 
 	SDL_GL_DeleteContext(context);
@@ -76,18 +222,52 @@ void renderer_t::swap_screen_buffers()
 
 void renderer_t::draw()
 {
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture->id);
-
-	glUseProgram(shader->id);
-
-	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
-
-	glUniformMatrix4fv(glGetUniformLocation(shader->id, "view_projection"), 1, false, glm::value_ptr(view_projection));
-
-	for(auto& [path, model] : asset_manager_t::get().models)
+	for(auto& container : instance_containers)
 	{
-		model->draw();
+		// BIND TEXTURES AND SHADERS
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, container.texture->id);
+
+		glUseProgram(container.shader->id);
+
+		auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
+
+		glUniformMatrix4fv(glGetUniformLocation(container.shader->id, "view_projection"), 1, false, glm::value_ptr(view_projection));
+
+		// BIND BUFFERS
+		glBindVertexArray(container.model->vao);
+		glBindBuffer(GL_ARRAY_BUFFER, container.instance_vbo);
+
+		// UPDATE VERTEX ATTRIB POINTERS
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)sizeof(glm::vec4));
+
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 2));
+
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 3));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+#ifdef _DEBUG
+		glEnableVertexAttribArray(7);
+		glVertexAttribIPointer(7, 1, GL_INT, sizeof(int), (void*)(sizeof(glm::mat4) * container.instance_buffer_size));
+		glVertexAttribDivisor(7, 1);
+#endif // _DEBUG
+		
+		// DRAW MESH
+		glDrawElementsInstanced(GL_TRIANGLES, container.model->indices.size(), GL_UNSIGNED_INT, 0, container.instance_buffer_size);
+
+		// UNBIND BUFFERS
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 	}
 
 	primitive_renderer.draw();

@@ -129,100 +129,6 @@ void model_t::setup_buffers()
 	glBindVertexArray(0);
 }
 
-void model_t::add_instance(transform_t* transform, int entity_index)
-{
-	model_instance_data_t data;
-	data.transform = transform;
-
-#ifdef _DEBUG
-	data.index = entity_index;
-#endif // _DEBUG
-
-	instance_data.push_back(data);
-}
-
-void model_t::construct_instance_buffers()
-{
-	instance_buffer_size = instance_data.size();
-
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &instance_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
-
-#ifdef _DEBUG
-	glBufferData(GL_ARRAY_BUFFER, (sizeof(glm::mat4) + sizeof(int)) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
-#else
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
-#endif
-
-	std::vector<glm::mat4> transforms;
-#ifdef _DEBUG
-	std::vector<int> indexs;
-#endif // _DEBUG
-	for(int i = 0; i < instance_buffer_size; i++)
-	{
-		transforms.push_back(instance_data[i].transform->get_matrix());
-#ifdef _DEBUG
-		indexs.push_back(instance_data[i].index);
-#endif // _DEBUG
-	}
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
-#ifdef _DEBUG
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * transforms.size(), sizeof(int) * indexs.size(), &indexs[0]);
-#endif // _DEBUG
-
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)sizeof(glm::vec4));
-
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 2));
-
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4) * 3));
-
-	glVertexAttribDivisor(3, 1);
-	glVertexAttribDivisor(4, 1);
-	glVertexAttribDivisor(5, 1);
-	glVertexAttribDivisor(6, 1);
-
-#ifdef _DEBUG
-	glEnableVertexAttribArray(7);
-	glVertexAttribIPointer(7, 1, GL_INT, sizeof(int), (void*)(sizeof(glm::mat4) * transforms.size()));
-	glVertexAttribDivisor(7, 1);
-#endif // _DEBUG
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-void model_t::update_instance_buffers()
-{
-	std::vector<glm::mat4> transforms;
-
-	for(int i = 0; i < instance_buffer_size; i++)
-	{
-		transforms.push_back(instance_data[i].transform->get_matrix());
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void model_t::draw()
-{
-	update_instance_buffers();
-
-	glBindVertexArray(vao);
-	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, instance_buffer_size);
-	glBindVertexArray(0);
-}
-
 //
 // ASSET MANAGER
 //
@@ -241,8 +147,10 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 		std::string vShaderCode, fShaderCode;
 		std::string shader_version;
 		std::ifstream ifs(path);
-		if (ifs.is_open()) {
-			enum class line_type_ {
+		if (ifs.is_open())
+		{
+			enum class line_type_
+			{
 				none = 0,
 				vertex,
 				fragment,
@@ -250,31 +158,36 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 			} line_type = line_type_::none;
 
 			std::string line;
-			while (std::getline(ifs, line)) {
-				if (line == "[version]") {
+			while (std::getline(ifs, line))
+			{
+				if (line == "[version]")
+				{
 					line_type = line_type_::version;
 					continue;
 				}
-				else if (line == "[vertex]") {
+				else if (line == "[vertex]")
+				{
 					line_type = line_type_::vertex;
 					continue;
 				}
-				else if (line == "[fragment]") {
+				else if (line == "[fragment]")
+				{
 					line_type = line_type_::fragment;
 					continue;
 				}
 
-				if (line_type == line_type_::vertex) {
-					//vStream << line;
+				if (line_type == line_type_::vertex)
+				{
 					vShaderCode += line;
 					vShaderCode += "\n";
 				}
-				else if (line_type == line_type_::fragment) {
-					//fStream >> line;
+				else if (line_type == line_type_::fragment)
+				{
 					fShaderCode += line;
 					fShaderCode += "\n";
 				}
-				else if (line_type == line_type_::version) {
+				else if (line_type == line_type_::version)
+				{
 					shader_version += line;
 					shader_version += "\n";
 				}
@@ -282,8 +195,9 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 
 			ifs.close();
 		}
-		else {
-			log_error("COULD NOT OPEN SHADER FILE: ", path);
+		else
+		{
+			log_error("Could Not Open Shader File: ", path);
 		}
 
 		vShaderCode.insert(0, shader_version);
@@ -302,9 +216,10 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 		int success;
 		char infoLog[512];
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-		if (!success) {
+		if (!success)
+		{
 			glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-			log_error("SHADER COMPILATION FAILED ", infoLog);
+			log_error("Shader Compilation Failed ", infoLog);
 		}
 
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -312,9 +227,10 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 		glCompileShader(fragment);
 
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-		if (!success) {
+		if (!success)
+		{
 			glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-			log_error("SHADER COMPILATION FAILED ", infoLog);
+			log_error("Shader Compilation Failed ", infoLog);
 		}
 
 		// create program and attach shaders
@@ -337,7 +253,7 @@ std::shared_ptr<shader_t> asset_manager_t::load_shader_from_file(std::string pat
 
 		shaders.emplace(path, result); 
 
-		log_info("LOADED AND COMPILED SHADER ", path);
+		log_info("Loaded And Compiled Shader", path);
 	}
 
 	return result;
@@ -382,11 +298,13 @@ std::shared_ptr<texture_t> asset_manager_t::load_texture_from_file(std::string p
 		}
 		else
 		{
-			log_warning("texture failed to load as path: ", path);
+			log_warning("Texture Failed To Load As Path: ", path);
 			stbi_image_free(data);
 		}
 
 		textures.emplace(path, result); 
+
+		log_info("Loaded Texture", path);
 	}
 
 	return result;
@@ -407,7 +325,7 @@ std::shared_ptr<model_t> asset_manager_t::load_model_from_file(std::string path)
 		result->load_model(path);
 		models.emplace(path, result); 
 
-		log_info("LOADED MODEL ", path);
+		log_info("Loaded Model ", path);
 	}
 
 	return result;

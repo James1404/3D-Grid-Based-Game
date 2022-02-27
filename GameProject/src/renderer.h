@@ -26,17 +26,42 @@
 
 #include "log.h"
 
-namespace colour {
-	static const glm::vec3 black = glm::vec3(0, 0, 0);
-	static const glm::vec3 white = glm::vec3(1, 1, 1);
-	static const glm::vec3 grey = glm::vec3(0.5f, 0.5f, 0.5f);
-	static const glm::vec3 red = glm::vec3(1, 0, 0);
-	static const glm::vec3 green = glm::vec3(0, 1, 0);
-	static const glm::vec3 blue = glm::vec3(0, 0, 1);
-	static const glm::vec3 yellow = glm::vec3(1, 1, 0);
-	static const glm::vec3 cyan = glm::vec3(0, 1, 1);
-	static const glm::vec3 purple = glm::vec3(1, 0, 1);
-	static const glm::vec3 pink = glm::vec3(1, 0.75f, 0.75f);
+namespace colour
+{
+	inline constexpr auto black = glm::vec3(0, 0, 0);
+	inline constexpr auto white = glm::vec3(1, 1, 1);
+	inline constexpr auto grey = glm::vec3(0.5f, 0.5f, 0.5f);
+	inline constexpr auto red = glm::vec3(1, 0, 0);
+	inline constexpr auto green = glm::vec3(0, 1, 0);
+	inline constexpr auto blue = glm::vec3(0, 0, 1);
+	inline constexpr auto yellow = glm::vec3(1, 1, 0);
+	inline constexpr auto cyan = glm::vec3(0, 1, 1);
+	inline constexpr auto purple = glm::vec3(1, 0, 1);
+	inline constexpr auto pink = glm::vec3(1, 0.75f, 0.75f);
+};
+
+struct model_instance_data_t
+{
+	transform_t* transform;
+
+	int index;
+};
+
+struct instance_container_t
+{
+	std::vector<model_instance_data_t> instance_data;
+
+	std::shared_ptr<model_t> model;
+	std::shared_ptr<texture_t> texture;
+	std::shared_ptr<shader_t> shader;
+	
+	unsigned int instance_vbo;
+	int instance_buffer_size;
+
+	bool is_static;
+
+	~instance_container_t();
+	void construct_instance_buffers();
 };
 
 struct primitive_renderer_t
@@ -58,7 +83,6 @@ struct primitive_renderer_t
 	void shutdown();
 };
 
-
 struct renderer_t
 {
 	SDL_GLContext context;
@@ -77,6 +101,15 @@ struct renderer_t
 
 	void clear_screen();
 	void swap_screen_buffers();
+
+	std::vector<instance_container_t> instance_containers;
+
+	void add_instance(std::string model_path, std::string texture_path, std::string shader_path, bool is_static, transform_t* transform, int index);
+
+	void construct_all_instance_buffers();
+
+	void update_all_instance_buffers();
+	void update_non_static_instance_buffers();
 
 	void draw();
 

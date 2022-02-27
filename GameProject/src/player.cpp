@@ -14,13 +14,15 @@ void player_entity::init()
 	vel = glm::vec3(0, 0, 0);
 	interp_speed = walk_speed;
 
-	asset_manager_t::get().load_model_from_file("data/models/player.gltf")->add_instance(&visual_transform, index);
+	renderer_t::get().add_instance("data/models/player.gltf", "data/models/diffuse.jpg", "data/shaders/model_loading.glsl", false, &visual_transform, index);
 }
 
 void player_entity::move_grid_pos(glm::ivec3 _dir)
 {
 	if (is_moving())
+	{
 		return;
+	}
 
 	_dir.y = 0;
 	glm::ivec3 new_pos = grid_pos + _dir;
