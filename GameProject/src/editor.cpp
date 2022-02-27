@@ -293,7 +293,7 @@ void editor_t::init()
 
 	init_framebuffer();
 
-	log_info("INITIALIZED EDITOR");
+	log_info("Initialized Editor");
 }
 
 void editor_t::shutdown()
@@ -304,7 +304,7 @@ void editor_t::shutdown()
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
-	log_info("EDITOR SHUTDOWN");
+	log_info("Editor Shutdown");
 }
 
 void editor_t::handle_events()
@@ -761,7 +761,9 @@ void editor_t::draw()
 
 			if (ImGui::Button("Load"))
 			{
+				renderer_t::get().instance_containers.clear();
 				world_t::get().load();
+				renderer_t::get().construct_all_instance_buffers();
 			}
 
 			if(ImGui::BeginListBox("Chunks", {-1, 0}))

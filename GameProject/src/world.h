@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <typeindex>
+#include <string>
 
 #include "chunk.h"
 
@@ -44,6 +46,7 @@ struct world_t
 template<typename T>
 std::shared_ptr<T> new_entity();
 
+bool create_entity_by_type(entity_data_t& data, std::shared_ptr<entity_t>& entity);
 void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data);
 void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data);
 void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity_t> _entity);

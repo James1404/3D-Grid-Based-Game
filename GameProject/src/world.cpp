@@ -18,14 +18,14 @@ void world_t::init()
 		}
 	}
 
-	log_info("INITIALIZED WORLD");
+	log_info("Initialized World");
 }
 
 void world_t::shutdown()
 {
 	clear_world_data();
 
-	log_info("CLEANED LEVEL DATA");
+	log_info("Cleaned Level Data");
 }
 
 std::shared_ptr<chunk_t> world_t::get_current_chunk()
@@ -93,13 +93,13 @@ void world_t::save()
 		}
 	}
 
-	log_info("SAVED WORLD TO FILE");
+	log_info("Saved World To File");
 	ofs.close();
 }
 
 void world_t::load()
 {
-	//log_info("RETRIEVING WORLD DATA FROM FILE");
+	//log_info("Retrieving World Data From File");
 
 	clear_world_data();
 
@@ -108,7 +108,7 @@ void world_t::load()
 	std::ifstream ifs(levelPath);
 	if (ifs.is_open())
 	{
-		//log_info("PARSING WORLD DATA");
+		//log_info("Parsing World Data");
 
 		entity_data_t entity_data;
 
@@ -232,11 +232,11 @@ void world_t::load()
 
 		//name = level_name;
 
-		log_info("FINISHED LOADING WORLD DATA");
+		log_info("Finished Loading World Data");
 	}
 	else
 	{
-		log_error("CANNOT FIND WORLD FILE");
+		log_error("Cannot Find World File");
 	}
 
 	ifs.close();
@@ -293,10 +293,8 @@ std::shared_ptr<T> new_entity()
 	return std::dynamic_pointer_cast<T> (entity);
 }
 
-void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
+bool create_entity_by_type(entity_data_t& data, std::shared_ptr<entity_t>& entity)
 {
-	std::shared_ptr<entity_t> entity;
-
 	if (data.type == "player_spawn")
 	{
 		entity = new_entity<player_spawn_entity>();
@@ -308,50 +306,52 @@ void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 	else
 	{
 		log_warning("ENTITY TYPE UNKOWN : ", data.type);
-		return;
+		return false;
 	}
 
-	if (data.id != 0)
+	return true;
+}
+
+void add_entity(std::shared_ptr<chunk_t> chunk, entity_data_t data)
+{
+	//std::shared_ptr<entity_t> entity = new_entity(data.type);
+	std::shared_ptr<entity_t> entity;
+
+	if(create_entity_by_type(data, entity))
 	{
-		entity->id = data.id;
-	}
+		if (data.id != 0)
+		{
+			entity->id = data.id;
+		}
 
-	entity->chunk = chunk;
-	entity->flags = data.flags;
-	entity->grid_pos = data.grid_pos;
-	entity->visual_transform.position = data.visual_transform.position;
-	entity->visual_transform.rotation = data.visual_transform.rotation;
-	entity->visual_transform.scale = data.visual_transform.scale;
-	chunk->entities.push_back(entity);
+		entity->chunk = chunk;
+		entity->flags = data.flags;
+		entity->grid_pos = data.grid_pos;
+		entity->visual_transform.position = data.visual_transform.position;
+		entity->visual_transform.rotation = data.visual_transform.rotation;
+		entity->visual_transform.scale = data.visual_transform.scale;
+		chunk->entities.push_back(entity);
+	}
 }
 
 void add_entity_and_init(std::shared_ptr<chunk_t> chunk, entity_data_t data)
 {
 	std::shared_ptr<entity_t> entity;
 
-	if (data.type == "player_spawn")
+	if(create_entity_by_type(data, entity))
 	{
-		entity = new_entity<player_spawn_entity>();
-	}
-	else if (data.type == "block")
-	{
-		entity = new_entity<block_entity>();
-	}
-	else
-	{
-		log_warning("ENTITY TYPE UNKOWN : ", data.type);
-		return;
-	}
+		entity->chunk = chunk;
+		entity->flags = data.flags;
+		entity->grid_pos = data.grid_pos;
+		entity->visual_transform.position = data.visual_transform.position;
+		entity->visual_transform.rotation = data.visual_transform.rotation;
+		entity->visual_transform.scale = data.visual_transform.scale;
+		chunk->entities.push_back(entity);
 
-	entity->chunk = chunk;
-	entity->flags = data.flags;
-	entity->grid_pos = data.grid_pos;
-	entity->visual_transform.position = data.visual_transform.position;
-	entity->visual_transform.rotation = data.visual_transform.rotation;
-	entity->visual_transform.scale = data.visual_transform.scale;
-	chunk->entities.push_back(entity);
+		entity->init();
 
-	entity->init();
+		renderer_t::get().construct_all_instance_buffers();
+	}
 }
 
 void remove_entity(std::shared_ptr<chunk_t> chunk, std::weak_ptr<entity_t> _entity)

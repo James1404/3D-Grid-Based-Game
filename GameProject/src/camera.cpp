@@ -9,7 +9,7 @@ camera_t::camera_t()
 	: position(0, 0, 0), rotation(0, -90, 0),
 	  front(0,0,-1), right(0), up(worldUp)
 {
-	log_info("INITIALIZED CAMERA ", this);
+	log_info("Initialized Camera ", this);
 }
 
 camera_t::~camera_t() { }

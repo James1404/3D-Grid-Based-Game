@@ -41,10 +41,19 @@ int main(int argc, char* args[])
 	editor_t::get().init();
 #endif // _DEBUG
 
+	/*
 	for(auto& [path, model] : asset_manager_t::get().models)
 	{
 		model->construct_instance_buffers();
 	}
+
+	for(auto& model_instance : renderer_t::get().instance_container.model_instances)
+	{
+		model_instance.construct_instance_buffers();
+	}
+	*/
+
+	renderer_t::get().construct_all_instance_buffers();
 
 	uint64_t NOW = SDL_GetPerformanceCounter(), LAST = 0;
 	while (window_t::get().window_is_running)
@@ -103,6 +112,15 @@ int main(int argc, char* args[])
 
 		renderer_t::get().clear_screen();
 
+		if(current_engine_state == engine_state_editor)
+		{
+			renderer_t::get().update_all_instance_buffers();
+		}
+		else if(current_engine_state == engine_state_gameplay)
+		{
+			renderer_t::get().update_non_static_instance_buffers();
+		}
+
 		renderer_t::get().draw();
 
 		editor_t::get().unbind_framebuffer();
@@ -118,6 +136,7 @@ int main(int argc, char* args[])
 #else
 		renderer_t::get().clear_screen();
 
+		renderer_t::get().update_non_static_instance_buffers();
 		renderer_t::get().draw();
 
 		renderer_t::get().swap_screen_buffers();

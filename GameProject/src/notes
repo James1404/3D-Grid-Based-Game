@@ -1,0 +1,2 @@
+replace entity_t with raw structs.
+instead of using entity_t and what now. in functions just pass the values that are needed.
