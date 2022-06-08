@@ -2,6 +2,7 @@
 
 #include "input.h"
 #include "camera.h"
+#include "world.h"
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -10,16 +11,18 @@
 
 void player_entity::init()
 {
-	name = "player";
+	grid_pos = glm::ivec3(0);
+	visual_transform = transform_t();
+
 	vel = glm::vec3(0, 0, 0);
 	interp_speed = walk_speed;
 
-	renderer_t::get().add_instance("data/models/player.gltf", "data/models/diffuse.jpg", "data/shaders/model_loading.glsl", false, &visual_transform, index);
+	renderer_t::get().add_instance("data/models/player.gltf", "data/models/diffuse.jpg", "data/shaders/model_loading.glsl", false, &visual_transform, 0);
 }
 
 void player_entity::move_grid_pos(glm::ivec3 _dir)
 {
-	if (is_moving())
+	if (is_moving(visual_transform, grid_pos))
 	{
 		return;
 	}
@@ -28,20 +31,20 @@ void player_entity::move_grid_pos(glm::ivec3 _dir)
 	glm::ivec3 new_pos = grid_pos + _dir;
 	if (is_grounded(grid_pos))
 	{
-		if (!chunk->check_collisions(new_pos, this))
+		if (!world_t::get().check_collision(new_pos))
 		{
-			if(!chunk->check_collisions(new_pos + glm::ivec3(0,1,0), this))
+			if(!world_t::get().check_collision(new_pos + glm::ivec3(0,1,0)))
 			{
 				if (is_grounded(new_pos))
 				{
-					set_grid_pos(new_pos);
+					set_grid_pos(grid_pos, previous_grid_pos, new_pos);
 				}
 				else
 				{
-					if (!chunk->check_collisions(new_pos + glm::ivec3(0, -1, 0)))
+					if (!world_t::get().check_collision(new_pos + glm::ivec3(0, -1, 0)))
 					{
 						if (is_grounded(new_pos + glm::ivec3(0, -1, 0)))
-							set_grid_pos(new_pos + glm::ivec3(0, -1, 0));
+							set_grid_pos(grid_pos, previous_grid_pos, new_pos + glm::ivec3(0, -1, 0));
 					}
 				}
 			}
@@ -49,13 +52,13 @@ void player_entity::move_grid_pos(glm::ivec3 _dir)
 		else
 		{
 			// TODO: make no climb work
-			if (!chunk->check_collisions(grid_pos + glm::ivec3(0, 1, 0)))
+			if (!world_t::get().check_collision(grid_pos + glm::ivec3(0, 1, 0)))
 			{
-				if (!chunk->check_collisions(grid_pos + glm::ivec3(0, 2, 0)))
+				if (!world_t::get().check_collision(grid_pos + glm::ivec3(0, 2, 0)))
 				{
-					if (!chunk->check_collisions(new_pos + glm::ivec3(0, 1, 0)))
+					if (!world_t::get().check_collision(new_pos + glm::ivec3(0, 1, 0)))
 					{
-						set_grid_pos(new_pos + glm::ivec3(0, 1, 0));
+						set_grid_pos(grid_pos, previous_grid_pos, new_pos + glm::ivec3(0, 1, 0));
 					}
 				}
 			}
@@ -72,9 +75,10 @@ void player_entity::update(double dt)
 		if (is_first_person)
 		{
 			//model.is_paused = true;
+			visual_transform.scale = glm::vec3(0);
 
 			glm::vec3 target_pos = ((glm::vec3)grid_pos + glm::vec3(0, 1, 0));
-			player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
+			player_cam->position = target_pos;
 			vel = { 0,0,0 };
 
 			if (!(input_t::get().button_pressed("MoveUp") && input_t::get().button_pressed("MoveDown")))
@@ -122,12 +126,13 @@ void player_entity::update(double dt)
 		else
 		{
 			//model.is_paused = false;
+			visual_transform.scale = glm::vec3(1);
 
 			bool is_wall_collision = false;
 			for (int i = 0; i < 6; i++)
 			{
 				//add_primitive_wireframe_cube(grid_pos + glm::ivec3(0, i, i), glm::vec3(1), colour::cyan);
-				if (chunk->check_collisions(grid_pos + glm::ivec3(0, i, i), this))
+				if (world_t::get().check_collision(grid_pos + glm::ivec3(0, i, i)))
 				{
 					is_wall_collision = true;
 				}
@@ -146,23 +151,23 @@ void player_entity::update(double dt)
 			{
 			case camera_view_default:
 				{
-					glm::vec3 offset = glm::vec3(0, 6, 5);
+					glm::vec3 offset = glm::vec3(0, 5, 6);
 					glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
 					player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
-					player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-50, -90, 0), camera_speed * dt);
+					player_cam->rotation = glm::vec3(-30, -90, 0);
 				} break;
 			case camera_view_wall_infront:
 				{
 					glm::vec3 offset = glm::vec3(0, 6, 0);
 					glm::vec3 target_pos = ((glm::vec3)grid_pos + offset);
 					player_cam->position = lerp(player_cam->position, target_pos, camera_speed * dt);
-					player_cam->rotation = lerp(player_cam->rotation, glm::vec3(-89, -90, 0), camera_speed * dt);
+					player_cam->rotation = glm::vec3(-89, -90, 0);
 				} break;
 			}
 		}
 	}
 
-	if (!is_moving())
+	if (!is_moving(visual_transform, grid_pos))
 	{
 		if (input_t::get().key_pressed(SDL_SCANCODE_SPACE))
 		{
@@ -219,5 +224,10 @@ void player_entity::update(double dt)
 		}
 	}
 
-	interp_visuals(dt, interp_speed);
+	interp_visuals(visual_transform, grid_pos, dt, interp_speed);
+}
+
+bool player_entity::is_grounded(glm::ivec3 _pos)
+{
+	return world_t::get().check_collision(_pos + glm::ivec3(0, -1, 0));
 }

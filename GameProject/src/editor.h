@@ -25,7 +25,7 @@ struct editor_t
 
 	editor_mode mode = editor_mode::free_cam;
 	const float cam_movement_speed = 0.01f;
-	const float cam_rotation_speed = 0.075f;
+	const float cam_rotation_speed = 0.2f;
 	bool is_cam_control = false;
 
 	bool can_use_keyboard = true;
@@ -33,16 +33,14 @@ struct editor_t
 
 	int gizmo_type = -1;
 
-	enum transform_type_t
+	enum
 	{
 		GRID_EDITING,
 		VISUAL_EDITING
-	};
-
-	transform_type_t transform_type = GRID_EDITING;
+	} transform_type = GRID_EDITING;
 
 	bool placement_mode = false;
-	glm::vec3 placement_position{ 0 };
+	glm::vec3 placement_position = {};
 
 	std::string placement_type = "";
 

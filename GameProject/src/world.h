@@ -14,12 +14,20 @@ struct world_t
 	bool is_paused = false;
 
 	std::vector<std::shared_ptr<chunk_t>> chunks;
+
 	int current_chunk = 0;
 
 	void init();
 	void shutdown();
 
 	std::shared_ptr<chunk_t> get_current_chunk();
+	std::weak_ptr<chunk_t> find_chunk_by_name(std::string name);
+
+	bool check_collision(glm::ivec3 pos) const;
+	std::weak_ptr<entity_t> get_collision(glm::ivec3 pos);
+
+	std::weak_ptr<entity_t> find_entity_by_index(int index);
+
 	player_entity player;
 
 	void clear_world_data();

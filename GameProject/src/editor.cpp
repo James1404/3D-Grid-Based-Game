@@ -541,7 +541,7 @@ void editor_t::update(double dt)
 				auto entity = std::weak_ptr<entity_t>();
 				for (auto& chunk : world_t::get().chunks)
 				{
-					auto tmp = world_t::get().get_current_chunk()->find_entity_by_index(entity_index);
+					auto tmp = chunk->find_entity_by_index(entity_index);
 					if (tmp.lock())
 					{
 						entity = tmp;
@@ -572,7 +572,7 @@ void editor_t::update(double dt)
 			else
 			{
 				int entity_index = read_framebuffer_pixel(mouse_pos.x, mouse_pos.y);
-				auto entity = world_t::get().get_current_chunk()->find_entity_by_index(entity_index);
+				auto entity = world_t::get().find_entity_by_index(entity_index);
 
 				static bool is_selecting = false;
 				if (auto tmp_entity = entity.lock())
@@ -603,7 +603,9 @@ void editor_t::update(double dt)
 							{
 								for(int z = start_select.z; z <= end_select.z; z++)
 								{
-									auto entity = world_t::get().get_current_chunk()->get_entity_at_position(glm::ivec3(x, y, z));
+									//auto entity = world_t::get().get_current_chunk()->get_entity_at_position(glm::ivec3(x, y, z));
+									
+									auto entity = world_t::get().get_collision({ x,y,z });
 									if(entity.lock())
 									{
 										add_multiselect_entity(entity);
@@ -669,6 +671,7 @@ void editor_t::update(double dt)
 			{
 				remove_entity(world_t::get().get_current_chunk(), selected);
 			}
+			renderer_t::get().construct_all_instance_buffers();
 			clear_selected_entities();
 		}
 	}
@@ -853,20 +856,17 @@ void editor_t::draw()
 				}
 			}
 
-			if (ImGui::CollapsingHeader("Entities"))
+			if (ImGui::Button("Block"))
 			{
-				if (ImGui::Button("Block"))
-				{
-					placement_type = "block";
-					placement_mode = true;
-				}
+				placement_type = "block";
+				placement_mode = true;
+			}
 
-				ImGui::SameLine();
-				if (ImGui::Button("Player Spawn"))
-				{
-					placement_type = "player_spawn";
-					placement_mode = true;
-				}
+			ImGui::SameLine();
+			if (ImGui::Button("Player Spawn"))
+			{
+				placement_type = "player_spawn";
+				placement_mode = true;
 			}
 
 			ImGui::End();

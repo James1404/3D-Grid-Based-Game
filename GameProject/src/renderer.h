@@ -64,6 +64,21 @@ struct instance_container_t
 	void construct_instance_buffers();
 };
 
+struct non_instanced_model_t
+{
+	std::shared_ptr<model_t> model;
+	std::shared_ptr<texture_t> texture;
+	std::shared_ptr<shader_t> shader;
+
+	transform_t* transform;
+	int index;
+
+	non_instanced_model_t(std::string model_path, std::string texture_path, std::string shader_path, transform_t* transform, int index);
+	~non_instanced_model_t();
+
+	void draw();
+};
+
 struct primitive_renderer_t
 {
 	std::shared_ptr<shader_t> line_shader, quad_shader;
@@ -72,11 +87,11 @@ struct primitive_renderer_t
 
 	void add_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
 	void add_wireframe_cube(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
-	void add_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour);
+	void add_quad(const glm::vec3 min, const glm::vec3 max, const glm::vec3 colour);
 
 	void draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour);
 	void draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour);
-	void draw_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour);
+	void draw_quad(const glm::vec3 min, const glm::vec3 max, const glm::vec3 colour);
 
 	void draw();
 	void init();

@@ -6,8 +6,6 @@ static int current_entity_index = 0;
 
 void world_t::init()
 {
-	player = *new_entity<player_entity>();
-	player.chunk = chunks[current_chunk];
 	player.init();
 
 	for(auto& _chunk : chunks)
@@ -33,10 +31,81 @@ std::shared_ptr<chunk_t> world_t::get_current_chunk()
 	return chunks[current_chunk];
 }
 
+std::weak_ptr<chunk_t> world_t::find_chunk_by_name(std::string name)
+{
+	for(auto& chunk : chunks)
+	{
+		if(chunk->name == name)
+		{
+			return chunk;
+		}
+	}
+
+	return std::weak_ptr<chunk_t>();
+}
+
+bool world_t::check_collision(glm::ivec3 pos) const
+{
+	for(auto& chunk : chunks)
+	{
+		for(auto& entity : chunk->entities)
+		{
+			if (entity->flags.has(entity_flags_no_collision))
+				continue;
+
+			if (entity->grid_pos == pos)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+std::weak_ptr<entity_t> world_t::get_collision(glm::ivec3 pos)
+{
+	for(auto& chunk : chunks)
+	{
+		for (auto& entity : chunk->entities)
+		{
+			//if (entity->flags.has(entity_flags_no_collision))
+			//	continue;
+
+			if (entity->grid_pos == pos)
+			{
+				return entity;
+			}
+		}
+	}
+
+	return std::weak_ptr<entity_t>();
+}
+std::weak_ptr<entity_t> world_t::find_entity_by_index(int index)
+{
+	for (auto& chunk : chunks)
+	{
+		for (auto& entity : chunk->entities)
+		{
+			if (entity->index == index)
+			{
+				return entity;
+			}
+		}
+	}
+
+	//log_warning("Entity with index does not exist");
+	return std::weak_ptr<entity_t>();
+}
+
 void world_t::update(double dt)
 {
 	if (is_paused)
+	{
 		return;
+	}
+
+	player.update(dt);
 
 	for(auto& chunk : chunks)
 	{
@@ -45,14 +114,6 @@ void world_t::update(double dt)
 			_entity->update(dt);
 		}
 	}
-
-	player.update(dt);
-	/*
-	for (auto& _entity : chunks[current_chunk].entities)
-	{
-		_entity->update(dt);
-	}
-	*/
 }
 
 void world_t::clear_world_data()
@@ -65,7 +126,7 @@ void world_t::clear_world_data()
 	chunks.clear();
 }
 
-int fileVersion = 10;
+int fileVersion = 11;
 void world_t::save()
 {
 	std::string levelPath = "data/world.txt";
@@ -163,6 +224,7 @@ void world_t::load()
 
 				in_chunk = true;
 			}
+
 			if(in_chunk)
 			{
 				if(type == "entity")

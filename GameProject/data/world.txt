@@ -1,18 +1,18 @@
-file_version 10
+file_version 11
 chunk world
+	entity player_spawn
+		id 15698242470653079680
+		flags 2
+		grid_pos 4 12 19
+		visual_pos 4 12 19
+		visual_rot 0 0 0
+		visual_scl 0.1 0.1 0.1
+	end_entity
 	entity block
 		id 3578163573668865784
 		flags 0
 		grid_pos 2 7 2
 		visual_pos 2 7 2
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1697252549352115943
-		flags 0
-		grid_pos 2 7 3
-		visual_pos 2 7 3
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -465,34 +465,18 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 4059345576614280199
-		flags 0
-		grid_pos 4 7 3
-		visual_pos 4 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2695813443466201968
-		flags 0
-		grid_pos 4 7 4
-		visual_pos 4 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 4890492975618841189
 		flags 0
-		grid_pos 4 8 5
-		visual_pos 4 8 5
+		grid_pos 4 8 3
+		visual_pos 4 8 3
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 8503905305334021783
 		flags 0
-		grid_pos 4 8 6
-		visual_pos 4 8 6
+		grid_pos 4 8 4
+		visual_pos 4 8 4
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -505,23 +489,31 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 15506360278461270100
-		flags 0
-		grid_pos 3 7 3
-		visual_pos 3 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 8413155279212412334
-		flags 0
-		grid_pos 3 7 4
-		visual_pos 3 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 3017089319734217660
+		flags 0
+		grid_pos 3 8 3
+		visual_pos 3 8 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12138955735997725163
+		flags 0
+		grid_pos 3 8 4
+		visual_pos 3 8 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10378419654978901846
+		flags 0
+		grid_pos 4 8 5
+		visual_pos 4 8 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12368192194864566294
 		flags 0
 		grid_pos 3 8 5
 		visual_pos 3 8 5
@@ -529,66 +521,42 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 12138955735997725163
-		flags 0
-		grid_pos 3 8 6
-		visual_pos 3 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10378419654978901846
-		flags 0
-		grid_pos 4 8 7
-		visual_pos 4 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12368192194864566294
-		flags 0
-		grid_pos 3 8 7
-		visual_pos 3 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 3461157632280099068
 		flags 0
-		grid_pos 4 9 9
-		visual_pos 4 9 9
+		grid_pos 4 9 7
+		visual_pos 4 9 7
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 8580754833666591837
 		flags 0
-		grid_pos 3 9 9
-		visual_pos 3 9 9
+		grid_pos 3 9 7
+		visual_pos 3 9 7
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 16968056580805982890
 		flags 0
-		grid_pos 2 9 9
-		visual_pos 2 9 9
+		grid_pos 2 9 7
+		visual_pos 2 9 7
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 1526400693058264004
 		flags 0
-		grid_pos 1 8 7
-		visual_pos 1 8 7
+		grid_pos 1 8 5
+		visual_pos 1 8 5
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 4804465702605192673
 		flags 0
-		grid_pos 1 9 9
-		visual_pos 1 9 9
+		grid_pos 1 9 7
+		visual_pos 1 9 7
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -609,130 +577,98 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 15505744962758418587
-		flags 0
-		grid_pos 1 7 3
-		visual_pos 1 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6604615153201597829
 		flags 0
-		grid_pos 1 8 6
-		visual_pos 1 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6439517949081468412
-		flags 0
-		grid_pos 1 7 4
-		visual_pos 1 7 4
+		grid_pos 1 8 4
+		visual_pos 1 8 4
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 15026984926027216064
 		flags 0
-		grid_pos 4 9 10
-		visual_pos 4 9 10
+		grid_pos 4 9 8
+		visual_pos 4 9 8
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 17462625958504150015
 		flags 0
-		grid_pos 1 10 13
-		visual_pos 1 10 13
+		grid_pos 1 10 11
+		visual_pos 1 10 11
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 16698133293487278426
 		flags 0
-		grid_pos 3 9 10
-		visual_pos 3 9 10
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos 7 10 13
-		visual_pos 7 10 13
+		grid_pos 3 9 8
+		visual_pos 3 9 8
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 15240318273192737861
 		flags 0
-		grid_pos 2 9 10
-		visual_pos 2 9 10
+		grid_pos 2 9 8
+		visual_pos 2 9 8
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 14113190189356757091
 		flags 0
-		grid_pos 6 10 13
-		visual_pos 6 10 13
+		grid_pos 6 10 11
+		visual_pos 6 10 11
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 3020245440848569634
 		flags 0
-		grid_pos 1 9 10
-		visual_pos 1 9 10
+		grid_pos 1 9 8
+		visual_pos 1 9 8
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 16754050411011312795
 		flags 0
-		grid_pos 5 10 13
-		visual_pos 5 10 13
+		grid_pos 5 10 11
+		visual_pos 5 10 11
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 2773129310913799985
 		flags 0
-		grid_pos 5 10 14
-		visual_pos 5 10 14
+		grid_pos 5 10 12
+		visual_pos 5 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 16171774979264760725
 		flags 0
-		grid_pos 1 10 14
-		visual_pos 1 10 14
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 7 10 14
-		visual_pos 7 10 14
+		grid_pos 1 10 12
+		visual_pos 1 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 18228059832371723260
 		flags 0
-		grid_pos 6 10 14
-		visual_pos 6 10 14
+		grid_pos 6 10 12
+		visual_pos 6 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 428042286736025260
 		flags 0
-		grid_pos 6 10 15
-		visual_pos 6 10 15
+		grid_pos 6 10 13
+		visual_pos 6 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -747,32 +683,32 @@ chunk world
 	entity block
 		id 4715663104631673893
 		flags 0
-		grid_pos 5 10 15
-		visual_pos 5 10 15
+		grid_pos 5 10 13
+		visual_pos 5 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 6519879323610478792
 		flags 0
-		grid_pos 5 10 16
-		visual_pos 5 10 16
+		grid_pos 5 10 14
+		visual_pos 5 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 983595515681982559
 		flags 0
-		grid_pos 6 11 17
-		visual_pos 6 11 17
+		grid_pos 6 11 16
+		visual_pos 6 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 10191428989080546156
 		flags 0
-		grid_pos 5 11 17
-		visual_pos 5 11 17
+		grid_pos 5 11 16
+		visual_pos 5 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -811,32 +747,24 @@ chunk world
 	entity block
 		id 7639269301672350175
 		flags 0
-		grid_pos 2 8 7
-		visual_pos 2 8 7
+		grid_pos 2 8 5
+		visual_pos 2 8 5
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 1563796222968353646
 		flags 0
-		grid_pos 2 8 6
-		visual_pos 2 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10201034156206689979
-		flags 0
-		grid_pos -2 11 17
-		visual_pos -2 11 17
+		grid_pos 2 8 4
+		visual_pos 2 8 4
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 10884893486355422567
 		flags 0
-		grid_pos 6 10 16
-		visual_pos 6 10 16
+		grid_pos 6 10 14
+		visual_pos 6 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -857,58 +785,10 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 5210085172713978006
-		flags 0
-		grid_pos -2 11 18
-		visual_pos -2 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 12676303549220406785
 		flags 0
 		grid_pos -1 11 18
 		visual_pos -1 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12240094993079533724
-		flags 0
-		grid_pos -1 11 15
-		visual_pos -1 11 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5741504081487446749
-		flags 0
-		grid_pos -2 11 15
-		visual_pos -2 11 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14328595217171399559
-		flags 0
-		grid_pos -3 11 15
-		visual_pos -3 11 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13651338886732286669
-		flags 0
-		grid_pos -4 11 15
-		visual_pos -4 11 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14882284062765206101
-		flags 0
-		grid_pos -5 11 15
-		visual_pos -5 11 15
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -921,34 +801,10 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 9477235980835964059
-		flags 0
-		grid_pos -2 11 16
-		visual_pos -2 11 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13806826418152488420
-		flags 0
-		grid_pos -1 11 14
-		visual_pos -1 11 14
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 17425523169727692534
 		flags 0
 		grid_pos -1 11 13
 		visual_pos -1 11 13
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7153365387341922321
-		flags 0
-		grid_pos -2 11 14
-		visual_pos -2 11 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -961,14 +817,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 7316243556166223748
-		flags 0
-		grid_pos -3 11 14
-		visual_pos -3 11 14
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 5592181901369469910
 		flags 0
 		grid_pos -3 11 13
@@ -977,26 +825,10 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 10722209713836261255
-		flags 0
-		grid_pos -4 11 14
-		visual_pos -4 11 14
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 11190977416375878418
 		flags 0
 		grid_pos -4 11 13
 		visual_pos -4 11 13
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2603785289607832982
-		flags 0
-		grid_pos -5 11 14
-		visual_pos -5 11 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -1011,8 +843,8 @@ chunk world
 	entity block
 		id 12725706581891584484
 		flags 0
-		grid_pos 1 8 5
-		visual_pos 1 8 5
+		grid_pos 1 8 3
+		visual_pos 1 8 3
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -1057,18 +889,10 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 2509647433954930663
-		flags 0
-		grid_pos 2 7 4
-		visual_pos 2 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6152301042239320816
 		flags 0
-		grid_pos 2 8 5
-		visual_pos 2 8 5
+		grid_pos 2 8 3
+		visual_pos 2 8 3
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -1089,22 +913,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 2542757672161531451
-		flags 0
-		grid_pos 5 7 3
-		visual_pos 5 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1707300495554886069
-		flags 0
-		grid_pos 5 7 4
-		visual_pos 5 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 11650594914039507698
 		flags 0
 		grid_pos 6 7 1
@@ -1117,22 +925,6 @@ chunk world
 		flags 0
 		grid_pos 6 7 2
 		visual_pos 6 7 2
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16129069313917340193
-		flags 0
-		grid_pos 6 7 3
-		visual_pos 6 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14905113698372650477
-		flags 0
-		grid_pos 6 7 4
-		visual_pos 6 7 4
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -1153,23 +945,23 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 15358862104902033017
-		flags 0
-		grid_pos 7 7 3
-		visual_pos 7 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7795683434552922972
-		flags 0
-		grid_pos 7 7 4
-		visual_pos 7 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 10959961948605109924
+		flags 0
+		grid_pos 5 8 3
+		visual_pos 5 8 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11074409086089607020
+		flags 0
+		grid_pos 5 8 4
+		visual_pos 5 8 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16070186818954929577
 		flags 0
 		grid_pos 5 8 5
 		visual_pos 5 8 5
@@ -1177,23 +969,23 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 11074409086089607020
-		flags 0
-		grid_pos 5 8 6
-		visual_pos 5 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16070186818954929577
-		flags 0
-		grid_pos 5 8 7
-		visual_pos 5 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 15847696311827584296
+		flags 0
+		grid_pos 6 8 3
+		visual_pos 6 8 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17015577846460865559
+		flags 0
+		grid_pos 6 8 4
+		visual_pos 6 8 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10621286031710884923
 		flags 0
 		grid_pos 6 8 5
 		visual_pos 6 8 5
@@ -1201,95 +993,111 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 17015577846460865559
-		flags 0
-		grid_pos 6 8 6
-		visual_pos 6 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10621286031710884923
-		flags 0
-		grid_pos 6 8 7
-		visual_pos 6 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15907164933908380879
-		flags 0
-		grid_pos 7 8 5
-		visual_pos 7 8 5
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10417287686185951093
-		flags 0
-		grid_pos 7 8 6
-		visual_pos 7 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16172881768589947475
-		flags 0
-		grid_pos 7 8 7
-		visual_pos 7 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6979717547317713940
 		flags 0
-		grid_pos 2 10 14
-		visual_pos 2 10 14
+		grid_pos 2 10 12
+		visual_pos 2 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 1711319847296509963
 		flags 0
-		grid_pos 3 10 14
-		visual_pos 3 10 14
+		grid_pos 3 10 12
+		visual_pos 3 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 267850770291339383
 		flags 0
-		grid_pos 2 10 13
-		visual_pos 2 10 13
+		grid_pos 2 10 11
+		visual_pos 2 10 11
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 17762159446734874961
 		flags 0
-		grid_pos 3 10 13
-		visual_pos 3 10 13
+		grid_pos 3 10 11
+		visual_pos 3 10 11
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 11204963740439581885
 		flags 0
-		grid_pos 5 9 9
-		visual_pos 5 9 9
+		grid_pos 5 9 7
+		visual_pos 5 9 7
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 5424527911340804435
 		flags 0
-		grid_pos 5 9 10
-		visual_pos 5 9 10
+		grid_pos 5 9 8
+		visual_pos 5 9 8
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 15290263588980150170
+		flags 0
+		grid_pos 6 9 7
+		visual_pos 6 9 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3107737066464565770
+		flags 0
+		grid_pos 6 9 8
+		visual_pos 6 9 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3505413692473817438
+		flags 0
+		grid_pos 4 10 11
+		visual_pos 4 10 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12658939785840428418
+		flags 0
+		grid_pos 1 9 9
+		visual_pos 1 9 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9415943971077197535
+		flags 0
+		grid_pos 2 9 9
+		visual_pos 2 9 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1193818510584306714
+		flags 0
+		grid_pos 3 9 9
+		visual_pos 3 9 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6275796709052611781
+		flags 0
+		grid_pos 4 9 9
+		visual_pos 4 9 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 461365969976803201
 		flags 0
 		grid_pos 6 9 9
 		visual_pos 6 9 9
@@ -1297,7 +1105,55 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 3107737066464565770
+		id 426698796268754480
+		flags 0
+		grid_pos 5 9 9
+		visual_pos 5 9 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4210683845471682415
+		flags 0
+		grid_pos 1 9 10
+		visual_pos 1 9 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7584832822633722238
+		flags 0
+		grid_pos 2 9 10
+		visual_pos 2 9 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2892101396742437908
+		flags 0
+		grid_pos 3 9 10
+		visual_pos 3 9 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7418187702062756598
+		flags 0
+		grid_pos 4 9 10
+		visual_pos 4 9 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10962663368469775729
+		flags 0
+		grid_pos 5 9 10
+		visual_pos 5 9 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10071068730582224671
 		flags 0
 		grid_pos 6 9 10
 		visual_pos 6 9 10
@@ -1305,226 +1161,50 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 10587285295639010624
-		flags 0
-		grid_pos 7 9 9
-		visual_pos 7 9 9
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 11450181228939589522
-		flags 0
-		grid_pos 7 9 10
-		visual_pos 7 9 10
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3505413692473817438
-		flags 0
-		grid_pos 4 10 13
-		visual_pos 4 10 13
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12658939785840428418
-		flags 0
-		grid_pos 1 9 11
-		visual_pos 1 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 9415943971077197535
-		flags 0
-		grid_pos 2 9 11
-		visual_pos 2 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1193818510584306714
-		flags 0
-		grid_pos 3 9 11
-		visual_pos 3 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6275796709052611781
-		flags 0
-		grid_pos 4 9 11
-		visual_pos 4 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 461365969976803201
-		flags 0
-		grid_pos 6 9 11
-		visual_pos 6 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 426698796268754480
-		flags 0
-		grid_pos 5 9 11
-		visual_pos 5 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16713002800559386243
-		flags 0
-		grid_pos 7 9 11
-		visual_pos 7 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4210683845471682415
-		flags 0
-		grid_pos 1 9 12
-		visual_pos 1 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7584832822633722238
-		flags 0
-		grid_pos 2 9 12
-		visual_pos 2 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2892101396742437908
-		flags 0
-		grid_pos 3 9 12
-		visual_pos 3 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7418187702062756598
-		flags 0
-		grid_pos 4 9 12
-		visual_pos 4 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10962663368469775729
-		flags 0
-		grid_pos 5 9 12
-		visual_pos 5 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10071068730582224671
-		flags 0
-		grid_pos 6 9 12
-		visual_pos 6 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7065549782026545281
-		flags 0
-		grid_pos 7 9 12
-		visual_pos 7 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 17403475007622655591
-		flags 0
-		grid_pos -1 11 19
-		visual_pos -1 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15711611684955591415
-		flags 0
-		grid_pos -2 11 19
-		visual_pos -2 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12580818183878409361
-		flags 0
-		grid_pos 7 8 8
-		visual_pos 7 8 8
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 15870333529371658558
 		flags 0
-		grid_pos 6 8 8
-		visual_pos 6 8 8
+		grid_pos 6 8 6
+		visual_pos 6 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 17837063573866685026
 		flags 0
-		grid_pos 5 8 8
-		visual_pos 5 8 8
+		grid_pos 5 8 6
+		visual_pos 5 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 7686548360590806772
 		flags 0
-		grid_pos 4 8 8
-		visual_pos 4 8 8
+		grid_pos 4 8 6
+		visual_pos 4 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 12211688391558577826
 		flags 0
-		grid_pos 3 8 8
-		visual_pos 3 8 8
+		grid_pos 3 8 6
+		visual_pos 3 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 241526794617623900
 		flags 0
-		grid_pos 2 8 8
-		visual_pos 2 8 8
+		grid_pos 2 8 6
+		visual_pos 2 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 3145666952548208553
 		flags 0
-		grid_pos 1 8 8
-		visual_pos 1 8 8
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15632810552046723105
-		flags 0
-		grid_pos 0 11 19
-		visual_pos 0 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 5 11 19
-		visual_pos 5 11 19
+		grid_pos 1 8 6
+		visual_pos 1 8 6
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -2265,14 +1945,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 17872623820009035573
-		flags 0
-		grid_pos 0 14 -3
-		visual_pos 0 14 -3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 3118256871968651604
 		flags 0
 		grid_pos 0 14 -2
@@ -2889,50 +2561,26 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 7 10 15
-		visual_pos 7 10 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 16171774979264760725
 		flags 0
-		grid_pos 1 10 15
-		visual_pos 1 10 15
+		grid_pos 1 10 13
+		visual_pos 1 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 6979717547317713940
 		flags 0
-		grid_pos 2 10 15
-		visual_pos 2 10 15
+		grid_pos 2 10 13
+		visual_pos 2 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 1711319847296509963
 		flags 0
-		grid_pos 3 10 15
-		visual_pos 3 10 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos 7 10 16
-		visual_pos 7 10 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos 7 11 17
-		visual_pos 7 11 17
+		grid_pos 3 10 13
+		visual_pos 3 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -2947,24 +2595,16 @@ chunk world
 	entity block
 		id 1711319847296509963
 		flags 0
-		grid_pos 4 10 14
-		visual_pos 4 10 14
+		grid_pos 4 10 12
+		visual_pos 4 10 12
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 1711319847296509963
 		flags 0
-		grid_pos 4 10 15
-		visual_pos 4 10 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 6 11 19
-		visual_pos 6 11 19
+		grid_pos 4 10 13
+		visual_pos 4 10 13
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -3193,534 +2833,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 18368736493038100436
-		flags 0
-		grid_pos 0 11 20
-		visual_pos 0 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3369548762133224388
-		flags 0
-		grid_pos 0 11 21
-		visual_pos 0 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 8791341113751804386
-		flags 0
-		grid_pos 0 11 22
-		visual_pos 0 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15965081272691430335
-		flags 0
-		grid_pos 0 11 23
-		visual_pos 0 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12626542443734760392
-		flags 0
-		grid_pos 0 11 24
-		visual_pos 0 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 284525357195669921
-		flags 0
-		grid_pos 0 11 25
-		visual_pos 0 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15632810552046723105
-		flags 0
-		grid_pos 0 11 26
-		visual_pos 0 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 5 11 20
-		visual_pos 5 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2773129310913799985
-		flags 0
-		grid_pos 5 11 21
-		visual_pos 5 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4715663104631673893
-		flags 0
-		grid_pos 5 11 22
-		visual_pos 5 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6519879323610478792
-		flags 0
-		grid_pos 5 11 23
-		visual_pos 5 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10191428989080546156
-		flags 0
-		grid_pos 5 11 24
-		visual_pos 5 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 697818885733321083
-		flags 0
-		grid_pos 5 11 25
-		visual_pos 5 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 1 11 26
-		visual_pos 1 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos 6 11 20
-		visual_pos 6 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18228059832371723260
-		flags 0
-		grid_pos 6 11 21
-		visual_pos 6 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 428042286736025260
-		flags 0
-		grid_pos 6 11 22
-		visual_pos 6 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos 6 11 23
-		visual_pos 6 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos 6 11 24
-		visual_pos 6 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 6 11 25
-		visual_pos 6 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 2 11 26
-		visual_pos 2 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos 7 11 20
-		visual_pos 7 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 7 11 21
-		visual_pos 7 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 7 11 22
-		visual_pos 7 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos 7 11 23
-		visual_pos 7 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos 7 11 24
-		visual_pos 7 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 7 11 25
-		visual_pos 7 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 3 11 26
-		visual_pos 3 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos -2 11 20
-		visual_pos -2 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18228059832371723260
-		flags 0
-		grid_pos -2 11 21
-		visual_pos -2 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 428042286736025260
-		flags 0
-		grid_pos -2 11 22
-		visual_pos -2 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos -2 11 23
-		visual_pos -2 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos -2 11 24
-		visual_pos -2 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos -2 11 25
-		visual_pos -2 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos -2 11 26
-		visual_pos -2 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos -1 11 20
-		visual_pos -1 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos -1 11 21
-		visual_pos -1 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos -1 11 22
-		visual_pos -1 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos -1 11 23
-		visual_pos -1 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos -1 11 24
-		visual_pos -1 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos -1 11 25
-		visual_pos -1 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos -1 11 26
-		visual_pos -1 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15711611684955591415
-		flags 0
-		grid_pos -2 11 27
-		visual_pos -2 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos -2 11 28
-		visual_pos -2 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 17403475007622655591
-		flags 0
-		grid_pos -1 11 27
-		visual_pos -1 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos -1 11 28
-		visual_pos -1 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15632810552046723105
-		flags 0
-		grid_pos 0 11 27
-		visual_pos 0 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18368736493038100436
-		flags 0
-		grid_pos 0 11 28
-		visual_pos 0 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 1 11 27
-		visual_pos 1 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 1 11 28
-		visual_pos 1 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 2 11 27
-		visual_pos 2 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos 2 11 28
-		visual_pos 2 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 3 11 27
-		visual_pos 3 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos 3 11 28
-		visual_pos 3 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 4 11 26
-		visual_pos 4 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 4 11 27
-		visual_pos 4 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 4 11 28
-		visual_pos 4 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 5 11 26
-		visual_pos 5 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 5 11 27
-		visual_pos 5 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos 5 11 28
-		visual_pos 5 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 6 11 26
-		visual_pos 6 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 6 11 27
-		visual_pos 6 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos 6 11 28
-		visual_pos 6 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 7 11 26
-		visual_pos 7 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 7 11 27
-		visual_pos 7 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 7 11 28
-		visual_pos 7 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 3116499656138653012
 		flags 0
 		grid_pos 3 7 -9
@@ -3753,26 +2865,18 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 10191428989080546156
-		flags 0
-		grid_pos 8 11 17
-		visual_pos 8 11 17
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6519879323610478792
 		flags 0
-		grid_pos 4 10 16
-		visual_pos 4 10 16
+		grid_pos 4 10 14
+		visual_pos 4 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 10191428989080546156
 		flags 0
-		grid_pos 4 11 17
-		visual_pos 4 11 17
+		grid_pos 4 11 16
+		visual_pos 4 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -3785,74 +2889,18 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 4 11 19
-		visual_pos 4 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 4 11 20
-		visual_pos 4 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2773129310913799985
-		flags 0
-		grid_pos 4 11 21
-		visual_pos 4 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4715663104631673893
-		flags 0
-		grid_pos 4 11 22
-		visual_pos 4 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6519879323610478792
 		flags 0
-		grid_pos 4 11 23
-		visual_pos 4 11 23
+		grid_pos 1 10 14
+		visual_pos 1 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 10191428989080546156
 		flags 0
-		grid_pos 4 11 24
-		visual_pos 4 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 697818885733321083
-		flags 0
-		grid_pos 4 11 25
-		visual_pos 4 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6519879323610478792
-		flags 0
-		grid_pos 1 10 16
-		visual_pos 1 10 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10191428989080546156
-		flags 0
-		grid_pos 1 11 17
-		visual_pos 1 11 17
+		grid_pos 1 11 16
+		visual_pos 1 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -3865,74 +2913,18 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 1 11 19
-		visual_pos 1 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 1 11 20
-		visual_pos 1 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2773129310913799985
-		flags 0
-		grid_pos 1 11 21
-		visual_pos 1 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4715663104631673893
-		flags 0
-		grid_pos 1 11 22
-		visual_pos 1 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 6519879323610478792
 		flags 0
-		grid_pos 1 11 23
-		visual_pos 1 11 23
+		grid_pos 2 10 14
+		visual_pos 2 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 10191428989080546156
 		flags 0
-		grid_pos 1 11 24
-		visual_pos 1 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 697818885733321083
-		flags 0
-		grid_pos 1 11 25
-		visual_pos 1 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6519879323610478792
-		flags 0
-		grid_pos 2 10 16
-		visual_pos 2 10 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10191428989080546156
-		flags 0
-		grid_pos 2 11 17
-		visual_pos 2 11 17
+		grid_pos 2 11 16
+		visual_pos 2 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -3945,74 +2937,18 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 2 11 19
-		visual_pos 2 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 2 11 20
-		visual_pos 2 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2773129310913799985
-		flags 0
-		grid_pos 2 11 21
-		visual_pos 2 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4715663104631673893
-		flags 0
-		grid_pos 2 11 22
-		visual_pos 2 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6519879323610478792
-		flags 0
-		grid_pos 2 11 23
-		visual_pos 2 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10191428989080546156
-		flags 0
-		grid_pos 2 11 24
-		visual_pos 2 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 697818885733321083
-		flags 0
-		grid_pos 2 11 25
-		visual_pos 2 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 10884893486355422567
 		flags 0
-		grid_pos 3 10 16
-		visual_pos 3 10 16
+		grid_pos 3 10 14
+		visual_pos 3 10 14
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
 	entity block
 		id 983595515681982559
 		flags 0
-		grid_pos 3 11 17
-		visual_pos 3 11 17
+		grid_pos 3 11 16
+		visual_pos 3 11 16
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -4021,62 +2957,6 @@ chunk world
 		flags 0
 		grid_pos 3 11 18
 		visual_pos 3 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 3 11 19
-		visual_pos 3 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 14113190189356757091
-		flags 0
-		grid_pos 3 11 20
-		visual_pos 3 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18228059832371723260
-		flags 0
-		grid_pos 3 11 21
-		visual_pos 3 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 428042286736025260
-		flags 0
-		grid_pos 3 11 22
-		visual_pos 3 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos 3 11 23
-		visual_pos 3 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos 3 11 24
-		visual_pos 3 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 3 11 25
-		visual_pos 3 11 25
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -4249,54 +3129,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 3248278253669184762
-		flags 0
-		grid_pos 8 7 3
-		visual_pos 8 7 3
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3248278253669184762
-		flags 0
-		grid_pos 8 7 4
-		visual_pos 8 7 4
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3015585938600442098
-		flags 0
-		grid_pos 8 10 13
-		visual_pos 8 10 13
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5049990840609449391
-		flags 0
-		grid_pos 8 10 14
-		visual_pos 8 10 14
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 11471847729655014859
-		flags 0
-		grid_pos 8 10 15
-		visual_pos 8 10 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 11471847729655014859
-		flags 0
-		grid_pos 8 10 16
-		visual_pos 8 10 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 18368736493038100436
 		flags 0
 		grid_pos 0 9 9
@@ -4377,22 +3209,6 @@ chunk world
 		visual_scl 1 1 1
 	end_entity
 	entity block
-		id 16171774979264760725
-		flags 0
-		grid_pos 0 10 15
-		visual_pos 0 10 15
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6519879323610478792
-		flags 0
-		grid_pos 0 10 16
-		visual_pos 0 10 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
 		id 12761098132444957105
 		flags 0
 		grid_pos 8 11 18
@@ -4405,558 +3221,6 @@ chunk world
 		flags 0
 		grid_pos 8 11 19
 		visual_pos 8 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15543151114039269318
-		flags 0
-		grid_pos 8 11 20
-		visual_pos 8 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 8 11 21
-		visual_pos 8 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13238460579902606844
-		flags 0
-		grid_pos 8 11 22
-		visual_pos 8 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10884893486355422567
-		flags 0
-		grid_pos 8 11 23
-		visual_pos 8 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 983595515681982559
-		flags 0
-		grid_pos 8 11 24
-		visual_pos 8 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12761098132444957105
-		flags 0
-		grid_pos 8 11 25
-		visual_pos 8 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 8 11 26
-		visual_pos 8 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1331953967496904224
-		flags 0
-		grid_pos 8 11 27
-		visual_pos 8 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16754050411011312795
-		flags 0
-		grid_pos 8 11 28
-		visual_pos 8 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15907164933908380879
-		flags 0
-		grid_pos 8 8 5
-		visual_pos 8 8 5
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10417287686185951093
-		flags 0
-		grid_pos 8 8 6
-		visual_pos 8 8 6
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16172881768589947475
-		flags 0
-		grid_pos 8 8 7
-		visual_pos 8 8 7
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12580818183878409361
-		flags 0
-		grid_pos 8 8 8
-		visual_pos 8 8 8
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10587285295639010624
-		flags 0
-		grid_pos 8 9 9
-		visual_pos 8 9 9
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 11450181228939589522
-		flags 0
-		grid_pos 8 9 10
-		visual_pos 8 9 10
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16713002800559386243
-		flags 0
-		grid_pos 8 9 11
-		visual_pos 8 9 11
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7065549782026545281
-		flags 0
-		grid_pos 8 9 12
-		visual_pos 8 9 12
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2652945472391776978
-		flags 0
-		grid_pos -6 11 16
-		visual_pos -6 11 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4913686822987784269
-		flags 0
-		grid_pos -6 11 17
-		visual_pos -6 11 17
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3513492456486338932
-		flags 0
-		grid_pos -6 11 18
-		visual_pos -6 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 13421358571966552865
-		flags 0
-		grid_pos -6 11 19
-		visual_pos -6 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 48558902760751241
-		flags 0
-		grid_pos -6 11 20
-		visual_pos -6 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 4875673020114325424
-		flags 0
-		grid_pos -6 11 21
-		visual_pos -6 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10720782191071425918
-		flags 0
-		grid_pos -6 11 22
-		visual_pos -6 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 153170736353035693
-		flags 0
-		grid_pos -6 11 23
-		visual_pos -6 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5887960291922124536
-		flags 0
-		grid_pos -6 11 24
-		visual_pos -6 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 8725552014199994231
-		flags 0
-		grid_pos -6 11 25
-		visual_pos -6 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18347222078535019942
-		flags 0
-		grid_pos -6 11 26
-		visual_pos -6 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2174925601783694766
-		flags 0
-		grid_pos -6 11 27
-		visual_pos -6 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2028709156322040602
-		flags 0
-		grid_pos -6 11 28
-		visual_pos -6 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 18030675546907767952
-		flags 0
-		grid_pos -5 11 16
-		visual_pos -5 11 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7701629690929254151
-		flags 0
-		grid_pos -5 11 17
-		visual_pos -5 11 17
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3448495267802422519
-		flags 0
-		grid_pos -5 11 18
-		visual_pos -5 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5883024559929496500
-		flags 0
-		grid_pos -5 11 19
-		visual_pos -5 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 518991551480188117
-		flags 0
-		grid_pos -5 11 20
-		visual_pos -5 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 9530801001535364546
-		flags 0
-		grid_pos -5 11 21
-		visual_pos -5 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5651178579362581082
-		flags 0
-		grid_pos -5 11 22
-		visual_pos -5 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5649080969053365914
-		flags 0
-		grid_pos -5 11 23
-		visual_pos -5 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 466998016358966001
-		flags 0
-		grid_pos -5 11 24
-		visual_pos -5 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6174164290491335756
-		flags 0
-		grid_pos -5 11 25
-		visual_pos -5 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7490277348521116238
-		flags 0
-		grid_pos -5 11 26
-		visual_pos -5 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1094528187745893420
-		flags 0
-		grid_pos -5 11 27
-		visual_pos -5 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 5830239974206907741
-		flags 0
-		grid_pos -5 11 28
-		visual_pos -5 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12174015420233166250
-		flags 0
-		grid_pos -4 11 16
-		visual_pos -4 11 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10371141711025751660
-		flags 0
-		grid_pos -4 11 17
-		visual_pos -4 11 17
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 9542115496366968012
-		flags 0
-		grid_pos -4 11 18
-		visual_pos -4 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6403253920415522255
-		flags 0
-		grid_pos -4 11 19
-		visual_pos -4 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 16115733048188063245
-		flags 0
-		grid_pos -4 11 20
-		visual_pos -4 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3140285899631623553
-		flags 0
-		grid_pos -4 11 21
-		visual_pos -4 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 17229534484804805973
-		flags 0
-		grid_pos -4 11 22
-		visual_pos -4 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 17053061285024486132
-		flags 0
-		grid_pos -4 11 23
-		visual_pos -4 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7433502616484864565
-		flags 0
-		grid_pos -4 11 24
-		visual_pos -4 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 6665845887359651499
-		flags 0
-		grid_pos -4 11 25
-		visual_pos -4 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1410963170030832828
-		flags 0
-		grid_pos -4 11 26
-		visual_pos -4 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3713258440570596865
-		flags 0
-		grid_pos -4 11 27
-		visual_pos -4 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15223735383711707482
-		flags 0
-		grid_pos -4 11 28
-		visual_pos -4 11 28
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 7224212633160669380
-		flags 0
-		grid_pos -3 11 16
-		visual_pos -3 11 16
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 709147233747440102
-		flags 0
-		grid_pos -3 11 17
-		visual_pos -3 11 17
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 1882840896475198056
-		flags 0
-		grid_pos -3 11 18
-		visual_pos -3 11 18
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 9774926564076334597
-		flags 0
-		grid_pos -3 11 19
-		visual_pos -3 11 19
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15054770454332013549
-		flags 0
-		grid_pos -3 11 20
-		visual_pos -3 11 20
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 11031023480191026658
-		flags 0
-		grid_pos -3 11 21
-		visual_pos -3 11 21
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 15617609709007595572
-		flags 0
-		grid_pos -3 11 22
-		visual_pos -3 11 22
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 3267442999909016229
-		flags 0
-		grid_pos -3 11 23
-		visual_pos -3 11 23
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 8196088016774167895
-		flags 0
-		grid_pos -3 11 24
-		visual_pos -3 11 24
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12011866495446743041
-		flags 0
-		grid_pos -3 11 25
-		visual_pos -3 11 25
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 2138453666984782709
-		flags 0
-		grid_pos -3 11 26
-		visual_pos -3 11 26
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 10853002358271971620
-		flags 0
-		grid_pos -3 11 27
-		visual_pos -3 11 27
-		visual_rot 0 0 0
-		visual_scl 1 1 1
-	end_entity
-	entity block
-		id 12992680327460912464
-		flags 0
-		grid_pos -3 11 28
-		visual_pos -3 11 28
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
@@ -6432,12 +4696,7748 @@ chunk world
 		visual_rot 0 0 0
 		visual_scl 1 1 1
 	end_entity
-	entity player_spawn
-		id 15698242470653079680
-		flags 2
-		grid_pos 4 8 -7
-		visual_pos 4 8 -7
+	entity block
+		id 8190040605843946639
+		flags 0
+		grid_pos -5 11 14
+		visual_pos -5 11 14
 		visual_rot 0 0 0
-		visual_scl 0.1 0.1 0.1
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17756074069183599649
+		flags 0
+		grid_pos -5 11 15
+		visual_pos -5 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3171188828658845514
+		flags 0
+		grid_pos -4 11 14
+		visual_pos -4 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17099532923903581189
+		flags 0
+		grid_pos -3 11 14
+		visual_pos -3 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 488259910412415905
+		flags 0
+		grid_pos -2 11 14
+		visual_pos -2 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17895109947739876823
+		flags 0
+		grid_pos -1 11 14
+		visual_pos -1 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6774731932135544028
+		flags 0
+		grid_pos -1 11 15
+		visual_pos -1 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11481692527359834786
+		flags 0
+		grid_pos -1 11 19
+		visual_pos -1 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16780331357602048053
+		flags 0
+		grid_pos 0 11 19
+		visual_pos 0 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14868099501316201479
+		flags 0
+		grid_pos 1 11 19
+		visual_pos 1 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12617456774855640491
+		flags 0
+		grid_pos 2 11 19
+		visual_pos 2 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13206715662251677560
+		flags 0
+		grid_pos 3 11 19
+		visual_pos 3 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12359277229948001233
+		flags 0
+		grid_pos 4 11 19
+		visual_pos 4 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17961392462518935367
+		flags 0
+		grid_pos 5 11 19
+		visual_pos 5 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14267906778898351063
+		flags 0
+		grid_pos 6 11 19
+		visual_pos 6 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7383940277184366650
+		flags 0
+		grid_pos -4 11 15
+		visual_pos -4 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16300105539898213405
+		flags 0
+		grid_pos -3 11 15
+		visual_pos -3 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9060580177040413925
+		flags 0
+		grid_pos -2 11 15
+		visual_pos -2 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16746186008292071988
+		flags 0
+		grid_pos -2 11 16
+		visual_pos -2 11 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6666614575961028669
+		flags 0
+		grid_pos -2 11 17
+		visual_pos -2 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15657492902399922724
+		flags 0
+		grid_pos -2 11 18
+		visual_pos -2 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3085797640264990105
+		flags 0
+		grid_pos -2 11 19
+		visual_pos -2 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2131856389554927668
+		flags 0
+		grid_pos -9 11 13
+		visual_pos -9 11 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14802342156299876438
+		flags 0
+		grid_pos -9 11 14
+		visual_pos -9 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17237097663589325187
+		flags 0
+		grid_pos -9 11 15
+		visual_pos -9 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11143621166630862263
+		flags 0
+		grid_pos -8 11 13
+		visual_pos -8 11 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13259168207681643080
+		flags 0
+		grid_pos -8 11 14
+		visual_pos -8 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5010280563816351220
+		flags 0
+		grid_pos -8 11 15
+		visual_pos -8 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15059483867714474548
+		flags 0
+		grid_pos -7 11 13
+		visual_pos -7 11 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10017920334305391926
+		flags 0
+		grid_pos -7 11 14
+		visual_pos -7 11 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5797323631327776300
+		flags 0
+		grid_pos -7 11 15
+		visual_pos -7 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9888300545695701302
+		flags 0
+		grid_pos -9 12 9
+		visual_pos -9 12 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17037953543109428979
+		flags 0
+		grid_pos -9 12 10
+		visual_pos -9 12 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1059922300006779089
+		flags 0
+		grid_pos -9 12 11
+		visual_pos -9 12 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13843645563661014470
+		flags 0
+		grid_pos -9 12 12
+		visual_pos -9 12 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4127583485823853007
+		flags 0
+		grid_pos -9 13 5
+		visual_pos -9 13 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10321570282174925921
+		flags 0
+		grid_pos -9 13 6
+		visual_pos -9 13 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13934884181270390300
+		flags 0
+		grid_pos -9 13 7
+		visual_pos -9 13 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16571374023302992550
+		flags 0
+		grid_pos -9 13 8
+		visual_pos -9 13 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14019453081087811422
+		flags 0
+		grid_pos -9 14 -4
+		visual_pos -9 14 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13355960981221793951
+		flags 0
+		grid_pos -9 14 -3
+		visual_pos -9 14 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12127495211225290928
+		flags 0
+		grid_pos -9 14 -2
+		visual_pos -9 14 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12736253083977485282
+		flags 0
+		grid_pos -9 14 -1
+		visual_pos -9 14 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6134524195699418136
+		flags 0
+		grid_pos -9 14 0
+		visual_pos -9 14 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1092786676611986053
+		flags 0
+		grid_pos -9 14 1
+		visual_pos -9 14 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15151493670823285631
+		flags 0
+		grid_pos -9 14 2
+		visual_pos -9 14 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17153419700326520909
+		flags 0
+		grid_pos -9 14 3
+		visual_pos -9 14 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13384713791187521048
+		flags 0
+		grid_pos -9 14 4
+		visual_pos -9 14 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16776950397729537885
+		flags 0
+		grid_pos -8 12 9
+		visual_pos -8 12 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17558374134840478128
+		flags 0
+		grid_pos -8 12 10
+		visual_pos -8 12 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10270544408149180843
+		flags 0
+		grid_pos -8 12 11
+		visual_pos -8 12 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15340278008226380435
+		flags 0
+		grid_pos -8 12 12
+		visual_pos -8 12 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1596532220503967982
+		flags 0
+		grid_pos -8 13 5
+		visual_pos -8 13 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10497110820301335760
+		flags 0
+		grid_pos -8 13 6
+		visual_pos -8 13 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4019637286613902854
+		flags 0
+		grid_pos -8 13 7
+		visual_pos -8 13 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6632986011642365641
+		flags 0
+		grid_pos -8 13 8
+		visual_pos -8 13 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9430708740567935949
+		flags 0
+		grid_pos -8 14 -4
+		visual_pos -8 14 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9637828100841459849
+		flags 0
+		grid_pos -8 14 -3
+		visual_pos -8 14 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3033248495979488728
+		flags 0
+		grid_pos -8 14 -2
+		visual_pos -8 14 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8748476891872870961
+		flags 0
+		grid_pos -8 14 -1
+		visual_pos -8 14 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1714653100382861632
+		flags 0
+		grid_pos -8 14 0
+		visual_pos -8 14 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11757603227222011692
+		flags 0
+		grid_pos -8 14 1
+		visual_pos -8 14 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10008989017280196647
+		flags 0
+		grid_pos -8 14 2
+		visual_pos -8 14 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8920520077389741078
+		flags 0
+		grid_pos -8 14 3
+		visual_pos -8 14 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11891745506158101685
+		flags 0
+		grid_pos -8 14 4
+		visual_pos -8 14 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6648919427128057201
+		flags 0
+		grid_pos -7 12 9
+		visual_pos -7 12 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5660871135905595307
+		flags 0
+		grid_pos -7 12 10
+		visual_pos -7 12 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5174034828713294602
+		flags 0
+		grid_pos -7 12 11
+		visual_pos -7 12 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16802697540592165956
+		flags 0
+		grid_pos -7 12 12
+		visual_pos -7 12 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8161827025879763015
+		flags 0
+		grid_pos -7 13 5
+		visual_pos -7 13 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17680118760255467716
+		flags 0
+		grid_pos -7 13 6
+		visual_pos -7 13 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4148046816571363859
+		flags 0
+		grid_pos -7 13 7
+		visual_pos -7 13 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4312796886481583812
+		flags 0
+		grid_pos -7 13 8
+		visual_pos -7 13 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4114317236602156704
+		flags 0
+		grid_pos -7 14 -4
+		visual_pos -7 14 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13217244630418714189
+		flags 0
+		grid_pos -7 14 -3
+		visual_pos -7 14 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13207454502285313946
+		flags 0
+		grid_pos -7 14 -2
+		visual_pos -7 14 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16119023518807928019
+		flags 0
+		grid_pos -7 14 -1
+		visual_pos -7 14 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6023060656198630644
+		flags 0
+		grid_pos -7 14 0
+		visual_pos -7 14 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17677623394564276934
+		flags 0
+		grid_pos -7 14 1
+		visual_pos -7 14 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18221444073603243401
+		flags 0
+		grid_pos -7 14 2
+		visual_pos -7 14 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8619377583274712692
+		flags 0
+		grid_pos -7 14 3
+		visual_pos -7 14 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9260165829589195480
+		flags 0
+		grid_pos -7 14 4
+		visual_pos -7 14 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10223552621376491970
+		flags 0
+		grid_pos -9 7 -17
+		visual_pos -9 7 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4581881693879370944
+		flags 0
+		grid_pos -9 7 -16
+		visual_pos -9 7 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17557322362463881789
+		flags 0
+		grid_pos -9 7 -15
+		visual_pos -9 7 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4796628841400552521
+		flags 0
+		grid_pos -9 7 -14
+		visual_pos -9 7 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 157457614938126105
+		flags 0
+		grid_pos -9 7 -13
+		visual_pos -9 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11499816932627237021
+		flags 0
+		grid_pos -9 7 -12
+		visual_pos -9 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18405011987835900878
+		flags 0
+		grid_pos -9 7 -11
+		visual_pos -9 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12913991053805735427
+		flags 0
+		grid_pos -9 8 -10
+		visual_pos -9 8 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5065885719084153343
+		flags 0
+		grid_pos -9 9 -9
+		visual_pos -9 9 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3776148750194494593
+		flags 0
+		grid_pos -9 10 -8
+		visual_pos -9 10 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16335193549431102023
+		flags 0
+		grid_pos -9 11 -7
+		visual_pos -9 11 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12495322093963643029
+		flags 0
+		grid_pos -9 12 -6
+		visual_pos -9 12 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11344153195943674025
+		flags 0
+		grid_pos -9 13 -5
+		visual_pos -9 13 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7199199365026413764
+		flags 0
+		grid_pos -8 7 -17
+		visual_pos -8 7 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16234815979629086798
+		flags 0
+		grid_pos -8 7 -16
+		visual_pos -8 7 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15694054569382247517
+		flags 0
+		grid_pos -8 7 -15
+		visual_pos -8 7 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10719733549444680046
+		flags 0
+		grid_pos -8 7 -14
+		visual_pos -8 7 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7886911692732824975
+		flags 0
+		grid_pos -8 7 -13
+		visual_pos -8 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16688529914610850323
+		flags 0
+		grid_pos -8 7 -12
+		visual_pos -8 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12369156473259173292
+		flags 0
+		grid_pos -8 7 -11
+		visual_pos -8 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1846923217971361746
+		flags 0
+		grid_pos -8 8 -10
+		visual_pos -8 8 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14197947195221286298
+		flags 0
+		grid_pos -8 9 -9
+		visual_pos -8 9 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13993553767467279652
+		flags 0
+		grid_pos -8 10 -8
+		visual_pos -8 10 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6945856427319630296
+		flags 0
+		grid_pos -8 11 -7
+		visual_pos -8 11 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11311857147072131448
+		flags 0
+		grid_pos -8 12 -6
+		visual_pos -8 12 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8142822253835794599
+		flags 0
+		grid_pos -8 13 -5
+		visual_pos -8 13 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7531080900567273596
+		flags 0
+		grid_pos -7 7 -17
+		visual_pos -7 7 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9037044718533125635
+		flags 0
+		grid_pos -7 7 -16
+		visual_pos -7 7 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15796292894623907271
+		flags 0
+		grid_pos -7 7 -15
+		visual_pos -7 7 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10952435545745584855
+		flags 0
+		grid_pos -7 7 -14
+		visual_pos -7 7 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1538572220606410568
+		flags 0
+		grid_pos -7 7 -13
+		visual_pos -7 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16760352040215741731
+		flags 0
+		grid_pos -7 7 -12
+		visual_pos -7 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8795996040259299986
+		flags 0
+		grid_pos -7 7 -11
+		visual_pos -7 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16697655492563244890
+		flags 0
+		grid_pos -7 8 -10
+		visual_pos -7 8 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6929052200006036413
+		flags 0
+		grid_pos -7 9 -9
+		visual_pos -7 9 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1521079824743571091
+		flags 0
+		grid_pos -7 10 -8
+		visual_pos -7 10 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1219282319381723556
+		flags 0
+		grid_pos -7 11 -7
+		visual_pos -7 11 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16735815297415900302
+		flags 0
+		grid_pos -7 12 -6
+		visual_pos -7 12 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12106171300059415147
+		flags 0
+		grid_pos -7 13 -5
+		visual_pos -7 13 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17484827603767594671
+		flags 0
+		grid_pos 0 14 -3
+		visual_pos 0 14 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3578163573668865784
+		flags 0
+		grid_pos 10 7 2
+		visual_pos 10 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1697252549352115943
+		flags 0
+		grid_pos 9 7 2
+		visual_pos 9 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10489433522427567999
+		flags 0
+		grid_pos 9 7 1
+		visual_pos 9 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3530329370354589819
+		flags 0
+		grid_pos 10 7 1
+		visual_pos 10 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 742532972360127221
+		flags 0
+		grid_pos 11 7 1
+		visual_pos 11 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15549948165799036253
+		flags 0
+		grid_pos 11 7 2
+		visual_pos 11 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6714598515997137620
+		flags 0
+		grid_pos 12 7 1
+		visual_pos 12 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10737960807502567353
+		flags 0
+		grid_pos 12 7 2
+		visual_pos 12 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 536306928672154742
+		flags 0
+		grid_pos 13 7 1
+		visual_pos 13 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9777628195373114568
+		flags 0
+		grid_pos 13 7 2
+		visual_pos 13 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3995503927868603114
+		flags 0
+		grid_pos 10 7 -1
+		visual_pos 10 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7087161437079586413
+		flags 0
+		grid_pos 10 7 0
+		visual_pos 10 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5228735452661441601
+		flags 0
+		grid_pos 11 7 -1
+		visual_pos 11 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18248833736323861056
+		flags 0
+		grid_pos 11 7 0
+		visual_pos 11 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5799118902564278762
+		flags 0
+		grid_pos 12 7 -1
+		visual_pos 12 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17335782079306692853
+		flags 0
+		grid_pos 12 7 0
+		visual_pos 12 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1330590983950484287
+		flags 0
+		grid_pos 13 7 -1
+		visual_pos 13 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11802129138975763851
+		flags 0
+		grid_pos 13 7 0
+		visual_pos 13 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3289072501472393912
+		flags 0
+		grid_pos 10 7 -5
+		visual_pos 10 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7353652080468662405
+		flags 0
+		grid_pos 10 7 -4
+		visual_pos 10 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15455379907777706764
+		flags 0
+		grid_pos 10 7 -3
+		visual_pos 10 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5582888870702931685
+		flags 0
+		grid_pos 10 7 -2
+		visual_pos 10 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15574232548211504146
+		flags 0
+		grid_pos 11 7 -5
+		visual_pos 11 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4654872517045240831
+		flags 0
+		grid_pos 11 7 -4
+		visual_pos 11 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2509678216865623922
+		flags 0
+		grid_pos 11 7 -3
+		visual_pos 11 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13051590301933082198
+		flags 0
+		grid_pos 11 7 -2
+		visual_pos 11 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2095325498151204671
+		flags 0
+		grid_pos 12 7 -5
+		visual_pos 12 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8001750068399012879
+		flags 0
+		grid_pos 12 7 -4
+		visual_pos 12 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6745667762571244329
+		flags 0
+		grid_pos 12 7 -3
+		visual_pos 12 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11869066358850320002
+		flags 0
+		grid_pos 12 7 -2
+		visual_pos 12 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13037778165398462909
+		flags 0
+		grid_pos 13 7 -5
+		visual_pos 13 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5351799436852694775
+		flags 0
+		grid_pos 13 7 -4
+		visual_pos 13 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1987824081275327393
+		flags 0
+		grid_pos 13 7 -3
+		visual_pos 13 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15437979244229352603
+		flags 0
+		grid_pos 13 7 -2
+		visual_pos 13 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9150228794009522167
+		flags 0
+		grid_pos 10 7 -13
+		visual_pos 10 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10640131996424809030
+		flags 0
+		grid_pos 10 7 -12
+		visual_pos 10 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2899718712616884181
+		flags 0
+		grid_pos 10 7 -11
+		visual_pos 10 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10013063143591583904
+		flags 0
+		grid_pos 10 7 -10
+		visual_pos 10 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13483012869984777805
+		flags 0
+		grid_pos 10 7 -9
+		visual_pos 10 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11005221033680519379
+		flags 0
+		grid_pos 10 7 -8
+		visual_pos 10 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1730328994489902077
+		flags 0
+		grid_pos 10 7 -7
+		visual_pos 10 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11949462274467919773
+		flags 0
+		grid_pos 10 7 -6
+		visual_pos 10 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16798750878349118830
+		flags 0
+		grid_pos 11 7 -13
+		visual_pos 11 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4475068183623156643
+		flags 0
+		grid_pos 11 7 -12
+		visual_pos 11 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16874944294951270359
+		flags 0
+		grid_pos 11 7 -11
+		visual_pos 11 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6166923865190666184
+		flags 0
+		grid_pos 11 7 -10
+		visual_pos 11 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4089818304787986860
+		flags 0
+		grid_pos 11 7 -9
+		visual_pos 11 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16432135499356286108
+		flags 0
+		grid_pos 11 7 -8
+		visual_pos 11 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14827630667359393673
+		flags 0
+		grid_pos 11 7 -7
+		visual_pos 11 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13022221907358066278
+		flags 0
+		grid_pos 11 7 -6
+		visual_pos 11 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8894456086229691765
+		flags 0
+		grid_pos 12 7 -13
+		visual_pos 12 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4054193272837593636
+		flags 0
+		grid_pos 12 7 -12
+		visual_pos 12 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9124990435354922237
+		flags 0
+		grid_pos 12 7 -11
+		visual_pos 12 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3590934091802815204
+		flags 0
+		grid_pos 12 7 -10
+		visual_pos 12 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9509811237186642103
+		flags 0
+		grid_pos 12 7 -9
+		visual_pos 12 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2583305214790777517
+		flags 0
+		grid_pos 12 7 -8
+		visual_pos 12 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16166188854678765042
+		flags 0
+		grid_pos 12 7 -7
+		visual_pos 12 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11472745573985361730
+		flags 0
+		grid_pos 12 7 -6
+		visual_pos 12 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6273319567673104829
+		flags 0
+		grid_pos 13 7 -13
+		visual_pos 13 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 217395294805232425
+		flags 0
+		grid_pos 13 7 -12
+		visual_pos 13 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3992703125764076872
+		flags 0
+		grid_pos 13 7 -11
+		visual_pos 13 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11572847264086155311
+		flags 0
+		grid_pos 13 7 -10
+		visual_pos 13 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4366465447052629646
+		flags 0
+		grid_pos 13 7 -9
+		visual_pos 13 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13018158377393206181
+		flags 0
+		grid_pos 13 7 -8
+		visual_pos 13 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2035545918054756785
+		flags 0
+		grid_pos 13 7 -7
+		visual_pos 13 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13758478229885167432
+		flags 0
+		grid_pos 13 7 -6
+		visual_pos 13 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6168051811980710776
+		flags 0
+		grid_pos 9 7 -13
+		visual_pos 9 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12973601506588612812
+		flags 0
+		grid_pos 9 7 -12
+		visual_pos 9 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 569314873773653304
+		flags 0
+		grid_pos 9 7 -11
+		visual_pos 9 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10482227320158748176
+		flags 0
+		grid_pos 9 7 -10
+		visual_pos 9 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 609541520731197335
+		flags 0
+		grid_pos 9 7 -9
+		visual_pos 9 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5129051371895595495
+		flags 0
+		grid_pos 9 7 -8
+		visual_pos 9 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3527839613341974183
+		flags 0
+		grid_pos 9 7 -7
+		visual_pos 9 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8190054816321628652
+		flags 0
+		grid_pos 9 7 -6
+		visual_pos 9 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13785890143777524161
+		flags 0
+		grid_pos 9 7 -5
+		visual_pos 9 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13710692732038410323
+		flags 0
+		grid_pos 9 7 -4
+		visual_pos 9 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10370164721398514752
+		flags 0
+		grid_pos 9 7 -3
+		visual_pos 9 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15518169257591922029
+		flags 0
+		grid_pos 9 7 -2
+		visual_pos 9 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15935318155853645797
+		flags 0
+		grid_pos 9 7 -1
+		visual_pos 9 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12933694656221324525
+		flags 0
+		grid_pos 9 7 0
+		visual_pos 9 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1248559848919124751
+		flags 0
+		grid_pos 14 7 -13
+		visual_pos 14 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16593482648436616578
+		flags 0
+		grid_pos 14 7 -12
+		visual_pos 14 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6858716539732329103
+		flags 0
+		grid_pos 14 7 -11
+		visual_pos 14 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17670506527171588761
+		flags 0
+		grid_pos 14 7 -10
+		visual_pos 14 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6425450476993881787
+		flags 0
+		grid_pos 14 7 -9
+		visual_pos 14 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 188977147057292784
+		flags 0
+		grid_pos 14 7 -8
+		visual_pos 14 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15138179770605566091
+		flags 0
+		grid_pos 14 7 -7
+		visual_pos 14 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2374463203485107013
+		flags 0
+		grid_pos 14 7 -6
+		visual_pos 14 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4385332092936802057
+		flags 0
+		grid_pos 14 7 -5
+		visual_pos 14 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7144732457631967240
+		flags 0
+		grid_pos 14 7 -4
+		visual_pos 14 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6605779110637112744
+		flags 0
+		grid_pos 14 7 -3
+		visual_pos 14 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2421595906513393748
+		flags 0
+		grid_pos 14 7 -2
+		visual_pos 14 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7815898880099021940
+		flags 0
+		grid_pos 14 7 -1
+		visual_pos 14 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3787778166564855616
+		flags 0
+		grid_pos 14 7 0
+		visual_pos 14 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9653866670716118173
+		flags 0
+		grid_pos 14 7 1
+		visual_pos 14 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15693084802541829208
+		flags 0
+		grid_pos 14 7 2
+		visual_pos 14 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2420077195958428532
+		flags 0
+		grid_pos 15 7 -13
+		visual_pos 15 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4240914829486706357
+		flags 0
+		grid_pos 15 7 -12
+		visual_pos 15 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14738934859533107992
+		flags 0
+		grid_pos 15 7 -11
+		visual_pos 15 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3432899132078234061
+		flags 0
+		grid_pos 15 7 -10
+		visual_pos 15 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 395016119373627608
+		flags 0
+		grid_pos 15 7 -9
+		visual_pos 15 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15731373852361264242
+		flags 0
+		grid_pos 15 7 -8
+		visual_pos 15 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7465459461583448114
+		flags 0
+		grid_pos 15 7 -7
+		visual_pos 15 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17971687432037894131
+		flags 0
+		grid_pos 15 7 -6
+		visual_pos 15 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16776572595221086327
+		flags 0
+		grid_pos 15 7 -5
+		visual_pos 15 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17821440382316367705
+		flags 0
+		grid_pos 15 7 -4
+		visual_pos 15 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5325261002644215910
+		flags 0
+		grid_pos 15 7 -3
+		visual_pos 15 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5584975946505303518
+		flags 0
+		grid_pos 15 7 -2
+		visual_pos 15 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10039864808891858203
+		flags 0
+		grid_pos 15 7 -1
+		visual_pos 15 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16730424288534509771
+		flags 0
+		grid_pos 15 7 0
+		visual_pos 15 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17883315385206217902
+		flags 0
+		grid_pos 15 7 1
+		visual_pos 15 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3162196291518725586
+		flags 0
+		grid_pos 15 7 2
+		visual_pos 15 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 449846249977950483
+		flags 0
+		grid_pos 16 7 -13
+		visual_pos 16 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16035108239292619283
+		flags 0
+		grid_pos 16 7 -12
+		visual_pos 16 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 490000245537432697
+		flags 0
+		grid_pos 16 7 -11
+		visual_pos 16 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6036403100627782212
+		flags 0
+		grid_pos 16 7 -10
+		visual_pos 16 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15327603342996173212
+		flags 0
+		grid_pos 16 7 -9
+		visual_pos 16 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6316148891886242009
+		flags 0
+		grid_pos 16 7 -8
+		visual_pos 16 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15658028216632536254
+		flags 0
+		grid_pos 16 7 -7
+		visual_pos 16 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3308166090024881066
+		flags 0
+		grid_pos 16 7 -6
+		visual_pos 16 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17249661248909590940
+		flags 0
+		grid_pos 16 7 -1
+		visual_pos 16 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6099902438232025312
+		flags 0
+		grid_pos 16 7 0
+		visual_pos 16 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16769458660508334464
+		flags 0
+		grid_pos 16 7 1
+		visual_pos 16 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8433729650349873841
+		flags 0
+		grid_pos 16 7 2
+		visual_pos 16 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17017492167951701525
+		flags 0
+		grid_pos 17 7 -13
+		visual_pos 17 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10835762620665579069
+		flags 0
+		grid_pos 17 7 -12
+		visual_pos 17 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7717843803903057652
+		flags 0
+		grid_pos 17 7 -11
+		visual_pos 17 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14089670849835825788
+		flags 0
+		grid_pos 17 7 -10
+		visual_pos 17 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11781267187210765841
+		flags 0
+		grid_pos 17 7 -9
+		visual_pos 17 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15775864907351987787
+		flags 0
+		grid_pos 17 7 -8
+		visual_pos 17 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15018647736386999819
+		flags 0
+		grid_pos 17 7 -7
+		visual_pos 17 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18153443520707828138
+		flags 0
+		grid_pos 17 7 -6
+		visual_pos 17 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11507614513984211452
+		flags 0
+		grid_pos 17 7 -1
+		visual_pos 17 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3640660069907538205
+		flags 0
+		grid_pos 17 7 0
+		visual_pos 17 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1727629417171099371
+		flags 0
+		grid_pos 17 7 1
+		visual_pos 17 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6290136947110235327
+		flags 0
+		grid_pos 17 7 2
+		visual_pos 17 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16656049963118333803
+		flags 0
+		grid_pos 18 7 -13
+		visual_pos 18 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16884385808453140021
+		flags 0
+		grid_pos 18 7 -12
+		visual_pos 18 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11497430333717624938
+		flags 0
+		grid_pos 18 7 -11
+		visual_pos 18 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15880644858686057592
+		flags 0
+		grid_pos 18 7 -10
+		visual_pos 18 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1755947859323236165
+		flags 0
+		grid_pos 18 7 -9
+		visual_pos 18 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14630808819838712699
+		flags 0
+		grid_pos 18 7 -8
+		visual_pos 18 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2002962419109777735
+		flags 0
+		grid_pos 18 7 -7
+		visual_pos 18 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11559287551143191304
+		flags 0
+		grid_pos 18 7 -6
+		visual_pos 18 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6605725587195471830
+		flags 0
+		grid_pos 18 7 -1
+		visual_pos 18 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10035259247112092908
+		flags 0
+		grid_pos 18 7 0
+		visual_pos 18 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 928806273597849613
+		flags 0
+		grid_pos 18 7 1
+		visual_pos 18 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5471280182348255888
+		flags 0
+		grid_pos 18 7 2
+		visual_pos 18 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8087770245043362884
+		flags 0
+		grid_pos 19 7 -13
+		visual_pos 19 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18266459466538037764
+		flags 0
+		grid_pos 19 7 -12
+		visual_pos 19 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14441614440161798817
+		flags 0
+		grid_pos 19 7 -11
+		visual_pos 19 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1536393990082804599
+		flags 0
+		grid_pos 19 7 -10
+		visual_pos 19 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 561670246363001236
+		flags 0
+		grid_pos 19 7 -9
+		visual_pos 19 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11520668817902155663
+		flags 0
+		grid_pos 19 7 -8
+		visual_pos 19 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17483461626244688860
+		flags 0
+		grid_pos 19 7 -7
+		visual_pos 19 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4913653506487955583
+		flags 0
+		grid_pos 19 7 -6
+		visual_pos 19 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11148188108143497636
+		flags 0
+		grid_pos 19 7 -1
+		visual_pos 19 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3770180572446642131
+		flags 0
+		grid_pos 19 7 0
+		visual_pos 19 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7600012898605829765
+		flags 0
+		grid_pos 19 7 1
+		visual_pos 19 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10560433891234576232
+		flags 0
+		grid_pos 19 7 2
+		visual_pos 19 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9897397398369745812
+		flags 0
+		grid_pos 20 7 -13
+		visual_pos 20 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11584869750844799042
+		flags 0
+		grid_pos 20 7 -12
+		visual_pos 20 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15494903802961708834
+		flags 0
+		grid_pos 20 7 -11
+		visual_pos 20 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11639265552541220942
+		flags 0
+		grid_pos 20 7 -10
+		visual_pos 20 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13349819243038747184
+		flags 0
+		grid_pos 20 7 -9
+		visual_pos 20 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6894225828951961851
+		flags 0
+		grid_pos 20 7 -8
+		visual_pos 20 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3047007739559558533
+		flags 0
+		grid_pos 20 7 -7
+		visual_pos 20 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14255542874504015305
+		flags 0
+		grid_pos 20 7 -6
+		visual_pos 20 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7772584115056307222
+		flags 0
+		grid_pos 20 7 -5
+		visual_pos 20 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15278845155036642224
+		flags 0
+		grid_pos 20 7 -4
+		visual_pos 20 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16237658720030687805
+		flags 0
+		grid_pos 20 7 -3
+		visual_pos 20 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2717297210131983169
+		flags 0
+		grid_pos 20 7 -2
+		visual_pos 20 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4557721556030045178
+		flags 0
+		grid_pos 20 7 -1
+		visual_pos 20 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11175608640083942871
+		flags 0
+		grid_pos 20 7 0
+		visual_pos 20 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15809917616291167635
+		flags 0
+		grid_pos 20 7 1
+		visual_pos 20 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3415413277019971857
+		flags 0
+		grid_pos 20 7 2
+		visual_pos 20 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 947616184311192094
+		flags 0
+		grid_pos 21 7 -13
+		visual_pos 21 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7824905423227871956
+		flags 0
+		grid_pos 21 7 -12
+		visual_pos 21 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10639563652389791656
+		flags 0
+		grid_pos 21 7 -11
+		visual_pos 21 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14192736025085482470
+		flags 0
+		grid_pos 21 7 -10
+		visual_pos 21 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9521719702515529802
+		flags 0
+		grid_pos 21 7 -9
+		visual_pos 21 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 46467473822551605
+		flags 0
+		grid_pos 21 7 -8
+		visual_pos 21 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12143651594310169123
+		flags 0
+		grid_pos 21 7 -7
+		visual_pos 21 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3100758695060750951
+		flags 0
+		grid_pos 21 7 -6
+		visual_pos 21 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1759979856747300894
+		flags 0
+		grid_pos 21 7 -5
+		visual_pos 21 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15909500038240288495
+		flags 0
+		grid_pos 21 7 -4
+		visual_pos 21 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16684959760836593827
+		flags 0
+		grid_pos 21 7 -3
+		visual_pos 21 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17415378863935266340
+		flags 0
+		grid_pos 21 7 -2
+		visual_pos 21 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2603881276685220160
+		flags 0
+		grid_pos 21 7 -1
+		visual_pos 21 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13802788587103724024
+		flags 0
+		grid_pos 21 7 0
+		visual_pos 21 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8451705946112240728
+		flags 0
+		grid_pos 21 7 1
+		visual_pos 21 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9619050133611683783
+		flags 0
+		grid_pos 21 7 2
+		visual_pos 21 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1268406556289600781
+		flags 0
+		grid_pos 22 7 -13
+		visual_pos 22 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2420401709929030314
+		flags 0
+		grid_pos 22 7 -12
+		visual_pos 22 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 436938711846624617
+		flags 0
+		grid_pos 22 7 -11
+		visual_pos 22 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10526329088371920516
+		flags 0
+		grid_pos 22 7 -10
+		visual_pos 22 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3150151161661983413
+		flags 0
+		grid_pos 22 7 -9
+		visual_pos 22 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7499655770671901355
+		flags 0
+		grid_pos 22 7 -8
+		visual_pos 22 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3033876003826188387
+		flags 0
+		grid_pos 22 7 -7
+		visual_pos 22 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 315126843222211108
+		flags 0
+		grid_pos 22 7 -6
+		visual_pos 22 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14413075198682766529
+		flags 0
+		grid_pos 22 7 -5
+		visual_pos 22 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10417689647004128163
+		flags 0
+		grid_pos 22 7 -4
+		visual_pos 22 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16728792451401108768
+		flags 0
+		grid_pos 22 7 -3
+		visual_pos 22 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11000662521363354275
+		flags 0
+		grid_pos 22 7 -2
+		visual_pos 22 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8152425338527745397
+		flags 0
+		grid_pos 22 7 -1
+		visual_pos 22 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7444613361955614971
+		flags 0
+		grid_pos 22 7 0
+		visual_pos 22 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17380587326234893834
+		flags 0
+		grid_pos 22 7 1
+		visual_pos 22 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14098376338877966668
+		flags 0
+		grid_pos 22 7 2
+		visual_pos 22 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10659879597170993994
+		flags 0
+		grid_pos 23 7 -13
+		visual_pos 23 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15351985793008041583
+		flags 0
+		grid_pos 23 7 -12
+		visual_pos 23 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11776338494342366777
+		flags 0
+		grid_pos 23 7 -11
+		visual_pos 23 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5032562587503120833
+		flags 0
+		grid_pos 23 7 -10
+		visual_pos 23 7 -10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1570249573235553471
+		flags 0
+		grid_pos 23 7 -9
+		visual_pos 23 7 -9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15412712409624117069
+		flags 0
+		grid_pos 23 7 -8
+		visual_pos 23 7 -8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15245086324885338514
+		flags 0
+		grid_pos 23 7 -7
+		visual_pos 23 7 -7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12215068343467101907
+		flags 0
+		grid_pos 23 7 -6
+		visual_pos 23 7 -6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15406759030647188336
+		flags 0
+		grid_pos 23 7 -5
+		visual_pos 23 7 -5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11335925434877849571
+		flags 0
+		grid_pos 23 7 -4
+		visual_pos 23 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7352121193522491573
+		flags 0
+		grid_pos 23 7 -3
+		visual_pos 23 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3361377065797960687
+		flags 0
+		grid_pos 23 7 -2
+		visual_pos 23 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6921662835928612099
+		flags 0
+		grid_pos 23 7 -1
+		visual_pos 23 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5965830597648154116
+		flags 0
+		grid_pos 23 7 0
+		visual_pos 23 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4434097395969947659
+		flags 0
+		grid_pos 23 7 1
+		visual_pos 23 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 917070233830572015
+		flags 0
+		grid_pos 23 7 2
+		visual_pos 23 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5504874672790016089
+		flags 0
+		grid_pos 24 7 -13
+		visual_pos 24 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15871624332027479882
+		flags 0
+		grid_pos 24 7 -12
+		visual_pos 24 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2413362838765604710
+		flags 0
+		grid_pos 24 7 -11
+		visual_pos 24 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3459113510987669989
+		flags 0
+		grid_pos 24 7 -4
+		visual_pos 24 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17514206395944477322
+		flags 0
+		grid_pos 24 7 -3
+		visual_pos 24 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4563087275108347019
+		flags 0
+		grid_pos 24 7 -2
+		visual_pos 24 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10317794259996267861
+		flags 0
+		grid_pos 24 7 -1
+		visual_pos 24 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2337248966916167629
+		flags 0
+		grid_pos 24 7 0
+		visual_pos 24 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7243358651791226295
+		flags 0
+		grid_pos 24 7 1
+		visual_pos 24 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5148154455694621256
+		flags 0
+		grid_pos 24 7 2
+		visual_pos 24 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1004607613256952339
+		flags 0
+		grid_pos 25 7 -13
+		visual_pos 25 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1185961012005537065
+		flags 0
+		grid_pos 25 7 -12
+		visual_pos 25 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4107499604120107411
+		flags 0
+		grid_pos 25 7 -11
+		visual_pos 25 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3580284750176675379
+		flags 0
+		grid_pos 25 7 -4
+		visual_pos 25 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17462549491257443745
+		flags 0
+		grid_pos 25 7 -3
+		visual_pos 25 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13354101005348650783
+		flags 0
+		grid_pos 25 7 -2
+		visual_pos 25 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14542848511626731506
+		flags 0
+		grid_pos 25 7 -1
+		visual_pos 25 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9465038996974960952
+		flags 0
+		grid_pos 25 7 0
+		visual_pos 25 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11745736434915554288
+		flags 0
+		grid_pos 25 7 1
+		visual_pos 25 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11977596203418442071
+		flags 0
+		grid_pos 25 7 2
+		visual_pos 25 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14748851156677945355
+		flags 0
+		grid_pos 26 7 -13
+		visual_pos 26 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10052337967614635061
+		flags 0
+		grid_pos 26 7 -12
+		visual_pos 26 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7026331348141639036
+		flags 0
+		grid_pos 26 7 -11
+		visual_pos 26 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16073101806821267508
+		flags 0
+		grid_pos 26 7 -4
+		visual_pos 26 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16146286322312880516
+		flags 0
+		grid_pos 26 7 -3
+		visual_pos 26 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15691469857611260920
+		flags 0
+		grid_pos 26 7 -2
+		visual_pos 26 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13165191027896171813
+		flags 0
+		grid_pos 26 7 -1
+		visual_pos 26 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14730352314237870436
+		flags 0
+		grid_pos 26 7 0
+		visual_pos 26 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13580832432747342527
+		flags 0
+		grid_pos 26 7 1
+		visual_pos 26 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10702413868490117403
+		flags 0
+		grid_pos 26 7 2
+		visual_pos 26 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9401867659696746476
+		flags 0
+		grid_pos 27 7 -13
+		visual_pos 27 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5167481314730805764
+		flags 0
+		grid_pos 27 7 -12
+		visual_pos 27 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5703425155659657057
+		flags 0
+		grid_pos 27 7 -11
+		visual_pos 27 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14997474553425404383
+		flags 0
+		grid_pos 27 7 -4
+		visual_pos 27 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7914512692318013119
+		flags 0
+		grid_pos 27 7 -3
+		visual_pos 27 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10561649965981711272
+		flags 0
+		grid_pos 27 7 -2
+		visual_pos 27 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14135128317462953027
+		flags 0
+		grid_pos 27 7 -1
+		visual_pos 27 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14573433465121404759
+		flags 0
+		grid_pos 27 7 0
+		visual_pos 27 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2273213187008889706
+		flags 0
+		grid_pos 27 7 1
+		visual_pos 27 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 45882448412708254
+		flags 0
+		grid_pos 27 7 2
+		visual_pos 27 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4910880442192528074
+		flags 0
+		grid_pos 28 7 -13
+		visual_pos 28 7 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 124221456951215037
+		flags 0
+		grid_pos 28 7 -12
+		visual_pos 28 7 -12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11843219521993063763
+		flags 0
+		grid_pos 28 7 -11
+		visual_pos 28 7 -11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15977692930778269567
+		flags 0
+		grid_pos 28 7 -4
+		visual_pos 28 7 -4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7297889059686353698
+		flags 0
+		grid_pos 28 7 -3
+		visual_pos 28 7 -3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5655618491675026863
+		flags 0
+		grid_pos 28 7 -2
+		visual_pos 28 7 -2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6650721875339387299
+		flags 0
+		grid_pos 28 7 -1
+		visual_pos 28 7 -1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12325530182733394642
+		flags 0
+		grid_pos 28 7 0
+		visual_pos 28 7 0
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7677691216050833352
+		flags 0
+		grid_pos 28 7 1
+		visual_pos 28 7 1
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4074959469456801317
+		flags 0
+		grid_pos 28 7 2
+		visual_pos 28 7 2
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12864215567994243574
+		flags 0
+		grid_pos 14 8 -13
+		visual_pos 14 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 390817210053803858
+		flags 0
+		grid_pos 15 8 -13
+		visual_pos 15 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2586634039319323069
+		flags 0
+		grid_pos 16 8 -13
+		visual_pos 16 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3040248631915826741
+		flags 0
+		grid_pos 15 9 -13
+		visual_pos 15 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17123530829424086711
+		flags 0
+		grid_pos 16 9 -13
+		visual_pos 16 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6625150833460542131
+		flags 0
+		grid_pos 17 9 -13
+		visual_pos 17 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15844489117291350201
+		flags 0
+		grid_pos 16 10 -13
+		visual_pos 16 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8182767935237513392
+		flags 0
+		grid_pos 17 10 -13
+		visual_pos 17 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9923304085996935806
+		flags 0
+		grid_pos 18 10 -13
+		visual_pos 18 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2290129394667647986
+		flags 0
+		grid_pos 19 10 -13
+		visual_pos 19 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6658305548922660427
+		flags 0
+		grid_pos 19 8 -13
+		visual_pos 19 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14799257454017224451
+		flags 0
+		grid_pos 19 9 -13
+		visual_pos 19 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15918707256998359143
+		flags 0
+		grid_pos 20 9 -13
+		visual_pos 20 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12450530855551429711
+		flags 0
+		grid_pos 20 8 -13
+		visual_pos 20 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7014261545855629672
+		flags 0
+		grid_pos 21 8 -13
+		visual_pos 21 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7316969732156967245
+		flags 0
+		grid_pos 22 8 -13
+		visual_pos 22 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12580173275191407296
+		flags 0
+		grid_pos 21 9 -13
+		visual_pos 21 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8669806415749856425
+		flags 0
+		grid_pos 20 10 -13
+		visual_pos 20 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2287764043155938743
+		flags 0
+		grid_pos 19 11 -13
+		visual_pos 19 11 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6970350778346006753
+		flags 0
+		grid_pos 18 11 -13
+		visual_pos 18 11 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7767080539703580500
+		flags 0
+		grid_pos 18 7 -14
+		visual_pos 18 7 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4120423309743452548
+		flags 0
+		grid_pos 18 7 -15
+		visual_pos 18 7 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17280198544051611301
+		flags 0
+		grid_pos 18 7 -16
+		visual_pos 18 7 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7844160708596326195
+		flags 0
+		grid_pos 18 7 -17
+		visual_pos 18 7 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17125013518185874203
+		flags 0
+		grid_pos 18 7 -18
+		visual_pos 18 7 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15195513883953697702
+		flags 0
+		grid_pos 18 7 -19
+		visual_pos 18 7 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2909441359171926256
+		flags 0
+		grid_pos 18 7 -20
+		visual_pos 18 7 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10429054289351671986
+		flags 0
+		grid_pos 18 7 -21
+		visual_pos 18 7 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7160510419035430130
+		flags 0
+		grid_pos 18 7 -22
+		visual_pos 18 7 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16741739359845598335
+		flags 0
+		grid_pos 18 7 -23
+		visual_pos 18 7 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18283274952972148287
+		flags 0
+		grid_pos 19 8 -14
+		visual_pos 19 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10080594335732325641
+		flags 0
+		grid_pos 19 9 -14
+		visual_pos 19 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10799833949671740636
+		flags 0
+		grid_pos 19 8 -23
+		visual_pos 19 8 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11415070902244836221
+		flags 0
+		grid_pos 19 8 -22
+		visual_pos 19 8 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13478462202639909092
+		flags 0
+		grid_pos 19 8 -21
+		visual_pos 19 8 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 825538023732053307
+		flags 0
+		grid_pos 19 8 -20
+		visual_pos 19 8 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 92878967367248495
+		flags 0
+		grid_pos 19 8 -19
+		visual_pos 19 8 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2213916284291640064
+		flags 0
+		grid_pos 19 8 -18
+		visual_pos 19 8 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10981557078618596017
+		flags 0
+		grid_pos 19 8 -17
+		visual_pos 19 8 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4002335270614819574
+		flags 0
+		grid_pos 19 8 -16
+		visual_pos 19 8 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14790160978511869477
+		flags 0
+		grid_pos 19 8 -15
+		visual_pos 19 8 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 144516123553252735
+		flags 0
+		grid_pos 19 9 -23
+		visual_pos 19 9 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16515788531711624758
+		flags 0
+		grid_pos 19 9 -22
+		visual_pos 19 9 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6043483898674526188
+		flags 0
+		grid_pos 19 9 -21
+		visual_pos 19 9 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3938361239019666252
+		flags 0
+		grid_pos 19 9 -20
+		visual_pos 19 9 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17979741990704285150
+		flags 0
+		grid_pos 19 9 -19
+		visual_pos 19 9 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5580384329648416567
+		flags 0
+		grid_pos 19 9 -18
+		visual_pos 19 9 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 476034676498820912
+		flags 0
+		grid_pos 19 9 -17
+		visual_pos 19 9 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2687354836394705044
+		flags 0
+		grid_pos 19 9 -16
+		visual_pos 19 9 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13710437791596708717
+		flags 0
+		grid_pos 19 9 -15
+		visual_pos 19 9 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9872152303963674236
+		flags 0
+		grid_pos 17 8 -23
+		visual_pos 17 8 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1908130176678231160
+		flags 0
+		grid_pos 17 8 -22
+		visual_pos 17 8 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15221618524888375271
+		flags 0
+		grid_pos 17 8 -21
+		visual_pos 17 8 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7610799093576134765
+		flags 0
+		grid_pos 17 8 -20
+		visual_pos 17 8 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6427937163131602491
+		flags 0
+		grid_pos 17 8 -19
+		visual_pos 17 8 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 884784146944585842
+		flags 0
+		grid_pos 17 8 -18
+		visual_pos 17 8 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17968693753981964969
+		flags 0
+		grid_pos 17 8 -17
+		visual_pos 17 8 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9177117191618130550
+		flags 0
+		grid_pos 17 8 -16
+		visual_pos 17 8 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11028722540003704935
+		flags 0
+		grid_pos 17 8 -15
+		visual_pos 17 8 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2716116019612605504
+		flags 0
+		grid_pos 17 8 -14
+		visual_pos 17 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17602999839534839184
+		flags 0
+		grid_pos 17 9 -23
+		visual_pos 17 9 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8836244253299000467
+		flags 0
+		grid_pos 17 9 -22
+		visual_pos 17 9 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17264857344296184549
+		flags 0
+		grid_pos 17 9 -21
+		visual_pos 17 9 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 744537627680364259
+		flags 0
+		grid_pos 17 9 -20
+		visual_pos 17 9 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8569069642746852286
+		flags 0
+		grid_pos 17 9 -19
+		visual_pos 17 9 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14212642711003508836
+		flags 0
+		grid_pos 17 9 -18
+		visual_pos 17 9 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1868190806170395126
+		flags 0
+		grid_pos 17 9 -17
+		visual_pos 17 9 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15850541792736585858
+		flags 0
+		grid_pos 17 9 -16
+		visual_pos 17 9 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7089544707486364431
+		flags 0
+		grid_pos 17 9 -15
+		visual_pos 17 9 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15932410438563447529
+		flags 0
+		grid_pos 17 9 -14
+		visual_pos 17 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2284559685498696918
+		flags 0
+		grid_pos 18 10 -23
+		visual_pos 18 10 -23
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2716805143984341812
+		flags 0
+		grid_pos 18 10 -22
+		visual_pos 18 10 -22
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18068146569301262752
+		flags 0
+		grid_pos 18 10 -21
+		visual_pos 18 10 -21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8259023490044294630
+		flags 0
+		grid_pos 18 10 -20
+		visual_pos 18 10 -20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3590536493021081569
+		flags 0
+		grid_pos 18 10 -19
+		visual_pos 18 10 -19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13379149736965618160
+		flags 0
+		grid_pos 18 10 -18
+		visual_pos 18 10 -18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17302575919609509746
+		flags 0
+		grid_pos 18 10 -17
+		visual_pos 18 10 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 843477783560930397
+		flags 0
+		grid_pos 18 10 -16
+		visual_pos 18 10 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3198991044107681049
+		flags 0
+		grid_pos 18 10 -15
+		visual_pos 18 10 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7336226124130972388
+		flags 0
+		grid_pos 18 10 -14
+		visual_pos 18 10 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17354917872632966709
+		flags 0
+		grid_pos 14 9 -13
+		visual_pos 14 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2059584985473472578
+		flags 0
+		grid_pos 22 9 -14
+		visual_pos 22 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11868295392522671886
+		flags 0
+		grid_pos 15 10 -13
+		visual_pos 15 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13918630229477944749
+		flags 0
+		grid_pos 16 11 -14
+		visual_pos 16 11 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7856736841634021280
+		flags 0
+		grid_pos 17 11 -13
+		visual_pos 17 11 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4084415493824594219
+		flags 0
+		grid_pos 18 12 -14
+		visual_pos 18 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13597187252076980745
+		flags 0
+		grid_pos 19 12 -14
+		visual_pos 19 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8082054611434320801
+		flags 0
+		grid_pos 20 11 -13
+		visual_pos 20 11 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6840390784735493130
+		flags 0
+		grid_pos 21 10 -13
+		visual_pos 21 10 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15269338666886204390
+		flags 0
+		grid_pos 14 10 -14
+		visual_pos 14 10 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12444016450865200939
+		flags 0
+		grid_pos 15 11 -14
+		visual_pos 15 11 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18321460167587721466
+		flags 0
+		grid_pos 16 12 -14
+		visual_pos 16 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14562218417896598503
+		flags 0
+		grid_pos 17 12 -14
+		visual_pos 17 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9208610744616048880
+		flags 0
+		grid_pos 18 13 -14
+		visual_pos 18 13 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7521775690432327350
+		flags 0
+		grid_pos 19 13 -14
+		visual_pos 19 13 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6565376658322290298
+		flags 0
+		grid_pos 20 12 -14
+		visual_pos 20 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10241614848285472383
+		flags 0
+		grid_pos 21 11 -14
+		visual_pos 21 11 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16726876668852304822
+		flags 0
+		grid_pos 22 10 -14
+		visual_pos 22 10 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18115536395057699173
+		flags 0
+		grid_pos 14 11 -15
+		visual_pos 14 11 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2958739828236172615
+		flags 0
+		grid_pos 15 12 -15
+		visual_pos 15 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13219782043340032526
+		flags 0
+		grid_pos 16 13 -15
+		visual_pos 16 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6717684520621185192
+		flags 0
+		grid_pos 17 13 -15
+		visual_pos 17 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10455674868071985692
+		flags 0
+		grid_pos 18 14 -15
+		visual_pos 18 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5813762468346047778
+		flags 0
+		grid_pos 19 14 -15
+		visual_pos 19 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12142710387438721098
+		flags 0
+		grid_pos 20 13 -14
+		visual_pos 20 13 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9939250797257596996
+		flags 0
+		grid_pos 21 12 -14
+		visual_pos 21 12 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12793227396239208029
+		flags 0
+		grid_pos 22 11 -14
+		visual_pos 22 11 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1933933214561602612
+		flags 0
+		grid_pos 14 12 -15
+		visual_pos 14 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7084703097938825539
+		flags 0
+		grid_pos 15 13 -15
+		visual_pos 15 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12734184286751761261
+		flags 0
+		grid_pos 16 14 -15
+		visual_pos 16 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11815713488604508312
+		flags 0
+		grid_pos 17 14 -15
+		visual_pos 17 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17162734713490313040
+		flags 0
+		grid_pos 18 15 -15
+		visual_pos 18 15 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9349828999792932055
+		flags 0
+		grid_pos 19 15 -15
+		visual_pos 19 15 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8814524034026694326
+		flags 0
+		grid_pos 20 14 -15
+		visual_pos 20 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7868207181346683169
+		flags 0
+		grid_pos 21 13 -15
+		visual_pos 21 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1324887457527705188
+		flags 0
+		grid_pos 22 12 -15
+		visual_pos 22 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5545564336407298894
+		flags 0
+		grid_pos 14 13 -15
+		visual_pos 14 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12345231359686529409
+		flags 0
+		grid_pos 15 14 -15
+		visual_pos 15 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6012923013078983320
+		flags 0
+		grid_pos 16 15 -15
+		visual_pos 16 15 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6860981201321670189
+		flags 0
+		grid_pos 17 15 -15
+		visual_pos 17 15 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4373190662257667596
+		flags 0
+		grid_pos 18 16 -15
+		visual_pos 18 16 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3164112098341073061
+		flags 0
+		grid_pos 19 16 -15
+		visual_pos 19 16 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 793238359856365917
+		flags 0
+		grid_pos 20 15 -15
+		visual_pos 20 15 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5910055561941150086
+		flags 0
+		grid_pos 21 14 -15
+		visual_pos 21 14 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 662406245161367968
+		flags 0
+		grid_pos 22 13 -15
+		visual_pos 22 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5394349070330105248
+		flags 0
+		grid_pos 22 9 -13
+		visual_pos 22 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6122152283337810441
+		flags 0
+		grid_pos 24 8 -14
+		visual_pos 24 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13980032916472850252
+		flags 0
+		grid_pos 23 9 -14
+		visual_pos 23 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8279595238550673693
+		flags 0
+		grid_pos 13 8 -13
+		visual_pos 13 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8738938279914842560
+		flags 0
+		grid_pos 13 9 -13
+		visual_pos 13 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7461687938498094174
+		flags 0
+		grid_pos 13 10 -14
+		visual_pos 13 10 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2521890471129449427
+		flags 0
+		grid_pos 13 11 -15
+		visual_pos 13 11 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8576198731628203400
+		flags 0
+		grid_pos 13 12 -15
+		visual_pos 13 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4183641548389544320
+		flags 0
+		grid_pos 13 13 -15
+		visual_pos 13 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14595314419226145614
+		flags 0
+		grid_pos 12 8 -13
+		visual_pos 12 8 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 279690856998333302
+		flags 0
+		grid_pos 12 9 -13
+		visual_pos 12 9 -13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11444298161848013583
+		flags 0
+		grid_pos 12 10 -14
+		visual_pos 12 10 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2195803050863144995
+		flags 0
+		grid_pos 12 11 -15
+		visual_pos 12 11 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12904353769147231842
+		flags 0
+		grid_pos 12 12 -15
+		visual_pos 12 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10706108394468660273
+		flags 0
+		grid_pos 12 13 -15
+		visual_pos 12 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15750763389130788078
+		flags 0
+		grid_pos 9 8 -17
+		visual_pos 9 8 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2766006978163618449
+		flags 0
+		grid_pos 9 9 -17
+		visual_pos 9 9 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8836749144413919246
+		flags 0
+		grid_pos 9 10 -17
+		visual_pos 9 10 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18321188108336772773
+		flags 0
+		grid_pos 9 11 -17
+		visual_pos 9 11 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7035146733711634033
+		flags 0
+		grid_pos 9 12 -17
+		visual_pos 9 12 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8833992898748026772
+		flags 0
+		grid_pos 9 13 -17
+		visual_pos 9 13 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14105895265276755462
+		flags 0
+		grid_pos 10 8 -14
+		visual_pos 10 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9951740741158381287
+		flags 0
+		grid_pos 10 9 -14
+		visual_pos 10 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12241003037509800423
+		flags 0
+		grid_pos 10 10 -15
+		visual_pos 10 10 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7143732242890810656
+		flags 0
+		grid_pos 10 11 -15
+		visual_pos 10 11 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14657888161713876252
+		flags 0
+		grid_pos 10 12 -15
+		visual_pos 10 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16409914093712107404
+		flags 0
+		grid_pos 10 13 -15
+		visual_pos 10 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1338584647893800879
+		flags 0
+		grid_pos 11 8 -14
+		visual_pos 11 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8548417442923520535
+		flags 0
+		grid_pos 11 9 -14
+		visual_pos 11 9 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13702846953217289037
+		flags 0
+		grid_pos 11 10 -15
+		visual_pos 11 10 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15610260624339409995
+		flags 0
+		grid_pos 11 11 -15
+		visual_pos 11 11 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1289896100412619187
+		flags 0
+		grid_pos 11 12 -15
+		visual_pos 11 12 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16831970591129446369
+		flags 0
+		grid_pos 11 13 -15
+		visual_pos 11 13 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 457506909190074565
+		flags 0
+		grid_pos 9 8 -16
+		visual_pos 9 8 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6938295332514837192
+		flags 0
+		grid_pos 9 9 -16
+		visual_pos 9 9 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9507848561553148407
+		flags 0
+		grid_pos 9 10 -16
+		visual_pos 9 10 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4669891582435647602
+		flags 0
+		grid_pos 9 11 -16
+		visual_pos 9 11 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18069555943253228380
+		flags 0
+		grid_pos 9 12 -16
+		visual_pos 9 12 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17745917361098187996
+		flags 0
+		grid_pos 9 13 -16
+		visual_pos 9 13 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14388813285498815730
+		flags 0
+		grid_pos 9 7 -14
+		visual_pos 9 7 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10927735780764435261
+		flags 0
+		grid_pos 9 8 -15
+		visual_pos 9 8 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6000342633651771148
+		flags 0
+		grid_pos 10 9 -15
+		visual_pos 10 9 -15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10210448496336390838
+		flags 0
+		grid_pos 23 8 -14
+		visual_pos 23 8 -14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7093003481742942365
+		flags 0
+		grid_pos 25 7 3
+		visual_pos 25 7 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1746539807655594443
+		flags 0
+		grid_pos 25 7 4
+		visual_pos 25 7 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4673504213792581583
+		flags 0
+		grid_pos 25 7 5
+		visual_pos 25 7 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9271645948104962400
+		flags 0
+		grid_pos 25 7 6
+		visual_pos 25 7 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3292108215167556781
+		flags 0
+		grid_pos 25 7 7
+		visual_pos 25 7 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9072884411445444244
+		flags 0
+		grid_pos 25 7 8
+		visual_pos 25 7 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16465758185602747031
+		flags 0
+		grid_pos 25 7 9
+		visual_pos 25 7 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2217542417410986020
+		flags 0
+		grid_pos 26 7 3
+		visual_pos 26 7 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7528285038673685216
+		flags 0
+		grid_pos 26 7 4
+		visual_pos 26 7 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4928934161038162408
+		flags 0
+		grid_pos 26 7 5
+		visual_pos 26 7 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11308482280714988767
+		flags 0
+		grid_pos 26 7 6
+		visual_pos 26 7 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16394953477911652477
+		flags 0
+		grid_pos 26 7 7
+		visual_pos 26 7 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14344427139431182352
+		flags 0
+		grid_pos 26 7 8
+		visual_pos 26 7 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6139745822900932838
+		flags 0
+		grid_pos 26 7 9
+		visual_pos 26 7 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10687384690583143557
+		flags 0
+		grid_pos 27 7 3
+		visual_pos 27 7 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3015004934921412040
+		flags 0
+		grid_pos 27 7 4
+		visual_pos 27 7 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10314305767441787906
+		flags 0
+		grid_pos 27 7 5
+		visual_pos 27 7 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 648887982272320137
+		flags 0
+		grid_pos 27 7 6
+		visual_pos 27 7 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12049664175611087853
+		flags 0
+		grid_pos 27 7 7
+		visual_pos 27 7 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9171888098425198872
+		flags 0
+		grid_pos 27 7 8
+		visual_pos 27 7 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5091239660961295799
+		flags 0
+		grid_pos 27 7 9
+		visual_pos 27 7 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1172184751140337813
+		flags 0
+		grid_pos 28 7 3
+		visual_pos 28 7 3
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17471286819174382478
+		flags 0
+		grid_pos 28 7 4
+		visual_pos 28 7 4
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17579568089010805769
+		flags 0
+		grid_pos 28 7 5
+		visual_pos 28 7 5
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3662325393595975828
+		flags 0
+		grid_pos 28 7 6
+		visual_pos 28 7 6
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6815783211600968142
+		flags 0
+		grid_pos 28 7 7
+		visual_pos 28 7 7
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8427836520808883110
+		flags 0
+		grid_pos 28 7 8
+		visual_pos 28 7 8
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17367835386328778724
+		flags 0
+		grid_pos 28 7 9
+		visual_pos 28 7 9
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15219822985805102927
+		flags 0
+		grid_pos 25 7 17
+		visual_pos 25 7 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18374530854328903096
+		flags 0
+		grid_pos 25 7 18
+		visual_pos 25 7 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11515296696469561415
+		flags 0
+		grid_pos 25 7 19
+		visual_pos 25 7 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12757460129785571314
+		flags 0
+		grid_pos 25 7 20
+		visual_pos 25 7 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8546448800834840338
+		flags 0
+		grid_pos 25 7 21
+		visual_pos 25 7 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9950009236766863646
+		flags 0
+		grid_pos 26 7 17
+		visual_pos 26 7 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15474640876745071580
+		flags 0
+		grid_pos 26 7 18
+		visual_pos 26 7 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5195853146468031990
+		flags 0
+		grid_pos 26 7 19
+		visual_pos 26 7 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9053573557628538933
+		flags 0
+		grid_pos 26 7 20
+		visual_pos 26 7 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14298559274543037976
+		flags 0
+		grid_pos 26 7 21
+		visual_pos 26 7 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17650977541868748324
+		flags 0
+		grid_pos 27 7 17
+		visual_pos 27 7 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5224880048323304274
+		flags 0
+		grid_pos 27 7 18
+		visual_pos 27 7 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2772832147452259893
+		flags 0
+		grid_pos 27 7 19
+		visual_pos 27 7 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5875497714323766497
+		flags 0
+		grid_pos 27 7 20
+		visual_pos 27 7 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5646396145817734415
+		flags 0
+		grid_pos 27 7 21
+		visual_pos 27 7 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3636473906180831160
+		flags 0
+		grid_pos 28 7 17
+		visual_pos 28 7 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13602994865164969459
+		flags 0
+		grid_pos 28 7 18
+		visual_pos 28 7 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5582627571848694181
+		flags 0
+		grid_pos 28 7 19
+		visual_pos 28 7 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4395992304732878173
+		flags 0
+		grid_pos 28 7 20
+		visual_pos 28 7 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11046311163827819033
+		flags 0
+		grid_pos 28 7 21
+		visual_pos 28 7 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11367259780221762404
+		flags 0
+		grid_pos 25 7 10
+		visual_pos 25 7 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1299757762784403508
+		flags 0
+		grid_pos 25 7 11
+		visual_pos 25 7 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12014769276108311397
+		flags 0
+		grid_pos 25 7 12
+		visual_pos 25 7 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17386613026200719019
+		flags 0
+		grid_pos 25 7 13
+		visual_pos 25 7 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13886896619819724287
+		flags 0
+		grid_pos 25 7 14
+		visual_pos 25 7 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12731759432275922031
+		flags 0
+		grid_pos 25 7 15
+		visual_pos 25 7 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6523981422406524044
+		flags 0
+		grid_pos 25 7 16
+		visual_pos 25 7 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12920996853376573742
+		flags 0
+		grid_pos 26 7 10
+		visual_pos 26 7 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 581655216429751662
+		flags 0
+		grid_pos 26 7 11
+		visual_pos 26 7 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11373519139938909648
+		flags 0
+		grid_pos 26 7 12
+		visual_pos 26 7 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10093298000236174154
+		flags 0
+		grid_pos 26 7 13
+		visual_pos 26 7 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12188046354160677505
+		flags 0
+		grid_pos 26 7 14
+		visual_pos 26 7 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2601057378750636221
+		flags 0
+		grid_pos 26 7 15
+		visual_pos 26 7 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 780083587426781484
+		flags 0
+		grid_pos 26 7 16
+		visual_pos 26 7 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 456925713809384832
+		flags 0
+		grid_pos 27 7 10
+		visual_pos 27 7 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8623964841348776012
+		flags 0
+		grid_pos 27 7 11
+		visual_pos 27 7 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1412514414984394290
+		flags 0
+		grid_pos 27 7 12
+		visual_pos 27 7 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6434226247572323804
+		flags 0
+		grid_pos 27 7 13
+		visual_pos 27 7 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14510789173576004687
+		flags 0
+		grid_pos 27 7 14
+		visual_pos 27 7 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5018160319468777435
+		flags 0
+		grid_pos 27 7 15
+		visual_pos 27 7 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11599439374030147786
+		flags 0
+		grid_pos 27 7 16
+		visual_pos 27 7 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17814979709326734707
+		flags 0
+		grid_pos 28 7 10
+		visual_pos 28 7 10
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18412169587346625162
+		flags 0
+		grid_pos 28 7 11
+		visual_pos 28 7 11
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15432449453801936743
+		flags 0
+		grid_pos 28 7 12
+		visual_pos 28 7 12
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5944482407636214325
+		flags 0
+		grid_pos 28 7 13
+		visual_pos 28 7 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8941489130008319695
+		flags 0
+		grid_pos 28 7 14
+		visual_pos 28 7 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1095106193632064715
+		flags 0
+		grid_pos 28 7 15
+		visual_pos 28 7 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16426874900488195784
+		flags 0
+		grid_pos 28 7 16
+		visual_pos 28 7 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10999388829155080143
+		flags 0
+		grid_pos -9 11 16
+		visual_pos -9 11 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4428768145146201721
+		flags 0
+		grid_pos -9 11 17
+		visual_pos -9 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14096672918336324259
+		flags 0
+		grid_pos -9 11 18
+		visual_pos -9 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12086209596729174296
+		flags 0
+		grid_pos -8 12 16
+		visual_pos -8 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1032367929814204790
+		flags 0
+		grid_pos -8 12 17
+		visual_pos -8 12 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3776132322545937868
+		flags 0
+		grid_pos -8 12 18
+		visual_pos -8 12 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6677193223450045776
+		flags 0
+		grid_pos -7 12 16
+		visual_pos -7 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2618370514094447284
+		flags 0
+		grid_pos -6 12 16
+		visual_pos -6 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10155786060419971096
+		flags 0
+		grid_pos -5 12 16
+		visual_pos -5 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3391372962186682318
+		flags 0
+		grid_pos -4 12 16
+		visual_pos -4 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1646770780533368140
+		flags 0
+		grid_pos -4 12 17
+		visual_pos -4 12 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16483841877934860402
+		flags 0
+		grid_pos -4 12 18
+		visual_pos -4 12 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13866100143583916028
+		flags 0
+		grid_pos -3 11 16
+		visual_pos -3 11 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1658632418032350597
+		flags 0
+		grid_pos -3 11 17
+		visual_pos -3 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2423005819318905897
+		flags 0
+		grid_pos -3 11 18
+		visual_pos -3 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6461224249129299080
+		flags 0
+		grid_pos -9 11 19
+		visual_pos -9 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10384433384184138472
+		flags 0
+		grid_pos -8 12 19
+		visual_pos -8 12 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12596693837825722541
+		flags 0
+		grid_pos -4 12 19
+		visual_pos -4 12 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18240648396241196498
+		flags 0
+		grid_pos -3 11 19
+		visual_pos -3 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9328850191034013428
+		flags 0
+		grid_pos -9 11 20
+		visual_pos -9 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16935324634527473067
+		flags 0
+		grid_pos -8 12 20
+		visual_pos -8 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7983053463709844923
+		flags 0
+		grid_pos -7 12 20
+		visual_pos -7 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3697995500441637891
+		flags 0
+		grid_pos -6 12 20
+		visual_pos -6 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2662517957626409855
+		flags 0
+		grid_pos -5 12 20
+		visual_pos -5 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10825585613569681816
+		flags 0
+		grid_pos -4 12 20
+		visual_pos -4 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8519447345649956789
+		flags 0
+		grid_pos -3 11 20
+		visual_pos -3 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11031520036345935698
+		flags 0
+		grid_pos -2 11 20
+		visual_pos -2 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4714434459369463483
+		flags 0
+		grid_pos -1 11 20
+		visual_pos -1 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4364431113727488774
+		flags 0
+		grid_pos 0 11 20
+		visual_pos 0 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17645949510297011422
+		flags 0
+		grid_pos 1 11 20
+		visual_pos 1 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4852111839333905172
+		flags 0
+		grid_pos 2 11 20
+		visual_pos 2 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16585889300136650252
+		flags 0
+		grid_pos 3 11 20
+		visual_pos 3 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2909632910756945600
+		flags 0
+		grid_pos 4 11 20
+		visual_pos 4 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13718922313094697203
+		flags 0
+		grid_pos 5 11 20
+		visual_pos 5 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17794958235977225646
+		flags 0
+		grid_pos 6 11 20
+		visual_pos 6 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13956178826778507192
+		flags 0
+		grid_pos 7 11 20
+		visual_pos 7 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8475099988837035476
+		flags 0
+		grid_pos 8 11 20
+		visual_pos 8 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 168517821965006856
+		flags 0
+		grid_pos -9 11 21
+		visual_pos -9 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15618842226569630966
+		flags 0
+		grid_pos -8 11 21
+		visual_pos -8 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10137205518422411791
+		flags 0
+		grid_pos -7 11 21
+		visual_pos -7 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9850258756946576003
+		flags 0
+		grid_pos -6 11 21
+		visual_pos -6 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17433954199561651914
+		flags 0
+		grid_pos -5 11 21
+		visual_pos -5 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4365672453879806921
+		flags 0
+		grid_pos -4 11 21
+		visual_pos -4 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4132000407810743189
+		flags 0
+		grid_pos -3 11 21
+		visual_pos -3 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2568091096001982933
+		flags 0
+		grid_pos -2 11 21
+		visual_pos -2 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10653345105455588115
+		flags 0
+		grid_pos -1 11 21
+		visual_pos -1 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8745737755038320715
+		flags 0
+		grid_pos 0 11 21
+		visual_pos 0 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12830332700096647968
+		flags 0
+		grid_pos 1 11 21
+		visual_pos 1 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4554292857234739660
+		flags 0
+		grid_pos 2 11 21
+		visual_pos 2 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1716101893248885543
+		flags 0
+		grid_pos 3 11 21
+		visual_pos 3 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3758211561987112687
+		flags 0
+		grid_pos 4 11 21
+		visual_pos 4 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15934661305264552369
+		flags 0
+		grid_pos 5 11 21
+		visual_pos 5 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8741443048368250009
+		flags 0
+		grid_pos 6 11 21
+		visual_pos 6 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9094844030958559248
+		flags 0
+		grid_pos 7 11 21
+		visual_pos 7 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17567387755261512442
+		flags 0
+		grid_pos 8 11 21
+		visual_pos 8 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6205041619769508305
+		flags 0
+		grid_pos 9 11 19
+		visual_pos 9 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4906439487703681457
+		flags 0
+		grid_pos 9 11 20
+		visual_pos 9 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3771606693688577071
+		flags 0
+		grid_pos 9 11 21
+		visual_pos 9 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18171589812229126244
+		flags 0
+		grid_pos 10 11 19
+		visual_pos 10 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14322504872893871396
+		flags 0
+		grid_pos 10 11 20
+		visual_pos 10 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11557882987581604576
+		flags 0
+		grid_pos 10 11 21
+		visual_pos 10 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7049582105177802038
+		flags 0
+		grid_pos 11 11 19
+		visual_pos 11 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6599642131026424017
+		flags 0
+		grid_pos 11 11 20
+		visual_pos 11 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7830127257994999268
+		flags 0
+		grid_pos 11 11 21
+		visual_pos 11 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10147355602021855612
+		flags 0
+		grid_pos 12 11 19
+		visual_pos 12 11 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7633634640698733011
+		flags 0
+		grid_pos 12 11 20
+		visual_pos 12 11 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 106472633705792624
+		flags 0
+		grid_pos 12 11 21
+		visual_pos 12 11 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12885486698495946287
+		flags 0
+		grid_pos 9 11 18
+		visual_pos 9 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 37353198769370503
+		flags 0
+		grid_pos 10 11 18
+		visual_pos 10 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9738581510537893071
+		flags 0
+		grid_pos 11 11 18
+		visual_pos 11 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8012568137544457989
+		flags 0
+		grid_pos 12 11 18
+		visual_pos 12 11 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15326514901922850084
+		flags 0
+		grid_pos 10 14 -16
+		visual_pos 10 14 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 612060787432444528
+		flags 0
+		grid_pos 11 14 -16
+		visual_pos 11 14 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12828767633532194102
+		flags 0
+		grid_pos 12 14 -16
+		visual_pos 12 14 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1689163105918416976
+		flags 0
+		grid_pos 13 14 -16
+		visual_pos 13 14 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17300865142123163585
+		flags 0
+		grid_pos 14 14 -16
+		visual_pos 14 14 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5986388143328975147
+		flags 0
+		grid_pos 11 15 -16
+		visual_pos 11 15 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3205062521691422248
+		flags 0
+		grid_pos 12 15 -16
+		visual_pos 12 15 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5611926424801354811
+		flags 0
+		grid_pos 13 15 -16
+		visual_pos 13 15 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13635625049001832145
+		flags 0
+		grid_pos 14 15 -16
+		visual_pos 14 15 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11411185223611072758
+		flags 0
+		grid_pos 10 15 -17
+		visual_pos 10 15 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11759349867534433229
+		flags 0
+		grid_pos 9 14 -17
+		visual_pos 9 14 -17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1143386015585404994
+		flags 0
+		grid_pos 15 15 -16
+		visual_pos 15 15 -16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11028702473233745091
+		flags 0
+		grid_pos 13 10 18
+		visual_pos 13 10 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14524752379053213975
+		flags 0
+		grid_pos 13 10 19
+		visual_pos 13 10 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10346612953741499069
+		flags 0
+		grid_pos 13 10 20
+		visual_pos 13 10 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13544422637721292995
+		flags 0
+		grid_pos 13 10 21
+		visual_pos 13 10 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10856447595230163449
+		flags 0
+		grid_pos 14 10 18
+		visual_pos 14 10 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12820225686446227010
+		flags 0
+		grid_pos 14 10 19
+		visual_pos 14 10 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14082116375090445163
+		flags 0
+		grid_pos 14 10 20
+		visual_pos 14 10 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3415537840767340042
+		flags 0
+		grid_pos 14 10 21
+		visual_pos 14 10 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6921030242688246912
+		flags 0
+		grid_pos 15 10 18
+		visual_pos 15 10 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13308505677204020800
+		flags 0
+		grid_pos 15 10 19
+		visual_pos 15 10 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17134025606503978551
+		flags 0
+		grid_pos 15 10 20
+		visual_pos 15 10 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 700294731073338697
+		flags 0
+		grid_pos 15 10 21
+		visual_pos 15 10 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5259672592244489856
+		flags 0
+		grid_pos 16 10 18
+		visual_pos 16 10 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17948474589454139960
+		flags 0
+		grid_pos 16 10 19
+		visual_pos 16 10 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12355730083304835802
+		flags 0
+		grid_pos 16 10 20
+		visual_pos 16 10 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11187992886038696472
+		flags 0
+		grid_pos 16 10 21
+		visual_pos 16 10 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 134956460483802053
+		flags 0
+		grid_pos 17 9 18
+		visual_pos 17 9 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12008230517223184038
+		flags 0
+		grid_pos 17 9 19
+		visual_pos 17 9 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 561662787374959162
+		flags 0
+		grid_pos 17 9 20
+		visual_pos 17 9 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14325697259011228486
+		flags 0
+		grid_pos 17 9 21
+		visual_pos 17 9 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11764460494543419463
+		flags 0
+		grid_pos 18 9 18
+		visual_pos 18 9 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12224344722731343485
+		flags 0
+		grid_pos 18 9 19
+		visual_pos 18 9 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7969235535033687465
+		flags 0
+		grid_pos 18 9 20
+		visual_pos 18 9 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16742705163106824303
+		flags 0
+		grid_pos 18 9 21
+		visual_pos 18 9 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2568023669559462941
+		flags 0
+		grid_pos 19 9 18
+		visual_pos 19 9 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2446921301250029194
+		flags 0
+		grid_pos 19 9 19
+		visual_pos 19 9 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3839424657508376836
+		flags 0
+		grid_pos 19 9 20
+		visual_pos 19 9 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9013237774165167086
+		flags 0
+		grid_pos 19 9 21
+		visual_pos 19 9 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8651004276707247128
+		flags 0
+		grid_pos 20 9 18
+		visual_pos 20 9 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4448992573689674674
+		flags 0
+		grid_pos 20 9 19
+		visual_pos 20 9 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7888227392022036796
+		flags 0
+		grid_pos 20 9 20
+		visual_pos 20 9 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18087640393292656100
+		flags 0
+		grid_pos 20 9 21
+		visual_pos 20 9 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14973741706993994001
+		flags 0
+		grid_pos 21 8 18
+		visual_pos 21 8 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2581710613495167265
+		flags 0
+		grid_pos 21 8 19
+		visual_pos 21 8 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18031512336737864395
+		flags 0
+		grid_pos 21 8 20
+		visual_pos 21 8 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4652622683966994190
+		flags 0
+		grid_pos 21 8 21
+		visual_pos 21 8 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10567694528828547964
+		flags 0
+		grid_pos 22 8 18
+		visual_pos 22 8 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12337928645674805948
+		flags 0
+		grid_pos 22 8 19
+		visual_pos 22 8 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9927861445882018446
+		flags 0
+		grid_pos 22 8 20
+		visual_pos 22 8 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7206711990883503484
+		flags 0
+		grid_pos 22 8 21
+		visual_pos 22 8 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4063779860083177802
+		flags 0
+		grid_pos 23 8 18
+		visual_pos 23 8 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6747710630671826466
+		flags 0
+		grid_pos 23 8 19
+		visual_pos 23 8 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11935967207605971430
+		flags 0
+		grid_pos 23 8 20
+		visual_pos 23 8 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17573031894408850616
+		flags 0
+		grid_pos 23 8 21
+		visual_pos 23 8 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6494899898317898885
+		flags 0
+		grid_pos 24 8 18
+		visual_pos 24 8 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16561461353433031787
+		flags 0
+		grid_pos 24 8 19
+		visual_pos 24 8 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10596566558067025980
+		flags 0
+		grid_pos 24 8 20
+		visual_pos 24 8 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17591684516040196456
+		flags 0
+		grid_pos 24 8 21
+		visual_pos 24 8 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16298927727308433690
+		flags 0
+		grid_pos 1 11 17
+		visual_pos 1.08507 11 17.2603
+		visual_rot 0 0 -2.56822e-06
+		visual_scl 0.835791 1 1
+	end_entity
+	entity block
+		id 4893170954276338884
+		flags 0
+		grid_pos 2 11 17
+		visual_pos 2.25532 11 17.3776
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2095718365898037086
+		flags 0
+		grid_pos 3 11 17
+		visual_pos 3 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1787796837383596684
+		flags 0
+		grid_pos 4 11 17
+		visual_pos 4 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13749370562522131467
+		flags 0
+		grid_pos 5 11 17
+		visual_pos 5 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2559548037877134132
+		flags 0
+		grid_pos 6 11 17
+		visual_pos 6 11 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7682487201501472363
+		flags 0
+		grid_pos 1 11 15
+		visual_pos 1 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17141658712706465254
+		flags 0
+		grid_pos 2 11 15
+		visual_pos 2 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9889068458552501408
+		flags 0
+		grid_pos 3 11 15
+		visual_pos 3 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14982244258209300488
+		flags 0
+		grid_pos 4 11 15
+		visual_pos 4 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 866340754557792578
+		flags 0
+		grid_pos 5 11 15
+		visual_pos 5 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2347948872613608022
+		flags 0
+		grid_pos 6 11 15
+		visual_pos 6 11 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17161314034341689459
+		flags 0
+		grid_pos 18 7 -29
+		visual_pos 18 7 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16596344825607630801
+		flags 0
+		grid_pos 18 7 -28
+		visual_pos 18 7 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17620892310663389018
+		flags 0
+		grid_pos 18 7 -27
+		visual_pos 18 7 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2444770420451880809
+		flags 0
+		grid_pos 18 7 -26
+		visual_pos 18 7 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17092946712041334752
+		flags 0
+		grid_pos 18 7 -25
+		visual_pos 18 7 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15164783789010299104
+		flags 0
+		grid_pos 18 7 -24
+		visual_pos 18 7 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15171851583713498574
+		flags 0
+		grid_pos 19 8 -29
+		visual_pos 19 8 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12126260251563319363
+		flags 0
+		grid_pos 19 8 -28
+		visual_pos 19 8 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17689198827414465819
+		flags 0
+		grid_pos 19 8 -27
+		visual_pos 19 8 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3441457378716325980
+		flags 0
+		grid_pos 19 8 -26
+		visual_pos 19 8 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11843562077114759778
+		flags 0
+		grid_pos 19 8 -25
+		visual_pos 19 8 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10353854921920954579
+		flags 0
+		grid_pos 19 8 -24
+		visual_pos 19 8 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3838232979129416019
+		flags 0
+		grid_pos 19 9 -29
+		visual_pos 19 9 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6724922110164767561
+		flags 0
+		grid_pos 19 9 -28
+		visual_pos 19 9 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1991259995281656253
+		flags 0
+		grid_pos 19 9 -27
+		visual_pos 19 9 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6209898601894897887
+		flags 0
+		grid_pos 19 9 -26
+		visual_pos 19 9 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9730719347427424865
+		flags 0
+		grid_pos 19 9 -25
+		visual_pos 19 9 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8122859093491358076
+		flags 0
+		grid_pos 19 9 -24
+		visual_pos 19 9 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7201129163385156225
+		flags 0
+		grid_pos 17 8 -29
+		visual_pos 17 8 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3433283307238613454
+		flags 0
+		grid_pos 17 8 -28
+		visual_pos 17 8 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16971337606393915006
+		flags 0
+		grid_pos 17 8 -27
+		visual_pos 17 8 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13985330077531351456
+		flags 0
+		grid_pos 17 8 -26
+		visual_pos 17 8 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8044311505027653197
+		flags 0
+		grid_pos 17 8 -25
+		visual_pos 17 8 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12517900076034063862
+		flags 0
+		grid_pos 17 9 -29
+		visual_pos 17 9 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8230411911079528517
+		flags 0
+		grid_pos 17 9 -28
+		visual_pos 17 9 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13983856003679768987
+		flags 0
+		grid_pos 17 9 -27
+		visual_pos 17 9 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11825303730682181025
+		flags 0
+		grid_pos 17 9 -26
+		visual_pos 17 9 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6621478497792556744
+		flags 0
+		grid_pos 17 9 -25
+		visual_pos 17 9 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4994698454949527599
+		flags 0
+		grid_pos 18 10 -29
+		visual_pos 18 10 -29
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15499538145070616188
+		flags 0
+		grid_pos 18 10 -28
+		visual_pos 18 10 -28
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9291116219936306140
+		flags 0
+		grid_pos 18 10 -27
+		visual_pos 18 10 -27
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12204445785125104991
+		flags 0
+		grid_pos 18 10 -26
+		visual_pos 18 10 -26
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13971373659295321580
+		flags 0
+		grid_pos 18 10 -25
+		visual_pos 18 10 -25
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4435061711630560596
+		flags 0
+		grid_pos 17 8 -24
+		visual_pos 17 8 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12300432382084544480
+		flags 0
+		grid_pos 17 9 -24
+		visual_pos 17 9 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9960542143041047016
+		flags 0
+		grid_pos 18 10 -24
+		visual_pos 18 10 -24
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11015088076547904239
+		flags 0
+		grid_pos 18 7 -30
+		visual_pos 18 7 -30
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 767029029477967517
+		flags 0
+		grid_pos 19 7 -30
+		visual_pos 19 7 -30
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9604964587002043444
+		flags 0
+		grid_pos 18 7 -31
+		visual_pos 18 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12768544678464411338
+		flags 0
+		grid_pos 19 7 -31
+		visual_pos 19 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9691022274253451215
+		flags 0
+		grid_pos 18 7 -32
+		visual_pos 18 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7128054360320839850
+		flags 0
+		grid_pos 19 7 -32
+		visual_pos 19 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 757511947447533705
+		flags 0
+		grid_pos 18 7 -33
+		visual_pos 18 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8777290994112808903
+		flags 0
+		grid_pos 19 7 -33
+		visual_pos 19 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7743414404247523448
+		flags 0
+		grid_pos 17 7 -30
+		visual_pos 17 7 -30
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1083126561722682275
+		flags 0
+		grid_pos 17 7 -31
+		visual_pos 17 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13843179138078072202
+		flags 0
+		grid_pos 17 7 -32
+		visual_pos 17 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5693579011859262969
+		flags 0
+		grid_pos 17 7 -33
+		visual_pos 17 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7918963211211437564
+		flags 0
+		grid_pos 16 7 -30
+		visual_pos 16 7 -30
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11511818752099550911
+		flags 0
+		grid_pos 16 7 -32
+		visual_pos 16 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3930581673948062254
+		flags 0
+		grid_pos 16 7 -31
+		visual_pos 16 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1397441141067468809
+		flags 0
+		grid_pos 16 7 -33
+		visual_pos 16 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14533388660216209182
+		flags 0
+		grid_pos 15 7 -31
+		visual_pos 15 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2034332413892437847
+		flags 0
+		grid_pos 15 7 -32
+		visual_pos 15 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3606491966945407885
+		flags 0
+		grid_pos 15 7 -33
+		visual_pos 15 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7471861036496065875
+		flags 0
+		grid_pos 14 7 -33
+		visual_pos 14 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4651765391948455878
+		flags 0
+		grid_pos 20 7 -31
+		visual_pos 20 7 -31
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 560844333774364881
+		flags 0
+		grid_pos 20 7 -32
+		visual_pos 20 7 -32
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15600494057207118372
+		flags 0
+		grid_pos 20 7 -33
+		visual_pos 20 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11363795948364856954
+		flags 0
+		grid_pos 21 7 -33
+		visual_pos 21 7 -33
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17150519698311428862
+		flags 0
+		grid_pos 14 7 -34
+		visual_pos 14 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18043638002711819278
+		flags 0
+		grid_pos 15 7 -34
+		visual_pos 15 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4879956089343851314
+		flags 0
+		grid_pos 16 7 -34
+		visual_pos 16 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 691707654542518162
+		flags 0
+		grid_pos 17 7 -34
+		visual_pos 17 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5012166044345643024
+		flags 0
+		grid_pos 18 7 -34
+		visual_pos 18 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 186710967695205769
+		flags 0
+		grid_pos 19 7 -34
+		visual_pos 19 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16014809841527800195
+		flags 0
+		grid_pos 20 7 -34
+		visual_pos 20 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6262870819368481974
+		flags 0
+		grid_pos 21 7 -34
+		visual_pos 21 7 -34
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3990636245572403414
+		flags 0
+		grid_pos 14 7 -36
+		visual_pos 14 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2035025437271794888
+		flags 0
+		grid_pos 15 7 -36
+		visual_pos 15 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2760001074450420223
+		flags 0
+		grid_pos 16 7 -36
+		visual_pos 16 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2698156607445052040
+		flags 0
+		grid_pos 17 7 -36
+		visual_pos 17 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3307806790028371738
+		flags 0
+		grid_pos 18 7 -36
+		visual_pos 18 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16641606901405512466
+		flags 0
+		grid_pos 19 7 -36
+		visual_pos 19 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16964076974637409462
+		flags 0
+		grid_pos 20 7 -36
+		visual_pos 20 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4978887633403975446
+		flags 0
+		grid_pos 21 7 -36
+		visual_pos 21 7 -36
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10628304007790827459
+		flags 0
+		grid_pos 15 7 -38
+		visual_pos 15 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16841570976130921124
+		flags 0
+		grid_pos 15 7 -37
+		visual_pos 15 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17053773554329866163
+		flags 0
+		grid_pos 16 7 -38
+		visual_pos 16 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16155190814003487868
+		flags 0
+		grid_pos 16 7 -37
+		visual_pos 16 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6364163159296274489
+		flags 0
+		grid_pos 16 7 -39
+		visual_pos 16 7 -39
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8444559433372027630
+		flags 0
+		grid_pos 17 7 -38
+		visual_pos 17 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1528033029197944399
+		flags 0
+		grid_pos 17 7 -37
+		visual_pos 17 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3105086224454053893
+		flags 0
+		grid_pos 17 7 -39
+		visual_pos 17 7 -39
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4714752962190867244
+		flags 0
+		grid_pos 18 7 -38
+		visual_pos 18 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15952313953897694487
+		flags 0
+		grid_pos 18 7 -37
+		visual_pos 18 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8243471549882830202
+		flags 0
+		grid_pos 18 7 -39
+		visual_pos 18 7 -39
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15958740306370632601
+		flags 0
+		grid_pos 19 7 -38
+		visual_pos 19 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7596839708162710279
+		flags 0
+		grid_pos 19 7 -37
+		visual_pos 19 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4136943756820903075
+		flags 0
+		grid_pos 19 7 -39
+		visual_pos 19 7 -39
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12452655596925235801
+		flags 0
+		grid_pos 20 7 -38
+		visual_pos 20 7 -38
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2202908021513824291
+		flags 0
+		grid_pos 20 7 -37
+		visual_pos 20 7 -37
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 827361678253892721
+		flags 0
+		grid_pos 14 7 -35
+		visual_pos 14 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11043792663789016294
+		flags 0
+		grid_pos 15 7 -35
+		visual_pos 15 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 785315755826360422
+		flags 0
+		grid_pos 16 7 -35
+		visual_pos 16 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13653773139131326177
+		flags 0
+		grid_pos 17 7 -35
+		visual_pos 17 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9179706960114468145
+		flags 0
+		grid_pos 18 7 -35
+		visual_pos 18 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2203934558273173818
+		flags 0
+		grid_pos 19 7 -35
+		visual_pos 19 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15516673633261268771
+		flags 0
+		grid_pos 20 7 -35
+		visual_pos 20 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13322531496033730227
+		flags 0
+		grid_pos 21 7 -35
+		visual_pos 21 7 -35
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3925253964174884582
+		flags 0
+		grid_pos -9 12 13
+		visual_pos -9 12 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8031413711308202004
+		flags 0
+		grid_pos -9 13 13
+		visual_pos -9 13 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3218002922948304913
+		flags 0
+		grid_pos -9 14 13
+		visual_pos -9 14 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8159233184679030706
+		flags 0
+		grid_pos -9 12 14
+		visual_pos -9 12 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 841359786269242441
+		flags 0
+		grid_pos -9 15 13
+		visual_pos -9 15 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9648366681696535175
+		flags 0
+		grid_pos -9 15 14
+		visual_pos -9 15 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17999642210462693210
+		flags 0
+		grid_pos -9 16 13
+		visual_pos -9 16 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3722858723894673505
+		flags 0
+		grid_pos -9 17 13
+		visual_pos -9 17 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2209806598774305977
+		flags 0
+		grid_pos -9 12 15
+		visual_pos -9 12 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8670144716278914045
+		flags 0
+		grid_pos -9 12 16
+		visual_pos -9 12 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7919358354029888161
+		flags 0
+		grid_pos -9 13 15
+		visual_pos -9 13 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11307255843920282253
+		flags 0
+		grid_pos -9 14 15
+		visual_pos -9 14 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4492622457893616084
+		flags 0
+		grid_pos -9 15 15
+		visual_pos -9 15 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 432239820985997391
+		flags 0
+		grid_pos -9 15 16
+		visual_pos -9 15 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16371600696731957099
+		flags 0
+		grid_pos -9 16 15
+		visual_pos -9 16 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 6068800755113415864
+		flags 0
+		grid_pos -9 17 15
+		visual_pos -9 17 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7036226686644787456
+		flags 0
+		grid_pos -9 12 17
+		visual_pos -9 12 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10167054389752520453
+		flags 0
+		grid_pos -9 12 18
+		visual_pos -9 12 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15097853253449310820
+		flags 0
+		grid_pos -9 12 19
+		visual_pos -9 12 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12760989049363014754
+		flags 0
+		grid_pos -9 12 20
+		visual_pos -9 12 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10941179451646208046
+		flags 0
+		grid_pos -9 13 17
+		visual_pos -9 13 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10232186538624839903
+		flags 0
+		grid_pos -9 13 19
+		visual_pos -9 13 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8922913795478063393
+		flags 0
+		grid_pos -9 14 17
+		visual_pos -9 14 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5917522512240429882
+		flags 0
+		grid_pos -9 14 19
+		visual_pos -9 14 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5499659851374074924
+		flags 0
+		grid_pos -9 15 17
+		visual_pos -9 15 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3543766201412535936
+		flags 0
+		grid_pos -9 15 18
+		visual_pos -9 15 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8624757719609856590
+		flags 0
+		grid_pos -9 15 19
+		visual_pos -9 15 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16814165640565213873
+		flags 0
+		grid_pos -9 15 20
+		visual_pos -9 15 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 10216789769980171314
+		flags 0
+		grid_pos -9 16 17
+		visual_pos -9 16 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13206174200608791514
+		flags 0
+		grid_pos -9 16 19
+		visual_pos -9 16 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14520244333773110102
+		flags 0
+		grid_pos -9 17 17
+		visual_pos -9 17 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18096505835214708930
+		flags 0
+		grid_pos -9 17 19
+		visual_pos -9 17 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3307295357927673663
+		flags 0
+		grid_pos -9 18 13
+		visual_pos -9 18 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5311960752423232710
+		flags 0
+		grid_pos -9 18 14
+		visual_pos -9 18 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4631224991674634598
+		flags 0
+		grid_pos -9 18 15
+		visual_pos -9 18 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8090923991722320357
+		flags 0
+		grid_pos -9 18 16
+		visual_pos -9 18 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14931858367202136642
+		flags 0
+		grid_pos -9 18 17
+		visual_pos -9 18 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12876653118751763118
+		flags 0
+		grid_pos -9 18 18
+		visual_pos -9 18 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 18027311610637629276
+		flags 0
+		grid_pos -9 18 19
+		visual_pos -9 18 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9212451541081390451
+		flags 0
+		grid_pos -9 18 20
+		visual_pos -9 18 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12791636401927418517
+		flags 0
+		grid_pos -9 19 13
+		visual_pos -9 19 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8928197660685257818
+		flags 0
+		grid_pos -9 19 15
+		visual_pos -9 19 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14366296098823275370
+		flags 0
+		grid_pos -9 19 17
+		visual_pos -9 19 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 129737287080565977
+		flags 0
+		grid_pos -9 19 19
+		visual_pos -9 19 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17393556784786525024
+		flags 0
+		grid_pos -9 20 13
+		visual_pos -9 20 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8585635498876955162
+		flags 0
+		grid_pos -9 20 15
+		visual_pos -9 20 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3493703504711096114
+		flags 0
+		grid_pos -9 20 17
+		visual_pos -9 20 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5070182179341461423
+		flags 0
+		grid_pos -9 20 19
+		visual_pos -9 20 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 4509930204336191531
+		flags 0
+		grid_pos -9 21 13
+		visual_pos -9 21 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11227239382153163870
+		flags 0
+		grid_pos -9 21 14
+		visual_pos -9 21 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5021073898603534485
+		flags 0
+		grid_pos -9 21 15
+		visual_pos -9 21 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15228246207425144416
+		flags 0
+		grid_pos -9 21 16
+		visual_pos -9 21 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1787523987015804628
+		flags 0
+		grid_pos -9 21 17
+		visual_pos -9 21 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 15065756026339344645
+		flags 0
+		grid_pos -9 21 18
+		visual_pos -9 21 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 5352311276447147643
+		flags 0
+		grid_pos -9 21 19
+		visual_pos -9 21 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 337537071650873622
+		flags 0
+		grid_pos -9 21 20
+		visual_pos -9 21 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2857571895981155106
+		flags 0
+		grid_pos -9 22 13
+		visual_pos -9 22 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 103584716070284939
+		flags 0
+		grid_pos -9 22 15
+		visual_pos -9 22 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 473395399415684804
+		flags 0
+		grid_pos -9 22 17
+		visual_pos -9 22 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 16650367403359233059
+		flags 0
+		grid_pos -9 22 19
+		visual_pos -9 22 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8289104519983583877
+		flags 0
+		grid_pos -9 23 13
+		visual_pos -9 23 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2370410099590207034
+		flags 0
+		grid_pos -9 23 15
+		visual_pos -9 23 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9444001882315083365
+		flags 0
+		grid_pos -9 23 17
+		visual_pos -9 23 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1467746435049604187
+		flags 0
+		grid_pos -9 23 19
+		visual_pos -9 23 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17718650956842794193
+		flags 0
+		grid_pos -9 24 13
+		visual_pos -9 24 13
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9585479747158734180
+		flags 0
+		grid_pos -9 24 14
+		visual_pos -9 24 14
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 19324892668393989
+		flags 0
+		grid_pos -9 24 15
+		visual_pos -9 24 15
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2568646169665810888
+		flags 0
+		grid_pos -9 24 16
+		visual_pos -9 24 16
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17569641794044889575
+		flags 0
+		grid_pos -9 24 17
+		visual_pos -9 24 17
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 13791602223646858174
+		flags 0
+		grid_pos -9 24 18
+		visual_pos -9 24 18
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 1146764820583417029
+		flags 0
+		grid_pos -9 24 19
+		visual_pos -9 24 19
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 14776886812069959562
+		flags 0
+		grid_pos -9 24 20
+		visual_pos -9 24 20
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3328314700742499068
+		flags 0
+		grid_pos -9 12 21
+		visual_pos -9 12 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 11781667147079993257
+		flags 0
+		grid_pos -9 13 21
+		visual_pos -9 13 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2643225330672810091
+		flags 0
+		grid_pos -9 14 21
+		visual_pos -9 14 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 3051683781500385863
+		flags 0
+		grid_pos -9 15 21
+		visual_pos -9 15 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12335157457796448775
+		flags 0
+		grid_pos -9 16 21
+		visual_pos -9 16 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9469622408226240282
+		flags 0
+		grid_pos -9 17 21
+		visual_pos -9 17 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 17844104579860573312
+		flags 0
+		grid_pos -9 18 21
+		visual_pos -9 18 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 12215929046038309944
+		flags 0
+		grid_pos -9 19 21
+		visual_pos -9 19 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 8531746946290729791
+		flags 0
+		grid_pos -9 20 21
+		visual_pos -9 20 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7985690055383907351
+		flags 0
+		grid_pos -9 21 21
+		visual_pos -9 21 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 9180887363986517482
+		flags 0
+		grid_pos -9 22 21
+		visual_pos -9 22 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 2265624972879901163
+		flags 0
+		grid_pos -9 23 21
+		visual_pos -9 23 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
+	end_entity
+	entity block
+		id 7194155099050217799
+		flags 0
+		grid_pos -9 24 21
+		visual_pos -9 24 21
+		visual_rot 0 0 0
+		visual_scl 1 1 1
 	end_entity
 end_chunk

@@ -51,7 +51,8 @@ struct entity_data_t
 	{}
 };
 
-struct entity_t {
+struct entity_t
+{
 	uuid id = 0;
 	int index = 0;
 
@@ -67,34 +68,6 @@ struct entity_t {
 	virtual void update(double dt) {}
 
 	entity_data_t extract_data();
-
-	bool is_grounded(glm::ivec3 _pos);
-	bool is_moving() const;
-	void set_grid_pos(glm::vec3 _pos);
-	void revert_grid_pos();
-	void interp_visuals(double dt, float interp_speed);
-};
-
-
-struct node_t
-{
-	std::string type;
-
-	glm::ivec3 pos;
-
-	virtual void init();
-	virtual void update(double dt);
-};
-
-struct volume_t
-{
-	std::string type;
-
-	std::string event;
-	glm::ivec3 pos, size;
-
-	virtual void init();
-	virtual void update(double dt);
 };
 
 struct chunk_t
@@ -102,16 +75,16 @@ struct chunk_t
 	std::string name;
 
 	std::vector<std::shared_ptr<entity_t>> entities;
-	std::vector<std::shared_ptr<node_t>> nodes;
-	std::vector<std::shared_ptr<volume_t>> volumes;
 
 	bool check_collisions(glm::vec3 _pos) const;
 	bool check_collisions(glm::vec3 _pos, entity_t* _ignored_entity) const;
+	bool check_collisions(glm::vec3 _pos, void* _ignored_pointer) const;
 	bool check_collisions(glm::vec3 _pos, std::string _tag) const;
 	bool check_collisions(glm::vec3 _pos, entity_t* _ignored_entity, std::string _tag) const;
 
 	std::weak_ptr<entity_t> get_collisions(glm::vec3 _pos);
 	std::weak_ptr<entity_t> get_collisions(glm::vec3 _pos, entity_t* _ignored_entity);
+	std::weak_ptr<entity_t> get_collisions(glm::vec3 _pos, glm::ivec3 _ignored_pos);
 	std::weak_ptr<entity_t> get_collisions(glm::vec3 _pos, std::string _tag);
 	std::weak_ptr<entity_t> get_collisions(glm::vec3 _pos, entity_t* _ignored_entity, std::string _tag);
 

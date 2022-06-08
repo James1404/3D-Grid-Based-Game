@@ -7,62 +7,76 @@
 #include <gtx/matrix_decompose.hpp>
 #include <glm.hpp>
 
-inline float lerp(const float a, const float b, const float t) {
+inline float lerp(const float a, const float b, const float t)
+{
 	return (a * (1.0f - t) + (b * t));
 }
 
-inline glm::vec2 lerp(const glm::vec2 a, const glm::vec2 b, const float t) {
+inline glm::vec2 lerp(const glm::vec2 a, const glm::vec2 b, const float t)
+{
 	return glm::vec2(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
 }
 
-inline glm::vec3 lerp(const glm::vec3 a, const glm::vec3 b, const float t) {
+inline glm::vec3 lerp(const glm::vec3 a, const glm::vec3 b, const float t)
+{
 	return glm::vec3(lerp(a.x, b.x, t), lerp(a.y, b.y, t), lerp(a.z, b.z, t));
 }
 
-inline glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step) {
+inline glm::vec2 move_towards(const glm::vec2 pos, const glm::vec2 target, const float step)
+{
 	const glm::vec2 delta = target - pos;
 	const float len2 = glm::dot(delta, delta);
 
 	if (len2 < step * step)
+	{
 		return target;
+	}
 
 	const glm::vec2 direction = delta / glm::sqrt(len2);
 
 	return pos + step * direction;
 }
 
-inline glm::vec3 move_towards(const glm::vec3 pos, const glm::vec3 target, const float step) {
+inline glm::vec3 move_towards(const glm::vec3 pos, const glm::vec3 target, const float step)
+{
 	const glm::vec3 delta = target - pos;
 	const float len2 = glm::dot(delta, delta);
 
 	if (len2 < step * step)
+	{
 		return target;
+	}
 
 	const glm::vec3 direction = delta / glm::sqrt(len2);
 
 	return pos + step * direction;
 }
 
-inline glm::vec2 vec_floor(glm::vec2 vec) {
+inline glm::vec2 vec_floor(glm::vec2 vec)
+{
 	return glm::vec2(floorf(vec.x), floorf(vec.y));
 }
 
-inline glm::vec3 vec_floor(glm::vec3 vec) {
+inline glm::vec3 vec_floor(glm::vec3 vec)
+{
 	return glm::vec3(floorf(vec.x), floorf(vec.y), floorf(vec.z));
 }
 
-inline glm::ivec2 vec_to_ivec(glm::vec2 vec) {
+inline glm::ivec2 vec_to_ivec(glm::vec2 vec)
+{
 	return (glm::ivec2)vec_floor(vec);
 }
 
-inline glm::ivec3 vec_to_ivec(glm::vec3 vec) {
+inline glm::ivec3 vec_to_ivec(glm::vec3 vec)
+{
 	return (glm::ivec3)vec_floor(vec);
 }
 
 inline glm::vec3 sqrt_magnitude(glm::vec3 vec)
 {
 	float length = sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z));
-	if (length != 0) {
+	if (length != 0)
+	{
 		vec /= length;
 	}
 
@@ -225,3 +239,26 @@ public:
 private:
 	std::queue<_Ty> queue;
 };
+
+inline bool is_moving(transform_t& visual_transform, glm::ivec3& grid_pos)
+{
+	return (visual_transform.position != (glm::vec3)grid_pos);
+}
+
+inline void set_grid_pos(glm::ivec3& grid_pos, glm::ivec3& previous_grid_pos, glm::vec3 new_grid_pos)
+{
+	previous_grid_pos = grid_pos;
+	grid_pos = new_grid_pos;
+}
+
+inline void revert_grid_pos(glm::ivec3& grid_pos, glm::ivec3& previous_grid_pos)
+{
+	grid_pos = previous_grid_pos;
+}
+
+inline void interp_visuals(transform_t& visual_transform, glm::ivec3& grid_pos, double dt, float interp_speed)
+{
+	// TODO: implement lerping instead of move_towards
+	//visual_transform.position = lerp(visual_transform.position, (glm::vec3)grid_pos, interp_speed * dt);
+	visual_transform.position = move_towards(visual_transform.position, grid_pos, interp_speed * dt);
+}

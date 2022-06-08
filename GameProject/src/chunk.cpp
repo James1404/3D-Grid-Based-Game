@@ -57,34 +57,6 @@ entity_data_t entity_t::extract_data()
 	return entity_data_t(name, id, flags, grid_pos);
 }
 
-bool entity_t::is_grounded(glm::ivec3 _pos)
-{
-	return chunk->check_collisions(_pos + glm::ivec3(0, -1, 0), this);
-}
-
-bool entity_t::is_moving() const
-{
-	return (visual_transform.position != (glm::vec3)grid_pos);
-}
-
-void entity_t::set_grid_pos(glm::vec3 _pos)
-{
-	previous_grid_pos = grid_pos;
-	grid_pos = _pos;
-}
-
-void entity_t::revert_grid_pos()
-{
-	grid_pos = previous_grid_pos;
-}
-
-void entity_t::interp_visuals(double dt, float interp_speed)
-{
-	// TODO: implement lerping instead of move_towards
-	//visual_transform.position = lerp(visual_transform.position, (glm::vec3)grid_pos, interp_speed * dt);
-	visual_transform.position = move_towards(visual_transform.position, grid_pos, interp_speed * dt);
-}
-
 //
 // CHUNK
 //
@@ -223,6 +195,29 @@ bool chunk_t::check_collisions(glm::vec3 _pos, entity_t* _ignored_entity) const
 
 		if (entity->flags.has(entity_flags_no_collision))
 			continue;
+
+		if (entity->grid_pos == vec_to_ivec(_pos))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool chunk_t::check_collisions(glm::vec3 _pos, void* _ignored_pointer) const
+{
+	for (auto& entity : entities)
+	{
+		if (entity.get() == _ignored_pointer)
+		{
+			continue;
+		}
+
+		if (entity->flags.has(entity_flags_no_collision))
+		{
+			continue;
+		}
 
 		if (entity->grid_pos == vec_to_ivec(_pos))
 		{

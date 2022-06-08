@@ -32,26 +32,14 @@ int main(int argc, char* args[])
 
 	input_t::get().init();
 	input_t::get().load();
-	
+
 	world_t::get().load();
 
 	event_manager_t::get().init();
 
-#ifdef _DEBUG
+#if EDITOR
 	editor_t::get().init();
-#endif // _DEBUG
-
-	/*
-	for(auto& [path, model] : asset_manager_t::get().models)
-	{
-		model->construct_instance_buffers();
-	}
-
-	for(auto& model_instance : renderer_t::get().instance_container.model_instances)
-	{
-		model_instance.construct_instance_buffers();
-	}
-	*/
+#endif // EDITOR
 
 	renderer_t::get().construct_all_instance_buffers();
 
@@ -61,9 +49,9 @@ int main(int argc, char* args[])
 		/* ----- HANDLE EVENTS ----- */
 		if (window_t::get().handle_events())
 		{
-#ifdef _DEBUG
+#if EDITOR
 			editor_t::get().handle_events();
-#endif // _DEBUG
+#endif // EDITOR
 		}
 
 		/* ----- UPDATE GAME ----- */
@@ -74,7 +62,7 @@ int main(int argc, char* args[])
 
 		world_t::get().update(dt);
 
-#ifdef _DEBUG
+#if EDITOR
 		if (current_engine_state == engine_state_editor)
 		{
 			world_t::get().is_paused = true;
@@ -88,26 +76,20 @@ int main(int argc, char* args[])
 		if (input_t::get().key_down(SDL_SCANCODE_ESCAPE)) {
 			if (current_engine_state == engine_state_gameplay)
 			{
-				//world_t::get().load();
 				current_engine_state = engine_state_editor;
-
-				//for(auto& [path, model] : asset_manager_t::get().models)
-				//{
-				//	model->construct_instance_buffers();
-				//}
 			}
 			else if (current_engine_state == engine_state_editor)
 			{
 				current_engine_state = engine_state_gameplay;
 			}
 		}
-#endif // _DEBUG
+#endif // EDITOR
 
 		camera_manager_t::get().update();
 		input_t::get().update();
 
 		/* ----- RENDER GAME ----- */
-#ifdef _DEBUG
+#if EDITOR
 		editor_t::get().bind_framebuffer();
 
 		renderer_t::get().clear_screen();
@@ -140,15 +122,15 @@ int main(int argc, char* args[])
 		renderer_t::get().draw();
 
 		renderer_t::get().swap_screen_buffers();
-#endif // _DEBUG
+#endif // EDITOR
 	}
 
 	/* ----- CLEAN GAME ----- */
 	log_info("STARTING CLEANUP");
-	
-#ifdef _DEBUG
+
+#if EDITOR
 	editor_t::get().shutdown();
-#endif // _DEBUG
+#endif // EDITOR
 
 	camera_manager_t::get().shutdown();
 

@@ -24,28 +24,28 @@ void instance_container_t::construct_instance_buffers()
 	glGenBuffers(1, &instance_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
 
-#ifdef _DEBUG
+#if EDITOR
 	glBufferData(GL_ARRAY_BUFFER, (sizeof(glm::mat4) + sizeof(int)) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
 #else
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instance_buffer_size, NULL, GL_DYNAMIC_DRAW);
 #endif
 
 	std::vector<glm::mat4> transforms;
-#ifdef _DEBUG
+#if EDITOR
 	std::vector<int> indexs;
-#endif // _DEBUG
+#endif // EDITOR
 	for(int i = 0; i < instance_buffer_size; i++)
 	{
 		transforms.push_back(instance_data[i].transform->get_matrix());
-#ifdef _DEBUG
+#if EDITOR
 		indexs.push_back(instance_data[i].index);
-#endif // _DEBUG
+#endif // EDITOR
 	}
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::mat4) * transforms.size(), &transforms[0]);
-#ifdef _DEBUG
+#if EDITOR
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * transforms.size(), sizeof(int) * indexs.size(), &indexs[0]);
-#endif // _DEBUG
+#endif // EDITOR
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
@@ -64,11 +64,11 @@ void instance_container_t::construct_instance_buffers()
 	glVertexAttribDivisor(5, 1);
 	glVertexAttribDivisor(6, 1);
 
-#ifdef _DEBUG
+#if EDITOR
 	glEnableVertexAttribArray(7);
 	glVertexAttribIPointer(7, 1, GL_INT, sizeof(int), (void*)(sizeof(glm::mat4) * transforms.size()));
 	glVertexAttribDivisor(7, 1);
-#endif // _DEBUG
+#endif // EDITOR
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -80,6 +80,9 @@ void instance_container_t::construct_instance_buffers()
 
 void renderer_t::add_instance(std::string model_path, std::string texture_path, std::string shader_path, bool is_static, transform_t* transform, int index)
 {
+	// TODO: Instead of reconstructing buffer every time we add or remove one, we should
+	// allocate more than we need to reduce the number of glBufferData calls.
+	
 	model_instance_data_t data = {transform, index};
 
 	auto model = asset_manager_t::get().load_model_from_file(model_path);
@@ -102,6 +105,9 @@ void renderer_t::add_instance(std::string model_path, std::string texture_path, 
 	//
 	// It might be because one model is being used with multiple different textures and shaders.
 	// (Maybe....???)
+	//
+	// FIXED IT!!!!!
+	// (I just needed to redo the glVertexAttribPointer every frame after binding instance_vbo).
 
 	instance_container_t container;
 	container.model = model;
@@ -187,9 +193,9 @@ void renderer_t::init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	//SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(1);
 
-	projection_matrix = glm::perspective(glm::radians(45.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
+	projection_matrix = glm::perspective(glm::radians(60.0f), (float)screen_resolution_x / (float)screen_resolution_y, near_clip_plane, far_clip_plane);
 
 	// Set aspect ratio
 	glViewport(0, 0, screen_resolution_x, screen_resolution_y);
@@ -256,11 +262,11 @@ void renderer_t::draw()
 		glVertexAttribDivisor(5, 1);
 		glVertexAttribDivisor(6, 1);
 
-#ifdef _DEBUG
+#if EDITOR
 		glEnableVertexAttribArray(7);
 		glVertexAttribIPointer(7, 1, GL_INT, sizeof(int), (void*)(sizeof(glm::mat4) * container.instance_buffer_size));
 		glVertexAttribDivisor(7, 1);
-#endif // _DEBUG
+#endif // EDITOR
 		
 		// DRAW MESH
 		glDrawElementsInstanced(GL_TRIANGLES, container.model->indices.size(), GL_UNSIGNED_INT, 0, container.instance_buffer_size);
@@ -288,7 +294,7 @@ void renderer_t::set_resolution(int x, int y)
 void primitive_renderer_t::init()
 {
 	// Line
-	line_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug/debug_line.glsl");
+	line_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug_line.glsl");
 
 	glGenVertexArrays(1, &line_vao);
 	glBindVertexArray(line_vao);
@@ -298,9 +304,9 @@ void primitive_renderer_t::init()
 
 	glGenBuffers(1, &line_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
-
+	
 	// Quad
-	quad_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug/debug_quad.glsl");
+	quad_shader = asset_manager_t::get().load_shader_from_file("data/shaders/debug_quad.glsl");
 
 	glGenVertexArrays(1, &quad_vao);
 	glBindVertexArray(quad_vao);
@@ -329,7 +335,8 @@ void primitive_renderer_t::shutdown()
 
 void primitive_renderer_t::draw_line(const glm::vec3 p1, const glm::vec3 p2, const glm::vec3 colour) {
 	// SETUP STUFF
-	float vertices[] = {
+	float vertices[] =
+	{
 		p1.x, p1.y, p1.z,	// first point
 		p2.x, p2.y, p2.z	// second point
 	};
@@ -338,50 +345,44 @@ void primitive_renderer_t::draw_line(const glm::vec3 p1, const glm::vec3 p2, con
 	glBindBuffer(GL_ARRAY_BUFFER, line_vbo);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
 	glUseProgram(line_shader->id);
 
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_projection"), 1, false, glm::value_ptr(renderer_t::get().projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view"), 1, false, glm::value_ptr(renderer_t::get().view_matrix));
+	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
+	glUniformMatrix4fv(glGetUniformLocation(line_shader->id, "u_view_projection"), 1, false, glm::value_ptr(view_projection));
 
 	glUniform3fv(glGetUniformLocation(line_shader->id, "u_color"), 1, glm::value_ptr(colour));
 
 	glBindVertexArray(line_vao);
 	glDrawArrays(GL_LINES, 0, 2);
-	//line_draw_list.push_back(drawing);
 }
 
 void primitive_renderer_t::draw_box_wireframe(const glm::vec3 pos, const glm::vec3 size, const glm::vec3 colour) {
 	glm::vec3 new_pos = pos + -.5f;
-	draw_line(new_pos, { new_pos.x + size.x, new_pos.y, new_pos.z }, colour);
-	draw_line(new_pos, { new_pos.x, new_pos.y + size.y, new_pos.z }, colour);
-	draw_line(new_pos, { new_pos.x, new_pos.y, new_pos.z + size.z }, colour);
 
-	draw_line(new_pos + size, new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(new_pos + size, new_pos + size - glm::vec3(0, size.y, 0), colour);
-	draw_line(new_pos + size, new_pos + size - glm::vec3(0, 0, size.z), colour);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	draw_quad(new_pos, {new_pos.x + size.x, new_pos.y + size.y, new_pos.z},          colour);
+	draw_quad(new_pos, {new_pos.x 		  , new_pos.y + size.y, new_pos.z + size.z}, colour);
+	draw_quad({new_pos.x, new_pos.y + size.y, new_pos.z}, {new_pos.x + size.x, new_pos.y + size.y, new_pos.z + size.z}, colour);
 
-	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, 0, 0), colour);
-	draw_line(new_pos + glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, 0, size.z), colour);
+	draw_quad(new_pos + size, new_pos + size - glm::vec3(size.x, size.y, 0), colour);
+	draw_quad(new_pos + size, new_pos + size - glm::vec3(0, size.y, size.x), colour);
+	draw_quad(new_pos + size - glm::vec3(0, size.y, 0), new_pos, colour);
 
-	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(size.x, size.y, 0), colour);
-	draw_line(new_pos + size - glm::vec3(0, size.y, 0), new_pos + size - glm::vec3(0, size.y, size.z), colour);
-
-	draw_line(new_pos + glm::vec3(size.x, 0, 0), new_pos + glm::vec3(size.x, size.y, 0), colour);
-	draw_line(new_pos + glm::vec3(0, 0, size.z), new_pos + glm::vec3(0, size.y, size.z), colour);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void primitive_renderer_t::draw_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour) {
+void primitive_renderer_t::draw_quad(const glm::vec3 min, const glm::vec3 max, const glm::vec3 colour)
+{
 	// SETUP STUFF
 	float vertices[] =
 	{
-		 0.5f,  0.5f, // top right
-		 0.5f, -0.5f, // bottom right
-		-0.5f, -0.5f, // bottom left
-		-0.5f,  0.5f  // top left
+		max.x, max.y, max.z, // top right
+		max.x, min.y, max.z, // bottom right
+		min.x, min.y, min.z, // bottom left
+		min.x, max.y, min.z  // top left
 	};
 
 	glBindVertexArray(quad_vao);
@@ -389,7 +390,7 @@ void primitive_renderer_t::draw_quad(const glm::vec3 pos, const glm::vec3 rot, c
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), &vertices);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
 	unsigned int indices[] =
@@ -403,18 +404,9 @@ void primitive_renderer_t::draw_quad(const glm::vec3 pos, const glm::vec3 rot, c
 
 	glUseProgram(quad_shader->id);
 
-	auto model = glm::mat4(1.0f);
-	model = glm::translate(model, pos);
+	auto view_projection = renderer_t::get().projection_matrix * renderer_t::get().view_matrix;
 
-	model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1, 0, 0));
-	model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0, 1, 0));
-	model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0, 0, 1));
-
-	model = glm::scale(model, glm::vec3(scl, 0));
-
-	auto mvp = renderer_t::get().projection_matrix * renderer_t::get().view_matrix * model;
-
-	glUniformMatrix4fv(glGetUniformLocation(quad_shader->id, "u_mvp"), 1, false, glm::value_ptr(mvp));
+	glUniformMatrix4fv(glGetUniformLocation(quad_shader->id, "u_view_projection"), 1, false, glm::value_ptr(view_projection));
 
 	glUniform3fv(glGetUniformLocation(quad_shader->id, "u_color"), 1, glm::value_ptr(colour));
 
@@ -443,8 +435,7 @@ struct primitive_data
 
 	struct
 	{
-		glm::vec3 pos, rot;
-		glm::vec2 scl;
+		glm::vec3 min, max;
 	} quad;
 
 	glm::vec3 colour;
@@ -474,7 +465,7 @@ void primitive_renderer_t::draw()
 			draw_box_wireframe(primitive.wireframe_cube.pos, primitive.wireframe_cube.size, primitive.colour);
 			break;
 		case primitive_data_type::quad:
-			draw_quad(primitive.quad.pos, primitive.quad.rot, primitive.quad.scl, primitive.colour);
+			draw_quad(primitive.quad.min, primitive.quad.max, primitive.colour);
 			break;
 		}
 
@@ -500,12 +491,11 @@ void primitive_renderer_t::add_wireframe_cube(const glm::vec3 pos, const glm::ve
 	primitive_draw_stack.push(data);
 }
 
-void primitive_renderer_t::add_quad(const glm::vec3 pos, const glm::vec3 rot, const glm::vec2 scl, const glm::vec3 colour)
+void primitive_renderer_t::add_quad(const glm::vec3 min, const glm::vec3 max, const glm::vec3 colour)
 {
 	auto data = primitive_data::new_primitive_data(primitive_data_type::quad);
-	data.quad.pos = pos;
-	data.quad.rot = rot;
-	data.quad.scl = scl;
+	data.quad.min = min;
+	data.quad.max = max;
 	data.colour = colour;
 	primitive_draw_stack.push(data);
 }

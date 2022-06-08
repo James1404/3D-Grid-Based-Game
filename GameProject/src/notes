@@ -1,2 +1,27 @@
 replace entity_t with raw structs.
 instead of using entity_t and what now. in functions just pass the values that are needed.
+
+doors are portals, which load the each chunk based on its portal offset.
+
+portal min and max:
+{
+	min: 8 7 -13
+	max: 8 7 2
+}
+
+add block generator for cubes, circles, spheres, triangles and create blocks from a heightmap.
+
+have one world and segment it into chunk sections on init, this will simplify world editing
+bacause you wont have to select the current entity or whatever.
+
+----MACROS---
+
+------- DEBUG
+_DEBUG
+_CONSOLE
+%(PreprocessorDefinitions)
+
+------- RELEASE
+NDEBUG
+_CONSOLE
+%(PreprocessorDefinitions)
